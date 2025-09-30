@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/main.astro';
+import type { MarkdownInstance } from 'astro';
+
+type PostFrontmatter = {
+    title: string;
+    author?: string;
+    date?: string;
+};
+const posts = Object.values(
+    import.meta.glob<MarkdownInstance<PostFrontmatter>>('../posts/*.md', {
+        eager: true,
+    })
+);
+
+const postsList = posts.filter(Boolean);
+const [featuredPost] = postsList;
+---
+<Layout>
+    <h1></h1>
+    {featuredPost && (
+        <>
+            <h1>{featuredPost.frontmatter.title}</h1>
+            <p>作者：{featuredPost.frontmatter.author ?? '佚名'}</p>
+        </>
+    )}
+
+    <section>
+        <h2>标签归档</h2>
+        <ul>
+            {postsList.map((post) => {
+                const href = post.url ?? '#';
+                return (
+                    <li>
+                        <a href={href}>{post.frontmatter.title}</a>
+                    </li>
+                );
+            })}
+        </ul>
+    </section>
+</Layout>

@@ -1,0 +1,35 @@
+---
+import "../styles/layout.css";
+import Header from "../components/header.astro";
+import Footer from "../components/footer.astro";
+---
+
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>MyBlog</title>
+    </head>
+    <body>
+        <div class="layout">
+            <aside class="column column--left">
+                <slot name="left" />
+            </aside>
+            <main class="column column--center">
+                <Header />
+                <div class="column-body">
+                    <slot name="middle" />
+                    <slot />
+                </div>
+                <Footer />
+            </main>
+            <aside class="column column--right">
+                <slot name="right" />
+            </aside>
+        </div>
+    </body>
+</html>
