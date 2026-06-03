@@ -1,46 +1,37 @@
-# Astro Starter Kit: Basics
+# dev-portfolio
+
+Astro portfolio/blog site based on the Dante Astro theme.
+
+## Local Commands
 
 ```sh
-npm create astro@latest -- --template basics
+npm install
+npm run dev
+npm run build
+npm run preview
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The local dev server defaults to `http://127.0.0.1:4321/`.
 
-## 🚀 Project Structure
+## Theme Customization
 
-Inside of your Astro project, you'll see the following folders and files:
+- Site-wide config: `src/data/site-config.ts`
+- Blog posts: `src/content/blog/`
+- Projects: `src/content/projects/`
+- Static files: `public/`
+- Global styles: `src/styles/global.css`
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+## Credits
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+This site is based on the Dante Astro theme by Just Good UI.
 
-## 🧞 Commands
+- Original theme: https://github.com/JustGoodUI/dante-astro-theme
+- Original author: Just Good UI
+- License: GPL-3.0
 
-All commands are run from the root of the project, from a terminal:
+The theme has been modified for this personal portfolio/blog.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## License
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Dante is licensed under GPL-3.0. A copy is included as `LICENSE.dante-gpl-3.0`.
+This project is based on Dante, so distributed source should preserve the original credits and GPL-3.0 license notice.
