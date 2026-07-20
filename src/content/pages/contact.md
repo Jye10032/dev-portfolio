@@ -1,14 +1,16 @@
 ---
-title: Get in touch
+title: 联系
 seo:
-  title: Contact
-  description: Get in touch through email or social media! Let me know how I can help.
+  title: 联系方式 - misaka.design
+  description: 通过邮件或社交媒体与 misaka 取得联系，交流想法与反馈
 ---
 
-Thank you for reaching out! Whether you have a question, a suggestion, or just want to share your thoughts, I'm all ears. Feel free to get in touch through any of the methods below:
+感谢你的来访！如果你有任何问题、建议，或者只是想聊聊，欢迎通过以下方式联系我：
 
-_Email:_
-Feel free to drop me an email at [example@example.com](mailto:example@example.com), and I'll do my best to respond as soon as possible.
+**邮件：**
+[hello@misaka.design](mailto:hello@misaka.design)
 
-_Social Media:_
-Connect with me on social media as well. Find me on [Twitter](https://twitter.com) or [LinkedIn](https://www.linkedin.com/).
+**社交媒体：**
+[GitHub](https://github.com/) · [Twitter](https://twitter.com/)
+
+我会尽快回复你的消息。

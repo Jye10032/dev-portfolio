@@ -6,7 +6,7 @@ import PostPreview from '../../components/PostPreview.astro';
 import Subscribe from '../../components/Subscribe.astro';
 import siteConfig from '../../data/site-config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { sortItemsByDateDesc } from '../../utils/data-utils';
+import { getPostsByType, sortItemsByDateDesc } from '../../utils/data-utils';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
     const posts = (await getCollection('blog')).sort(sortItemsByDateDesc);
@@ -17,11 +17,54 @@ type Props = { page: Page<CollectionEntry<'blog'>> };
 
 const { page } = Astro.props;
 const blog = page.data;
+
+const filter = Astro.url.searchParams.get('type') || 'all';
+const filteredPosts = getPostsByType(blog, filter as 'article' | 'note' | 'all');
 ---
 
-<BaseLayout title="Blog" description="Embark on a journey of personal insights and experiences through my blog" showHeader={false}>
-    <h1 class="mb-12 font-serif text-2xl leading-tight italic sm:mb-16 sm:text-4xl">Blog Archive</h1>
-    {blog.map((post) => <PostPreview post={post} class="mb-10 sm:mb-12" />)}
+<BaseLayout title="写作" description="所有文章与札记" showHeader={false}>
+    <div class="mb-12 sm:mb-16">
+        <h1 class="font-serif text-2xl leading-tight italic sm:text-4xl mb-8">写作</h1>
+
+        <!-- 类型筛选 -->
+        <div class="flex gap-4 text-sm">
+            <a
+                href="/blog"
+                class:list={[
+                    'px-3 py-1.5 rounded-full border transition-colors',
+                    filter === 'all'
+                        ? 'bg-main text-bg-main border-main'
+                        : 'border-main/20 hover:border-main/40'
+                ]}
+            >
+                全部
+            </a>
+            <a
+                href="/blog?type=article"
+                class:list={[
+                    'px-3 py-1.5 rounded-full border transition-colors',
+                    filter === 'article'
+                        ? 'bg-main text-bg-main border-main'
+                        : 'border-main/20 hover:border-main/40'
+                ]}
+            >
+                长文
+            </a>
+            <a
+                href="/blog?type=note"
+                class:list={[
+                    'px-3 py-1.5 rounded-full border transition-colors',
+                    filter === 'note'
+                        ? 'bg-main text-bg-main border-main'
+                        : 'border-main/20 hover:border-main/40'
+                ]}
+            >
+                札记
+            </a>
+        </div>
+    </div>
+
+    {filteredPosts.map((post) => <PostPreview post={post} class="mb-10 sm:mb-12" />)}
     <Pagination page={page} class="my-16 sm:my-24" />
     <Subscribe class="my-16 sm:my-24" />
 </BaseLayout>

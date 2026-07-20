@@ -25,22 +25,40 @@ type Props = { post: CollectionEntry<'blog'>; prevPost: CollectionEntry<'blog'>;
 
 const { href } = Astro.url;
 const { post, prevPost, nextPost } = Astro.props;
-const { title, publishDate, updatedDate, excerpt, tags = [], seo } = post.data;
+const { title, publishDate, updatedDate, excerpt, tags = [], seo, type, readingTime } = post.data;
 const { Content } = await render(post);
+const typeLabel = type === 'article' ? '长文' : '札记';
 ---
 
 <BaseLayout title={seo?.title ?? title} description={seo?.description ?? excerpt} image={seo?.image} pageType="article" showHeader={false}>
+    <!-- 阅读进度条 - 仅长文显示 -->
+    {type === 'article' && (
+        <div class="fixed top-0 left-0 w-full h-0.5 bg-muted z-50">
+            <div id="reading-progress" class="h-full bg-accent transition-all duration-150" style="width: 0%"></div>
+        </div>
+    )}
+
     <article class="mb-16 sm:mb-24">
         <header class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-xs text-main/60 border border-main/20 rounded px-2 py-1">
+                    {typeLabel}
+                </span>
+                {readingTime && (
+                    <span class="text-xs text-main/60">
+                        约 {readingTime} 分钟
+                    </span>
+                )}
+            </div>
             <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight">{title}</h1>
-            <div class="mt-4 text-sm">
+            <div class="mt-4 text-sm text-main/70">
                 <FormattedDate date={publishDate} />
                 {
                     updatedDate && (
                         <>
                             {' '}
                             <span>
-                                (Updated on <FormattedDate date={updatedDate} />)
+                                (更新于 <FormattedDate date={updatedDate} />)
                             </span>
                         </>
                     )
@@ -55,20 +73,20 @@ const { Content } = await render(post);
                 tags.length > 0 && (
                     <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
                         {tags.map((tag) => (
-                            <a class="text-main hover:underline" href={`/tags/${slugify(tag)}`}>
+                            <a class="text-accent hover:underline" href={`/tags/${slugify(tag)}`}>
                                 #{tag}
                             </a>
                         ))}
                     </div>
                 )
             }
-            <Button class="copy-url-button" aria-label="Copy link" data-url={href} data-tooltip-default="Copy link" data-tooltip-success="Copied">Share</Button>
+            <Button class="copy-url-button" aria-label="复制链接" data-url={href} data-tooltip-default="复制链接" data-tooltip-success="已复制">分享</Button>
         </div>
     </article>
     {
         (prevPost || nextPost) && (
             <div class="my-16 sm:my-24">
-                <h2 class="mb-12 font-serif text-xl italic sm:mb-16 sm:text-2xl">Read Next</h2>
+                <h2 class="mb-12 font-serif text-xl italic sm:mb-16 sm:text-2xl">继续阅读</h2>
                 {nextPost && <PostPreview post={nextPost} class="mb-10 sm:mb-12" headingLevel="h3" />}
                 {prevPost && <PostPreview post={prevPost} class="mb-10 sm:mb-12" headingLevel="h3" />}
             </div>
@@ -79,6 +97,20 @@ const { Content } = await render(post);
 
 <script>
     document.addEventListener('astro:page-load', () => {
+        // 阅读进度条
+        const progressBar = document.getElementById('reading-progress');
+        if (progressBar) {
+            const updateProgress = () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = (scrollTop / docHeight) * 100;
+                progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+            };
+            window.addEventListener('scroll', updateProgress, { passive: true });
+            updateProgress();
+        }
+
+        // 复制链接按钮
         const copyUrlButton = document.querySelector('.copy-url-button') as HTMLButtonElement;
         copyUrlButton?.addEventListener('click', async () => {
             await copyUrl(copyUrlButton);
@@ -90,7 +122,7 @@ const { Content } = await render(post);
 
             await navigator.clipboard.writeText(url);
 
-            button.innerText = 'Copied';
+            button.innerText = '已复制';
 
             setTimeout(() => {
                 button.innerText = label;

@@ -6,49 +6,21 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-    --text-main: #171717;
-    --bg-main: #f2f1ec;
-    --bg-muted: #eae9e1;
-    --border-main: #171717;
+    --text-main: #1a1a1a;
+    --bg-main: #faf9f7;
+    --bg-muted: #f0efeb;
+    --border-main: #1a1a1a;
+    --accent: #0066ff;
+    --accent-muted: #0052cc;
 }
 html.dark {
-    --text-main: #f2f1ec;
-    --bg-main: #171717;
-    --bg-muted: #242424;
-    --border-main: #f2f1ec;
+    --text-main: #e8e6e3;
+    --bg-main: #1a1a1a;
+    --bg-muted: #2a2a2a;
+    --border-main: #e8e6e3;
+    --accent: #4d94ff;
+    --accent-muted: #80b3ff;
 }
-
-/* Cyan */
-/*
-:root {
-    --text-main: #162a2b;
-    --bg-main: #d6e0e2;
-    --bg-muted: #ccd8db;
-    --border-main: #162a2b;
-}
-html.dark {
-    --text-main: #d6e0e2;
-    --bg-main: #162a2b;
-    --bg-muted: #1c3537;
-    --border-main: #d6e0e2;
-}
-*/
-
-/* Green */
-/*
-:root {
-    --text-main: #3a4238;
-    --bg-main: #f3efe6;
-    --bg-muted: #eee9dc;
-    --border-main: #3a4238;
-}
-html.dark {
-    --text-main: #f3efe6;
-    --bg-main: #5e6c5b;
-    --bg-muted: #596756;
-    --border-main: #f3efe6;
-}
-*/
 
 @theme inline {
     --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
@@ -56,9 +28,32 @@ html.dark {
     --font-serif: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
         'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif;
     --text-color-main: var(--text-main);
+    --text-color-accent: var(--accent);
+    --text-color-accent-muted: var(--accent-muted);
     --background-color-main: var(--bg-main);
     --background-color-muted: var(--bg-muted);
     --border-color-main: var(--border-main);
+}
+
+@layer base {
+    html {
+        @apply antialiased;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        @apply bg-main text-main;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        letter-spacing: 0.01em;
+        line-height: 1.7;
+    }
+
+    ::selection {
+        background-color: var(--accent);
+        color: white;
+    }
 }
 
 @layer utilities {
@@ -66,7 +61,7 @@ html.dark {
         --tw-prose-body: var(--text-color-main);
         --tw-prose-headings: var(--text-color-main);
         --tw-prose-lead: var(--text-color-main);
-        --tw-prose-links: var(--text-color-main);
+        --tw-prose-links: var(--text-color-accent);
         --tw-prose-bold: var(--text-color-main);
         --tw-prose-counters: var(--text-color-main);
         --tw-prose-bullets: var(--text-color-main);
@@ -81,11 +76,20 @@ html.dark {
     }
 
     .prose a {
-        @apply underline font-normal decoration-1 underline-offset-2 decoration-dashed hover:decoration-solid;
+        @apply underline font-normal decoration-1 underline-offset-2 decoration-dashed;
+        text-decoration-color: var(--accent);
+        transition: text-decoration-color 0.2s ease, text-underline-offset 0.2s ease;
+    }
+
+    .prose a:hover {
+        @apply decoration-solid;
+        text-decoration-color: var(--accent-muted);
+        text-underline-offset: 4px;
     }
 
     .prose :where(h1, h2, h3, h4, h5, h6) {
         @apply font-serif font-medium;
+        letter-spacing: -0.01em;
     }
 
     .prose :where(code, strong) {
@@ -94,5 +98,40 @@ html.dark {
 
     .prose blockquote {
         @apply font-serif font-normal italic border-none pl-0 text-[1.375em] leading-snug sm:text-[1.66667em];
+    }
+
+    .link-underline {
+        @apply underline decoration-1 underline-offset-2 decoration-dashed;
+        text-decoration-color: var(--accent);
+        transition: text-decoration-color 0.2s ease, text-underline-offset 0.2s ease;
+    }
+
+    .link-underline:hover {
+        @apply decoration-solid;
+        text-decoration-color: var(--accent-muted);
+        text-underline-offset: 4px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .theme-transition,
+    .theme-transition *,
+    .theme-transition *::before,
+    .theme-transition *::after {
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease !important;
     }
 }

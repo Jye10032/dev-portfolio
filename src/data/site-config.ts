@@ -3,86 +3,74 @@ import hero from '../assets/images/hero.jpg';
 import type { SiteConfig } from '../types';
 
 const siteConfig: SiteConfig = {
-    website: 'https://example.com',
+    website: 'https://misaka.design',
     avatar: {
         src: avatar,
-        alt: 'Ethan Donovan'
+        alt: 'misaka'
     },
-    title: 'Dante',
-    subtitle: 'Minimal Astro.js theme',
-    description: 'Astro.js and Tailwind CSS theme for blog and portfolio by justgoodui.com',
+    title: 'misaka.design',
+    subtitle: '写作与思考',
+    description: '一个关于设计、技术与生活的中文写作空间',
     image: {
         src: '/dante-preview.jpg',
-        alt: 'Dante - Astro.js and Tailwind CSS theme'
+        alt: 'misaka.design - 中文写作空间'
     },
     headerNavLinks: [
         {
-            text: 'Home',
+            text: '首页',
             href: '/'
         },
         {
-            text: 'Projects',
-            href: '/projects'
-        },
-        {
-            text: 'Blog',
+            text: '写作',
             href: '/blog'
         },
         {
-            text: 'Tags',
+            text: '主题',
             href: '/tags'
         }
     ],
     footerNavLinks: [
         {
-            text: 'About',
+            text: '关于',
             href: '/about'
         },
         {
-            text: 'Contact',
+            text: '联系',
             href: '/contact'
-        },
-        {
-            text: 'Terms',
-            href: '/terms'
-        },
-        {
-            text: 'Download theme',
-            href: 'https://github.com/JustGoodUI/dante-astro-theme'
         }
     ],
     socialLinks: [
         {
-            text: 'Dribbble',
-            href: 'https://dribbble.com/'
+            text: 'GitHub',
+            href: 'https://github.com/'
         },
         {
-            text: 'Instagram',
-            href: 'https://instagram.com/'
-        },
-        {
-            text: 'X/Twitter',
+            text: 'Twitter',
             href: 'https://twitter.com/'
         }
     ],
     hero: {
-        title: 'Hi There & Welcome to My Corner of the Web!',
-        text: "I'm **Ethan Donovan**, a web developer at Amazing Studio, dedicated to the realms of collaboration and artificial intelligence.\nMy approach involves embracing intuition, conducting just enough research, and leveraging aesthetics as a catalyst for exceptional products.\nI have a profound appreciation for top-notch software, visual design, and the principles of product-led growth.\n\nFeel free to explore some of my coding endeavors on [GitHub](https://github.com/JustGoodUI/dante-astro-theme) or follow me on [Twitter/X](https://twitter.com/justgoodui).",
+        title: '记录与思考',
+        text: '在这里，我分享关于设计、技术与生活的观察与想法。\n\n写作是一种梳理，也是一种对话。',
         image: {
             src: hero,
-            alt: 'A person sitting at a desk in front of a computer'
+            alt: 'misaka 的写作空间'
         },
         actions: [
             {
-                text: 'Get in Touch',
-                href: '/contact'
+                text: '开始阅读',
+                href: '/blog'
             }
         ]
     },
+    homeIntro: {
+        lead: '写作是一种梳理，也是一种对话。',
+        text: '在这里，我分享关于设计、技术与生活的观察与想法。'
+    },
     subscribe: {
         enabled: true,
-        title: 'Subscribe to Dante Newsletter',
-        text: 'One update per week. All the latest posts directly in your inbox.',
+        title: '订阅更新',
+        text: '每周一封，获取最新文章。',
         form: {
             action: '#'
         }

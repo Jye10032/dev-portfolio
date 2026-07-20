@@ -16,6 +16,11 @@ export type Hero = {
     actions?: Link[];
 };
 
+export type HomeIntro = {
+    lead?: string;
+    text?: string;
+};
+
 export type SubscribeForm = {
     action: string;
     emailFieldName?: string;
@@ -41,6 +46,7 @@ export type SiteConfig = {
     footerNavLinks?: Link[];
     socialLinks?: Link[];
     hero?: Hero;
+    homeIntro?: HomeIntro;
     subscribe?: Subscribe;
     postsPerPage?: number;
     projectsPerPage?: number;
