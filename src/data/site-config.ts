@@ -1,20 +1,15 @@
 import avatar from '../assets/images/avatar.jpg';
-import hero from '../assets/images/hero.jpg';
 import type { SiteConfig } from '../types';
 
 const siteConfig: SiteConfig = {
     website: 'https://misaka.design',
     avatar: {
         src: avatar,
-        alt: 'misaka'
+        alt: 'misaka.design'
     },
     title: 'misaka.design',
-    subtitle: '写作与思考',
-    description: '一个关于设计、技术与生活的中文写作空间',
-    image: {
-        src: '/dante-preview.jpg',
-        alt: 'misaka.design - 中文写作空间'
-    },
+    subtitle: '设计、AI 与持续成长',
+    description: '关于设计、AI，以及一个前端工程师如何持续成长。',
     headerNavLinks: [
         {
             text: '首页',
@@ -27,6 +22,10 @@ const siteConfig: SiteConfig = {
         {
             text: '主题',
             href: '/tags'
+        },
+        {
+            text: '便利贴墙',
+            href: '/wall'
         }
     ],
     footerNavLinks: [
@@ -41,39 +40,16 @@ const siteConfig: SiteConfig = {
     ],
     socialLinks: [
         {
-            text: 'GitHub',
-            href: 'https://github.com/'
-        },
-        {
-            text: 'Twitter',
-            href: 'https://twitter.com/'
+            text: 'RSS',
+            href: '/rss.xml'
         }
     ],
-    hero: {
-        title: '记录与思考',
-        text: '在这里，我分享关于设计、技术与生活的观察与想法。\n\n写作是一种梳理，也是一种对话。',
-        image: {
-            src: hero,
-            alt: 'misaka 的写作空间'
-        },
-        actions: [
-            {
-                text: '开始阅读',
-                href: '/blog'
-            }
-        ]
-    },
     homeIntro: {
-        lead: '写作是一种梳理，也是一种对话。',
-        text: '在这里，我分享关于设计、技术与生活的观察与想法。'
+        lead: '关于设计、AI，以及一个前端工程师如何持续成长。',
+        text: '这里先以中文写作为主，记录长文、札记和持续生长中的思考脉络。'
     },
     subscribe: {
-        enabled: true,
-        title: '订阅更新',
-        text: '每周一封，获取最新文章。',
-        form: {
-            action: '#'
-        }
+        enabled: false
     },
     postsPerPage: 8,
     projectsPerPage: 8

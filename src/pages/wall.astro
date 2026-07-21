@@ -1,0 +1,27 @@
+---
+import WallCanvas from '../components/wall/WallCanvas.astro';
+import WallPanel from '../components/wall/WallPanel.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout wide title="便利贴墙" description="灵感、碎片与实验的落脚点。">
+    <section class="mb-8 sm:mb-10">
+        <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight mb-4">便利贴墙</h1>
+        <p class="text-lg text-main/80 leading-relaxed">灵感、碎片与实验的落脚点。</p>
+    </section>
+    <div id="wall-root" class="relative">
+        <WallCanvas />
+        <WallPanel />
+    </div>
+</BaseLayout>
+
+<script>
+    import { initWall } from '../utils/wall/wall-app';
+
+    function setup() {
+        const root = document.getElementById('wall-root');
+        if (root) initWall(root);
+    }
+
+    document.addEventListener('astro:page-load', setup);
+</script>

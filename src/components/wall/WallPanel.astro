@@ -1,0 +1,206 @@
+---
+import { NOTE_COLORS, NOTE_ICONS, NOTE_SIZES, NOTE_STYLES } from '../../utils/wall/types';
+
+const styleLabels: Record<string, string> = {
+    plain: '空白',
+    lined: '横线',
+    grid: '方格',
+    taped: '胶带'
+};
+
+const sizeLabels: Record<string, string> = {
+    sm: '小',
+    md: '中',
+    lg: '大'
+};
+---
+
+<aside class="wall-panel" aria-label="便签属性面板" hidden>
+    <div class="wall-panel__card rounded-lg border border-main/10 bg-main p-4 shadow-lg">
+        <p class="wall-panel__hint mb-3 text-sm text-main/60">未选中便签</p>
+
+        <div class="mb-4">
+            <p class="mb-1.5 text-xs text-main/50">颜色</p>
+            <div class="flex flex-wrap gap-2">
+                {
+                    NOTE_COLORS.map((color) => (
+                        <button
+                            type="button"
+                            class="wall-panel__swatch h-6 w-6 rounded-full border border-main/15 transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+                            data-color={color}
+                            aria-label={`颜色 ${color}`}
+                        />
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <p class="mb-1.5 text-xs text-main/50">样式</p>
+            <div class="flex flex-wrap gap-1.5">
+                {
+                    NOTE_STYLES.map((style) => (
+                        <button
+                            type="button"
+                            class="wall-panel__chip rounded border border-main/15 px-2 py-1 text-xs text-main/70 transition-colors hover:border-(--accent) hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+                            data-style={style}
+                        >
+                            {styleLabels[style]}
+                        </button>
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <p class="mb-1.5 text-xs text-main/50">尺寸</p>
+            <div class="flex overflow-hidden rounded border border-main/15">
+                {
+                    NOTE_SIZES.map((size) => (
+                        <button
+                            type="button"
+                            class="wall-panel__seg flex-1 px-2 py-1 text-xs text-main/70 transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-(--accent)"
+                            data-size={size}
+                        >
+                            {sizeLabels[size]}
+                        </button>
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <p class="mb-1.5 text-xs text-main/50">角标</p>
+            <div class="grid grid-cols-7 gap-1">
+                {
+                    NOTE_ICONS.map((icon) => (
+                        <button
+                            type="button"
+                            class="wall-panel__icon rounded px-1 py-0.5 text-base leading-none transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--accent)"
+                            data-icon={icon}
+                            aria-label={`角标 ${icon}`}
+                        >
+                            {icon}
+                        </button>
+                    ))
+                }
+                <button
+                    type="button"
+                    class="wall-panel__icon rounded px-1 py-0.5 text-xs text-main/50 transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--accent)"
+                    data-icon=""
+                    aria-label="清除角标"
+                >
+                    无
+                </button>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <button
+                type="button"
+                class="wall-panel__action flex-1 rounded border border-main/15 px-2 py-1.5 text-sm text-main/70 transition-colors hover:border-(--accent) hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+                data-action="duplicate"
+            >
+                复制
+            </button>
+            <button
+                type="button"
+                class="wall-panel__action flex-1 rounded border border-main/15 px-2 py-1.5 text-sm text-main/70 transition-colors hover:border-red-500 hover:text-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+                data-action="delete"
+            >
+                删除
+            </button>
+        </div>
+    </div>
+</aside>
+
+<style>
+    /* 桌面端:右侧垂直居中浮出面板 */
+    .wall-panel {
+        position: fixed;
+        top: 50%;
+        right: 1rem;
+        width: 15rem;
+        z-index: 40;
+        transform: translateY(-50%) translateX(calc(100% + 2rem));
+        opacity: 0;
+        transition:
+            transform 0.25s ease,
+            opacity 0.25s ease;
+        pointer-events: none;
+    }
+
+    .wall-panel--open {
+        transform: translateY(-50%) translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* 移动端:底部抽屉 */
+    @media (max-width: 767px) {
+        .wall-panel {
+            top: auto;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: auto;
+            transform: translateY(100%);
+        }
+
+        .wall-panel--open {
+            transform: translateY(0);
+        }
+
+        .wall-panel__card {
+            border-radius: 0.75rem 0.75rem 0 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .wall-panel {
+            transition: none;
+        }
+    }
+
+    /* 颜色圆点与便签共用同一组 CSS 变量 */
+    .wall-panel__swatch[data-color='yellow'] {
+        background-color: var(--note-yellow);
+    }
+
+    .wall-panel__swatch[data-color='mint'] {
+        background-color: var(--note-mint);
+    }
+
+    .wall-panel__swatch[data-color='blue'] {
+        background-color: var(--note-blue);
+    }
+
+    .wall-panel__swatch[data-color='coral'] {
+        background-color: var(--note-coral);
+    }
+
+    .wall-panel__swatch[data-color='lavender'] {
+        background-color: var(--note-lavender);
+    }
+
+    .wall-panel__swatch[data-color='cream'] {
+        background-color: var(--note-cream);
+    }
+
+    /* 当前值高亮 */
+    .wall-panel__swatch.is-active {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    .wall-panel__chip.is-active,
+    .wall-panel__seg.is-active,
+    .wall-panel__icon.is-active {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .wall-panel__seg.is-active {
+        background-color: var(--bg-muted);
+    }
+</style>

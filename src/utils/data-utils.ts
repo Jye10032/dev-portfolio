@@ -33,15 +33,16 @@ export function isNote(post: CollectionEntry<'blog'>): boolean {
 }
 
 export function getFeaturedArticle(posts: CollectionEntry<'blog'>[]): CollectionEntry<'blog'> | undefined {
-    const featured = posts.filter((post) => post.data.isFeatured && isArticle(post));
-    return featured.sort(sortItemsByDateDesc)[0];
+    const articles = posts.filter(isArticle);
+    const featured = articles.filter((post) => post.data.isFeatured);
+    return [...featured].sort(sortItemsByDateDesc)[0] ?? [...articles].sort(sortItemsByDateDesc)[0];
 }
 
 export function getPostsByType(posts: CollectionEntry<'blog'>[], type: 'article' | 'note' | 'all' = 'all'): CollectionEntry<'blog'>[] {
-    if (type === 'all') return posts.sort(sortItemsByDateDesc);
+    if (type === 'all') return [...posts].sort(sortItemsByDateDesc);
     return posts.filter((post) => post.data.type === type).sort(sortItemsByDateDesc);
 }
 
 export function getLatestPosts(posts: CollectionEntry<'blog'>[], count: number = 5): CollectionEntry<'blog'>[] {
-    return posts.sort(sortItemsByDateDesc).slice(0, count);
+    return [...posts].sort(sortItemsByDateDesc).slice(0, count);
 }

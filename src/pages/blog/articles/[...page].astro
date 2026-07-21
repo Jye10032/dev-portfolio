@@ -1,0 +1,36 @@
+---
+import type { GetStaticPathsOptions, Page } from 'astro';
+import { type CollectionEntry, getCollection } from 'astro:content';
+import Pagination from '../../../components/Pagination.astro';
+import PostPreview from '../../../components/PostPreview.astro';
+import Subscribe from '../../../components/Subscribe.astro';
+import siteConfig from '../../../data/site-config';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getPostsByType, sortItemsByDateDesc } from '../../../utils/data-utils';
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+    const posts = getPostsByType((await getCollection('blog')).sort(sortItemsByDateDesc), 'article');
+    return paginate(posts, { pageSize: siteConfig.postsPerPage || 4 });
+}
+
+type Props = { page: Page<CollectionEntry<'blog'>> };
+
+const { page } = Astro.props;
+const blog = page.data;
+---
+
+<BaseLayout title="写作 - 长文" description="所有长文" showHeader={false}>
+    <div class="mb-12 sm:mb-16">
+        <h1 class="font-serif text-2xl leading-tight italic sm:text-4xl mb-8">写作</h1>
+
+        <div class="flex gap-4 text-sm">
+            <a href="/blog" class="px-3 py-1.5 rounded-full border transition-colors border-main/20 hover:border-main/40">全部</a>
+            <a href="/blog/articles" class="px-3 py-1.5 rounded-full border transition-colors bg-main text-bg-main border-main">长文</a>
+            <a href="/blog/notes" class="px-3 py-1.5 rounded-full border transition-colors border-main/20 hover:border-main/40">札记</a>
+        </div>
+    </div>
+
+    {blog.map((post) => <PostPreview post={post} class="mb-10 sm:mb-12" />)}
+    <Pagination page={page} class="my-16 sm:my-24" />
+    <Subscribe class="my-16 sm:my-24" />
+</BaseLayout>

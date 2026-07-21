@@ -2,15 +2,13 @@
 title: 联系
 seo:
   title: 联系方式 - misaka.design
-  description: 通过邮件或社交媒体与 misaka 取得联系，交流想法与反馈
+  description: 当前站点暂未公开固定联系方式，后续会在这里补充真实可用的联系渠道
 ---
 
-感谢你的来访！如果你有任何问题、建议，或者只是想聊聊，欢迎通过以下方式联系我：
+感谢你的来访。
 
-**邮件：**
-[hello@misaka.design](mailto:hello@misaka.design)
+这个站点还在持续整理中，目前暂未公开固定邮箱或社交账号。
 
-**社交媒体：**
-[GitHub](https://github.com/) · [Twitter](https://twitter.com/)
+等真实可用的联系渠道确认后，我会在这里补充。
 
-我会尽快回复你的消息。
+如果你只是想跟进新内容，现在可以先通过 [RSS](/rss.xml) 订阅更新。

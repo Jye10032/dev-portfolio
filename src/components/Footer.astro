@@ -4,6 +4,10 @@ import siteConfig from '../data/site-config';
 const socialLinks = siteConfig.socialLinks ?? [];
 const navLinks = siteConfig.footerNavLinks ?? [];
 const currentYear = new Date().getFullYear();
+
+function isExternalLink(href: string) {
+    return /^https?:///.test(href);
+}
 ---
 
 <footer class="mx-auto w-full max-w-3xl pt-12 pb-10 sm:pt-24 sm:pb-14">
@@ -31,8 +35,8 @@ const currentYear = new Date().getFullYear();
                         <a
                             class="inline-flex items-center justify-center text-sm hover:underline hover:underline-offset-2"
                             href={link.href}
-                            target="_blank"
-                            rel="noopener noreferer"
+                            target={isExternalLink(link.href) ? '_blank' : undefined}
+                            rel={isExternalLink(link.href) ? 'noopener noreferrer' : undefined}
                         >
                             {link.text}
                         </a>
@@ -42,7 +46,7 @@ const currentYear = new Date().getFullYear();
         }
         <p class="text-sm">
             &copy; {currentYear}
-            <a class="hover:underline hover:underline-offset-2" href="/">{siteConfig.title}</a>. All rights reserved.
+            <a class="hover:underline hover:underline-offset-2" href="/">{siteConfig.title}</a>。持续更新中。
         </p>
     </div>
 </footer>

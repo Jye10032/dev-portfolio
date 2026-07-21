@@ -6,7 +6,7 @@ type Props = { class?: string };
 
 const { class: className } = Astro.props;
 const subscribe = siteConfig.subscribe;
-if (!subscribe?.enabled || !subscribe?.form?.action) {
+if (!subscribe?.enabled || !subscribe?.form?.action || subscribe.form.action === '#') {
     return;
 }
 ---
