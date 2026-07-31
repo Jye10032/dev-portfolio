@@ -1,0 +1,19 @@
+---
+import type { HomeStoryScene } from '../../data/home-story';
+import HomeStoryStage from './HomeStoryStage.astro';
+
+type Props = {
+    scene: HomeStoryScene;
+};
+
+const { scene } = Astro.props;
+---
+
+<section class="home-scene" data-home-story-scene={scene.id} aria-labelledby={`home-scene-${scene.id}`}>
+    <div class="home-scene__mobile-stage">
+        <HomeStoryStage inline scene={scene} />
+    </div>
+    <p class="home-scene__eyebrow">{scene.eyebrow}</p>
+    <h2 id={`home-scene-${scene.id}`} class="home-scene__title">{scene.title}</h2>
+    <div class="home-scene__content"><slot /></div>
+</section>

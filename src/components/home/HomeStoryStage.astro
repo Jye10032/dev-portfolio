@@ -1,0 +1,27 @@
+---
+import type { HomeStoryScene } from '../../data/home-story';
+
+type Props = {
+    inline?: boolean;
+    scene?: HomeStoryScene;
+};
+
+const { inline = false, scene } = Astro.props;
+---
+
+<div class:list={['home-stage', inline && 'home-stage--inline']} data-home-stage aria-live={inline ? undefined : 'polite'}>
+    <div class="home-stage__terminal" aria-hidden={inline ? undefined : 'true'}>
+        <div class="home-stage__paper">
+            <div class="home-stage__chrome" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </div>
+            <p class="home-stage__prompt">
+                <span class="home-stage__chevron" aria-hidden="true">›</span>
+                <span data-home-command>{scene?.command}</span>
+            </p>
+            <p class="home-stage__status" data-home-status>{scene?.response}</p>
+            <span class="home-stage__caret" aria-hidden="true"></span>
+            <div class="home-stage__seal" aria-hidden="true">御坂</div>
+        </div>
+    </div>
+</div>

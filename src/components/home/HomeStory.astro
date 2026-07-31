@@ -1,0 +1,141 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { HomeNowItem, ImageInput } from '../../types';
+import { HOME_GROWTH_STATES, HOME_INTERESTS, HOME_STORY_SCENES } from '../../data/home-story';
+import CustomImage from '../CustomImage.astro';
+import PostPreview from '../PostPreview.astro';
+import HomeStoryScene from './HomeStoryScene.astro';
+import HomeStoryStage from './HomeStoryStage.astro';
+
+type Props = {
+    recommendations: CollectionEntry<'blog'>[];
+    homeNow?: HomeNowItem[];
+    avatar?: ImageInput;
+};
+
+const { recommendations, homeNow = [], avatar } = Astro.props;
+const [openScene, interestsScene, growthScene, nowScene, readingScene, scrollScene, enterScene] = HOME_STORY_SCENES;
+---
+
+<section class="home-story" data-home-story data-home-scene="open" aria-label="misaka.design 首页导览">
+    <div class="home-story__stage-column">
+        <div class="home-story__sticky">
+            <HomeStoryStage scene={openScene} />
+        </div>
+    </div>
+
+    <div class="home-story__scenes">
+        <HomeStoryScene scene={openScene}>
+            <div class="home-intro">
+                {
+                    avatar && (
+                        <figure class="home-bookplate">
+                            <CustomImage
+                                {...avatar}
+                                class="home-bookplate__image"
+                                loading="eager"
+                                fetchpriority="high"
+                                width={320}
+                                height={320}
+                                widths={[240, 320, 480, 640]}
+                                sizes="(max-width: 1023px) 45vw, 18rem"
+                            />
+                            <figcaption>misaka · collection no. 001</figcaption>
+                        </figure>
+                    )
+                }
+                <p class="home-intro__copy">收录设计、AI、前端，以及尚未想明白的问题。</p>
+            </div>
+        </HomeStoryScene>
+
+        <HomeStoryScene scene={interestsScene}>
+            <ol class="home-interest-list">
+                {
+                    HOME_INTERESTS.map((interest, index) => (
+                        <li>
+                            <span>{String(index + 1).padStart(2, '0')}</span>
+                            {interest}
+                        </li>
+                    ))
+                }
+            </ol>
+        </HomeStoryScene>
+
+        <HomeStoryScene scene={growthScene}>
+            <p>这里不是完成品仓库。每段思考都有自己的成熟度，也允许在新的经验里被改写。</p>
+            <ul class="home-growth-list">
+                {
+                    HOME_GROWTH_STATES.map((state) => (
+                        <li>
+                            <span aria-hidden="true" />
+                            {state}
+                        </li>
+                    ))
+                }
+            </ul>
+        </HomeStoryScene>
+
+        <HomeStoryScene scene={nowScene}>
+            {
+                homeNow.length > 0 ? (
+                    <dl class="home-now-list">
+                        {homeNow.map((item) => (
+                            <div>
+                                <dt>{item.label}</dt>
+                                <dd>{item.href ? <a href={item.href}>{item.text}</a> : item.text}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                ) : (
+                    <p>近期记录仍在整理。先从写作与札记中，查看正在形成的思考。</p>
+                )
+            }
+        </HomeStoryScene>
+
+        <HomeStoryScene scene={readingScene}>
+            {
+                recommendations.length > 0 ? (
+                    <div class="home-reading-list">
+                        {recommendations.map((post) => (
+                            <PostPreview post={post} headingLevel="h3" />
+                        ))}
+                    </div>
+                ) : (
+                    <a class="home-story-link" href="/blog">
+                        打开写作目录
+                    </a>
+                )
+            }
+        </HomeStoryScene>
+
+        <HomeStoryScene scene={scrollScene}>
+            <div class="home-scroll-index">
+                <div>
+                    <span>所好</span>
+                    <p>{HOME_INTERESTS.join(' · ')}</p>
+                </div>
+                <div>
+                    <span>生长</span>
+                    <p>{HOME_GROWTH_STATES.join(' · ')}</p>
+                </div>
+                {
+                    recommendations.length > 0 && (
+                        <div>
+                            <span>荐读</span>
+                            <p>{recommendations.map(({ data }) => data.title).join(' · ')}</p>
+                        </div>
+                    )
+                }
+            </div>
+        </HomeStoryScene>
+
+        <HomeStoryScene scene={enterScene}>
+            <p>长卷到此收起，余下的路径留给你选择。</p>
+            <nav class="home-entry-links" aria-label="继续浏览">
+                <a href="/blog">写作</a>
+                <a href="/tags">主题</a>
+                <a href="/wall">便利贴墙</a>
+            </nav>
+        </HomeStoryScene>
+    </div>
+</section>

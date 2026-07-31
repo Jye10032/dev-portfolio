@@ -1,65 +1,75 @@
 ---
 import { getCollection } from 'astro:content';
 import Button from '../components/Button.astro';
+import HomeStory from '../components/home/HomeStory.astro';
 import PostPreview from '../components/PostPreview.astro';
 import siteConfig from '../data/site-config';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getFeaturedArticle, getLatestPosts, getAllTags } from '../utils/data-utils';
+import '../styles/home-story.css';
+import { getAllTags, getFeaturedArticle, getHomepageRecommendations, getLatestPosts } from '../utils/data-utils';
 
-const posts = await getCollection('blog');
+const posts = await getCollection('blog', ({ data }) => !data.draft);
 const featuredArticle = getFeaturedArticle(posts);
-const latestPosts = getLatestPosts(posts.filter(p => p.id !== featuredArticle?.id), 4);
+const recommendations = getHomepageRecommendations(posts);
+const latestPosts = getLatestPosts(
+    posts.filter((p) => p.id !== featuredArticle?.id),
+    4
+);
 const tags = getAllTags(posts).slice(0, 6);
 ---
 
-<BaseLayout description={siteConfig.description}>
-    <!-- 品牌简介 -->
-    <section class="mb-16 sm:mb-24">
-        <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight mb-6">
-            {siteConfig.homeIntro?.lead || siteConfig.hero?.title}
-        </h1>
-        <p class="text-lg text-main/80 leading-relaxed max-w-2xl">
-            {siteConfig.homeIntro?.text || siteConfig.hero?.text}
-        </p>
-    </section>
+<BaseLayout description={siteConfig.description} wide>
+    <HomeStory recommendations={recommendations} homeNow={siteConfig.homeNow} avatar={siteConfig.avatar} />
 
     <!-- 精选长文 -->
-    {featuredArticle && (
-        <section class="mb-16 sm:mb-24">
-            <h2 class="mb-8 font-serif text-xl italic sm:mb-12 sm:text-2xl">精选</h2>
-            <PostPreview post={featuredArticle} featured={true} headingLevel="h3" />
-        </section>
-    )}
+    {
+        featuredArticle && (
+            <section class="mb-16 sm:mb-24">
+                <h2 class="mb-8 font-serif text-xl italic sm:mb-12 sm:text-2xl">精选</h2>
+                <PostPreview post={featuredArticle} featured={true} headingLevel="h3" />
+            </section>
+        )
+    }
 
     <!-- 最新动态 -->
-    {latestPosts.length > 0 && (
-        <section class="mb-16 sm:mb-24">
-            <div class="flex items-baseline justify-between mb-8 sm:mb-12">
-                <h2 class="font-serif text-xl italic sm:text-2xl">最新</h2>
-                <Button href="/blog" class="text-sm">查看全部</Button>
-            </div>
-            <div class="space-y-8 sm:space-y-10">
-                {latestPosts.map((post) => (
-                    <PostPreview post={post} headingLevel="h3" />
-                ))}
-            </div>
-        </section>
-    )}
+    {
+        latestPosts.length > 0 && (
+            <section class="mb-16 sm:mb-24">
+                <div class="mb-8 flex items-baseline justify-between sm:mb-12">
+                    <h2 class="font-serif text-xl italic sm:text-2xl">最新</h2>
+                    <Button href="/blog" class="text-sm">
+                        查看全部
+                    </Button>
+                </div>
+                <div class="space-y-8 sm:space-y-10">
+                    {latestPosts.map((post) => (
+                        <PostPreview post={post} headingLevel="h3" />
+                    ))}
+                </div>
+            </section>
+        )
+    }
 
     <!-- 主题入口 -->
-    {tags.length > 0 && (
-        <section class="mb-16 sm:mb-24">
-            <h2 class="mb-8 font-serif text-xl italic sm:mb-12 sm:text-2xl">主题</h2>
-            <div class="flex flex-wrap gap-3">
-                {tags.map((tag) => (
-                    <a
-                        href={`/tags/${tag.id}`}
-                        class="px-4 py-2 border border-main/20 rounded-full text-sm hover:bg-main hover:text-bg-main transition-colors"
-                    >
-                        #{tag.name}
-                    </a>
-                ))}
-            </div>
-        </section>
-    )}
+    {
+        tags.length > 0 && (
+            <section class="mb-16 sm:mb-24">
+                <h2 class="mb-8 font-serif text-xl italic sm:mb-12 sm:text-2xl">主题</h2>
+                <div class="flex flex-wrap gap-3">
+                    {tags.map((tag) => (
+                        <a
+                            href={`/tags/${tag.id}`}
+                            class="border-main/20 hover:bg-main hover:text-bg-main rounded-full border px-4 py-2 text-sm transition-colors"
+                        >
+                            #{tag.name}
+                        </a>
+                    ))}
+                </div>
+            </section>
+        )
+    }
 </BaseLayout>
+
+<script>
+    import '../scripts/home-story';
+</script>

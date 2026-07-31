@@ -48,6 +48,7 @@ const siteConfig: SiteConfig = {
         lead: '关于设计、AI，以及一个前端工程师如何持续成长。',
         text: '这里先以中文写作为主，记录长文、札记和持续生长中的思考脉络。'
     },
+    homeNow: [],
     subscribe: {
         enabled: false
     },

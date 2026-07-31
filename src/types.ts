@@ -21,6 +21,12 @@ export type HomeIntro = {
     text?: string;
 };
 
+export type HomeNowItem = {
+    label: '最近在做' | '最近在读' | '最近思考';
+    text: string;
+    href?: string;
+};
+
 export type SubscribeForm = {
     action: string;
     emailFieldName?: string;
@@ -47,6 +53,7 @@ export type SiteConfig = {
     socialLinks?: Link[];
     hero?: Hero;
     homeIntro?: HomeIntro;
+    homeNow?: HomeNowItem[];
     subscribe?: Subscribe;
     postsPerPage?: number;
     projectsPerPage?: number;

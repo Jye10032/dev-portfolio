@@ -1,4 +1,4 @@
-import { type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import { slugify } from './common-utils';
 
 export function sortItemsByDateDesc(itemA: CollectionEntry<'blog' | 'projects'>, itemB: CollectionEntry<'blog' | 'projects'>) {
@@ -45,4 +45,22 @@ export function getPostsByType(posts: CollectionEntry<'blog'>[], type: 'article'
 
 export function getLatestPosts(posts: CollectionEntry<'blog'>[], count: number = 5): CollectionEntry<'blog'>[] {
     return [...posts].sort(sortItemsByDateDesc).slice(0, count);
+}
+
+export function getHomepageRecommendations(posts: CollectionEntry<'blog'>[], count: number = 3): CollectionEntry<'blog'>[] {
+    const sorted = [...posts].sort(sortItemsByDateDesc);
+    const selected: CollectionEntry<'blog'>[] = [];
+
+    const add = (candidate?: CollectionEntry<'blog'>) => {
+        if (candidate && selected.length < count && !selected.some(({ id }) => id === candidate.id)) {
+            selected.push(candidate);
+        }
+    };
+
+    add(getFeaturedArticle(sorted));
+    add(sorted.find((candidate) => isArticle(candidate) && !selected.some(({ id }) => id === candidate.id)));
+    add(sorted.find((candidate) => isNote(candidate) && !selected.some(({ id }) => id === candidate.id)));
+    sorted.forEach(add);
+
+    return selected.slice(0, count);
 }
