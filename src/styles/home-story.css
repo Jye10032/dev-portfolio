@@ -87,8 +87,10 @@
     overflow-wrap: anywhere;
 }
 
+/* Warm amber inside the dark terminal, so the prompt reads as the same accent
+   family as the vermilion used elsewhere in the story. */
 .home-stage__chevron {
-    color: #75a7ff;
+    color: #d98b6a;
 }
 
 .home-stage__status {
@@ -154,9 +156,11 @@
     display: none;
 }
 
+/* Vermilion rather than the site's system blue: the story sits on warm paper,
+   and this is the same accent the scene-six seal uses. */
 .home-scene__eyebrow {
     margin: 0 0 1rem;
-    color: var(--accent-muted);
+    color: var(--home-vermilion);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.72rem;
     text-transform: uppercase;
@@ -247,7 +251,7 @@
 
 .home-interest-list span,
 .home-scroll-index span {
-    color: var(--accent-muted);
+    color: var(--home-vermilion);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.72rem;
 }
@@ -285,7 +289,7 @@
 }
 
 .home-now-list dt {
-    color: var(--accent-muted);
+    color: var(--home-vermilion);
     font-size: 0.78rem;
 }
 

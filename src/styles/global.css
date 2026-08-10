@@ -37,10 +37,15 @@ html.dark {
 }
 
 @theme inline {
-    --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-        'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif;
-    --font-serif: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-        'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif;
+    --font-sans:
+        'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
+        'Source Han Sans SC', sans-serif;
+    /* Real serif, system fonts only — no extra webfont download. Latin serifs
+       come first; they carry no CJK glyphs, so Chinese falls through to the
+       CJK serifs after them. */
+    --font-serif:
+        'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, 'Songti SC', STSong, 'Source Han Serif SC', 'Noto Serif CJK SC', SimSun,
+        serif;
     --text-color-main: var(--text-main);
     --text-color-accent: var(--accent);
     --text-color-accent-muted: var(--accent-muted);
@@ -90,9 +95,11 @@ html.dark {
     }
 
     .prose a {
-        @apply underline font-normal decoration-1 underline-offset-2 decoration-dashed;
+        @apply font-normal underline decoration-dashed decoration-1 underline-offset-2;
         text-decoration-color: var(--accent);
-        transition: text-decoration-color 0.2s ease, text-underline-offset 0.2s ease;
+        transition:
+            text-decoration-color 0.2s ease,
+            text-underline-offset 0.2s ease;
     }
 
     .prose a:hover {
@@ -111,13 +118,15 @@ html.dark {
     }
 
     .prose blockquote {
-        @apply font-serif font-normal italic border-none pl-0 text-[1.375em] leading-snug sm:text-[1.66667em];
+        @apply border-none pl-0 font-serif text-[1.375em] leading-snug font-normal italic sm:text-[1.66667em];
     }
 
     .link-underline {
-        @apply underline decoration-1 underline-offset-2 decoration-dashed;
+        @apply underline decoration-dashed decoration-1 underline-offset-2;
         text-decoration-color: var(--accent);
-        transition: text-decoration-color 0.2s ease, text-underline-offset 0.2s ease;
+        transition:
+            text-decoration-color 0.2s ease,
+            text-underline-offset 0.2s ease;
     }
 
     .link-underline:hover {
@@ -179,6 +188,9 @@ html.dark {
     .theme-transition *,
     .theme-transition *::before,
     .theme-transition *::after {
-        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease !important;
+        transition:
+            background-color 0.3s ease,
+            border-color 0.3s ease,
+            color 0.15s ease !important;
     }
 }
