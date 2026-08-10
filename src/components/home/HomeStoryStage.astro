@@ -9,8 +9,10 @@ type Props = {
 const { inline = false, scene } = Astro.props;
 ---
 
-<div class:list={['home-stage', inline && 'home-stage--inline']} data-home-stage aria-live={inline ? undefined : 'polite'}>
-    <div class="home-stage__terminal" aria-hidden={inline ? undefined : 'true'}>
+<div class:list={['home-stage', inline && 'home-stage--inline']} data-home-stage>
+    <!-- The typed command is a decorative animation. Each scene exposes the same
+         command and response to assistive tech via its own sr-only line. -->
+    <div class="home-stage__terminal" aria-hidden="true">
         <div class="home-stage__paper">
             <div class="home-stage__chrome" aria-hidden="true">
                 <span></span><span></span><span></span>
