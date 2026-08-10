@@ -1,11 +1,11 @@
-import avatar from '../assets/images/avatar.jpg';
+import avatar from '../assets/images/avatar-quiet-anime-v2.png';
 import type { SiteConfig } from '../types';
 
 const siteConfig: SiteConfig = {
     website: 'https://misaka.design',
     avatar: {
         src: avatar,
-        alt: 'misaka.design'
+        alt: 'misaka.design 二次元头像'
     },
     title: 'misaka.design',
     subtitle: '设计、AI 与持续成长',
