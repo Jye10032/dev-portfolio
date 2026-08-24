@@ -20,6 +20,10 @@ const siteConfig: SiteConfig = {
             href: '/blog'
         },
         {
+            text: '时间线',
+            href: '/timeline'
+        },
+        {
             text: '主题',
             href: '/tags'
         },

@@ -1,0 +1,370 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { slugify } from '../utils/common-utils';
+import { sortItemsByDateDesc } from '../utils/data-utils';
+
+type TimelinePost = CollectionEntry<'blog'>;
+
+type DayGroup = {
+    day: number;
+    posts: TimelinePost[];
+};
+
+type MonthGroup = {
+    month: number;
+    days: DayGroup[];
+};
+
+type YearGroup = {
+    year: number;
+    months: MonthGroup[];
+};
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
+const groupedPosts = new Map<number, Map<number, Map<number, TimelinePost[]>>>();
+
+for (const post of posts) {
+    const date = new Date(post.data.publishDate);
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1;
+    const day = date.getUTCDate();
+
+    if (!groupedPosts.has(year)) groupedPosts.set(year, new Map());
+    const yearGroup = groupedPosts.get(year)!;
+    if (!yearGroup.has(month)) yearGroup.set(month, new Map());
+    const monthGroup = yearGroup.get(month)!;
+    if (!monthGroup.has(day)) monthGroup.set(day, []);
+    monthGroup.get(day)!.push(post);
+}
+
+const timeline: YearGroup[] = [...groupedPosts].map(([year, months]) => ({
+    year,
+    months: [...months].map(([month, days]) => ({
+        month,
+        days: [...days].map(([day, dayPosts]) => ({ day, posts: dayPosts }))
+    }))
+}));
+
+const padDate = (value: number) => String(value).padStart(2, '0');
+const postTypeLabel = (post: TimelinePost) => (post.data.type === 'note' ? '札记' : '长文');
+---
+
+<BaseLayout title="时间线" description="按年月日浏览 misaka.design 的全部写作记录。">
+    <header class="timeline-header">
+        <p class="timeline-kicker">Writing archive</p>
+        <h1>时间线</h1>
+        <p>沿着日期，回看每一篇公开写作。</p>
+    </header>
+
+    {
+        timeline.length > 0 ? (
+            <div class="timeline" aria-label="博客发布时间线">
+                {timeline.map((yearGroup) => (
+                    <section class="timeline-year" aria-labelledby={`year-${yearGroup.year}`}>
+                        <div class="year-heading">
+                            <h2 id={`year-${yearGroup.year}`}>{yearGroup.year}</h2>
+                            <span>{yearGroup.year} 年</span>
+                        </div>
+
+                        <div class="year-content">
+                            {yearGroup.months.map((monthGroup) => (
+                                <section class="timeline-month" aria-labelledby={`month-${yearGroup.year}-${monthGroup.month}`}>
+                                    <h3 id={`month-${yearGroup.year}-${monthGroup.month}`}>
+                                        <span>{padDate(monthGroup.month)}</span>
+                                        <small>月</small>
+                                    </h3>
+
+                                    <div class="month-days">
+                                        {monthGroup.days.map((dayGroup) => (
+                                            <div class="timeline-day">
+                                                <time datetime={`${yearGroup.year}-${padDate(monthGroup.month)}-${padDate(dayGroup.day)}`}>
+                                                    {padDate(dayGroup.day)}
+                                                    <span>日</span>
+                                                </time>
+
+                                                <div class="day-posts">
+                                                    {dayGroup.posts.map((post) => (
+                                                        <article class="timeline-entry">
+                                                            <div class="entry-meta">
+                                                                <span class="entry-type">{postTypeLabel(post)}</span>
+                                                                {post.data.tags?.map((tag) => (
+                                                                    <a href={`/tags/${slugify(tag)}`}>#{tag}</a>
+                                                                ))}
+                                                            </div>
+                                                            <h4>
+                                                                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+                                                            </h4>
+                                                        </article>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+                        </div>
+                    </section>
+                ))}
+            </div>
+        ) : (
+            <p class="timeline-empty">还没有公开发布的文章。</p>
+        )
+    }
+</BaseLayout>
+
+<style>
+    .timeline-header {
+        margin-bottom: 4rem;
+        max-width: 38rem;
+    }
+
+    .timeline-kicker {
+        margin-bottom: 0.75rem;
+        color: var(--accent);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        line-height: 1.4;
+        text-transform: uppercase;
+    }
+
+    .timeline-header h1 {
+        margin: 0 0 1rem;
+        font-family: var(--font-serif);
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1;
+    }
+
+    .timeline-header > p:last-child {
+        margin: 0;
+        color: color-mix(in srgb, var(--text-main) 72%, transparent);
+        font-size: 1.0625rem;
+    }
+
+    .timeline {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+
+    .timeline::before {
+        position: absolute;
+        top: 1.2rem;
+        bottom: 0;
+        left: 5.45rem;
+        width: 1px;
+        background: color-mix(in srgb, var(--border-main) 20%, transparent);
+        content: '';
+    }
+
+    .timeline-year {
+        display: grid;
+        grid-template-columns: 4.25rem minmax(0, 1fr);
+        gap: 2.5rem;
+        position: relative;
+    }
+
+    .timeline-year + .timeline-year {
+        margin-top: 5rem;
+    }
+
+    .year-heading {
+        position: sticky;
+        top: 1.5rem;
+        align-self: start;
+        text-align: right;
+    }
+
+    .year-heading h2 {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1.1;
+    }
+
+    .year-heading span {
+        display: block;
+        margin-top: 0.35rem;
+        color: color-mix(in srgb, var(--text-main) 52%, transparent);
+        font-size: 0.6875rem;
+    }
+
+    .year-content {
+        min-width: 0;
+    }
+
+    .timeline-month {
+        position: relative;
+    }
+
+    .timeline-month::before {
+        position: absolute;
+        top: 0.45rem;
+        left: -3rem;
+        width: 0.625rem;
+        height: 0.625rem;
+        border: 2px solid var(--bg-main);
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+        content: '';
+    }
+
+    .timeline-month + .timeline-month {
+        margin-top: 3.5rem;
+    }
+
+    .timeline-month h3 {
+        display: flex;
+        align-items: baseline;
+        gap: 0.25rem;
+        margin: 0 0 1.25rem;
+        font-family: var(--font-serif);
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1;
+    }
+
+    .timeline-month h3 span {
+        font-size: 1.375rem;
+    }
+
+    .timeline-month h3 small {
+        color: color-mix(in srgb, var(--text-main) 55%, transparent);
+        font-family: var(--font-sans);
+        font-size: 0.6875rem;
+        font-weight: 500;
+    }
+
+    .month-days {
+        display: grid;
+        gap: 1.75rem;
+    }
+
+    .timeline-day {
+        display: grid;
+        grid-template-columns: 2.75rem minmax(0, 1fr);
+        gap: 1.25rem;
+    }
+
+    .timeline-day > time {
+        padding-top: 0.15rem;
+        color: color-mix(in srgb, var(--text-main) 65%, transparent);
+        font-variant-numeric: tabular-nums;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .timeline-day > time span {
+        margin-left: 0.15rem;
+        font-size: 0.625rem;
+        font-weight: 400;
+    }
+
+    .day-posts {
+        display: grid;
+        gap: 0.875rem;
+        min-width: 0;
+    }
+
+    .timeline-entry {
+        padding-bottom: 1rem;
+        border-bottom: 1px dashed color-mix(in srgb, var(--border-main) 22%, transparent);
+    }
+
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.75rem;
+        margin-bottom: 0.35rem;
+        color: color-mix(in srgb, var(--text-main) 52%, transparent);
+        font-size: 0.6875rem;
+        line-height: 1.5;
+    }
+
+    .entry-type {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .entry-meta a {
+        transition: color 0.2s ease;
+    }
+
+    .entry-meta a:hover {
+        color: var(--accent-muted);
+    }
+
+    .timeline-entry h4 {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: 1.125rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1.55;
+    }
+
+    .timeline-entry h4 a {
+        background-image: linear-gradient(var(--accent), var(--accent));
+        background-position: 0 100%;
+        background-repeat: no-repeat;
+        background-size: 0 1px;
+        transition: background-size 0.25s ease;
+    }
+
+    .timeline-entry h4 a:hover {
+        background-size: 100% 1px;
+    }
+
+    .timeline-empty {
+        padding: 3rem 0;
+        color: color-mix(in srgb, var(--text-main) 65%, transparent);
+    }
+
+    @media (max-width: 639px) {
+        .timeline-header {
+            margin-bottom: 3rem;
+        }
+
+        .timeline::before {
+            left: 0.3rem;
+        }
+
+        .timeline-year {
+            display: block;
+            padding-left: 1.75rem;
+        }
+
+        .timeline-year + .timeline-year {
+            margin-top: 4rem;
+        }
+
+        .year-heading {
+            position: static;
+            margin-bottom: 2.25rem;
+            text-align: left;
+        }
+
+        .year-heading span {
+            display: none;
+        }
+
+        .timeline-month::before {
+            left: -1.75rem;
+        }
+
+        .timeline-day {
+            grid-template-columns: 2.25rem minmax(0, 1fr);
+            gap: 0.75rem;
+        }
+
+        .timeline-entry h4 {
+            font-size: 1.0625rem;
+        }
+    }
+</style>
