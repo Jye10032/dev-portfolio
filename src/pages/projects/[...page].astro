@@ -8,7 +8,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { sortItemsByDateDesc } from '../../utils/data-utils';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
-    const projects = (await getCollection('projects')).sort(sortItemsByDateDesc);
+    const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
+    if (projects.length === 0) return [];
     return paginate(projects, { pageSize: siteConfig.projectsPerPage || 6 });
 }
 
