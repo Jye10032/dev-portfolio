@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import { getAllTags, getPostsByTag } from '../utils/data-utils';
+
+type Props = {
+    active?: 'all' | 'articles' | 'notes';
+};
+
+const { active = 'all' } = Astro.props;
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const popularTags = getAllTags(posts)
+    .map((tag) => ({ ...tag, count: getPostsByTag(posts, tag.id).length }))
+    .sort((tagA, tagB) => tagB.count - tagA.count || tagA.name.localeCompare(tagB.name, 'zh-CN'))
+    .slice(0, 10);
+
+const typeLinks = [
+    { id: 'all', href: '/blog', label: '全部' },
+    { id: 'articles', href: '/blog/articles', label: '长文' },
+    { id: 'notes', href: '/blog/notes', label: '札记' }
+] as const;
+---
+
+<header class="mb-12 sm:mb-16">
+    <h1 class="mb-8 font-serif text-2xl leading-tight italic sm:text-4xl">写作</h1>
+
+    <nav class="flex flex-wrap gap-2 text-sm" aria-label="内容类型">
+        {
+            typeLinks.map((link) => (
+                <a
+                    href={link.href}
+                    aria-current={active === link.id ? 'page' : undefined}
+                    class:list={[
+                        'rounded-full border px-3 py-1.5 transition-colors',
+                        active === link.id ? 'border-main bg-main text-bg-main' : 'border-main/20 hover:border-main/40'
+                    ]}
+                >
+                    {link.label}
+                </a>
+            ))
+        }
+    </nav>
+
+    {
+        popularTags.length > 0 && (
+            <nav class="border-main/10 mt-5 flex flex-wrap items-center gap-2 border-t pt-5 text-xs" aria-label="热门主题">
+                <span class="text-main/55 mr-1">主题</span>
+                {popularTags.map((tag) => (
+                    <a
+                        href={`/tags/${tag.id}`}
+                        class="border-main/15 text-main/70 hover:text-accent rounded-full border px-2.5 py-1 transition-colors hover:border-[var(--accent)]"
+                    >
+                        #{tag.name}
+                    </a>
+                ))}
+                <a class="text-main/60 hover:text-accent px-1 py-1 transition-colors" href="/tags">
+                    全部主题 <span aria-hidden="true">→</span>
+                </a>
+            </nav>
+        )
+    }
+</header>

@@ -24,6 +24,7 @@ const blog = defineCollection({
             publishDate: z.coerce.date(),
             updatedDate: z.coerce.date().optional(),
             isFeatured: z.boolean().default(false),
+            draft: z.boolean().default(false),
             type: z.enum(['article', 'note']).default('article'),
             lang: z.enum(['zh-CN', 'en']).default('zh-CN'),
             translationKey: z.string().optional(),
@@ -38,6 +39,7 @@ const pages = defineCollection({
     schema: ({ image }) =>
         z.object({
             title: z.string(),
+            draft: z.boolean().default(false),
             seo: seoSchema(image).optional()
         })
 });
@@ -50,6 +52,7 @@ const projects = defineCollection({
             description: z.string().optional(),
             publishDate: z.coerce.date(),
             isFeatured: z.boolean().default(false),
+            draft: z.boolean().default(false),
             seo: seoSchema(image).optional()
         })
 });

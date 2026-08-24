@@ -9,7 +9,7 @@ import { sortItemsByDateDesc } from '../../utils/data-utils';
 import { slugify } from '../../utils/common-utils';
 
 export async function getStaticPaths() {
-    const posts = (await getCollection('blog')).sort(sortItemsByDateDesc);
+    const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
     const postCount = posts.length;
     return posts.map((post, index) => ({
         params: { id: post.id },
@@ -32,26 +32,24 @@ const typeLabel = type === 'article' ? '长文' : '札记';
 
 <BaseLayout title={seo?.title ?? title} description={seo?.description ?? excerpt} image={seo?.image} pageType="article" showHeader={false}>
     <!-- 阅读进度条 - 仅长文显示 -->
-    {type === 'article' && (
-        <div class="fixed top-0 left-0 w-full h-0.5 bg-muted z-50">
-            <div id="reading-progress" class="h-full bg-accent transition-all duration-150" style="width: 0%"></div>
-        </div>
-    )}
+    {
+        type === 'article' && (
+            <div class="bg-muted fixed top-0 left-0 z-50 h-0.5 w-full">
+                <div id="reading-progress" class="bg-accent h-full transition-all duration-150" style="width: 0%" />
+            </div>
+        )
+    }
 
     <article class="mb-16 sm:mb-24">
         <header class="mb-8">
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-xs text-main/60 border border-main/20 rounded px-2 py-1">
+            <div class="mb-4 flex items-center gap-3">
+                <span class="text-main/60 border-main/20 rounded border px-2 py-1 text-xs">
                     {typeLabel}
                 </span>
-                {readingTime && (
-                    <span class="text-xs text-main/60">
-                        约 {readingTime} 分钟
-                    </span>
-                )}
+                {readingTime && <span class="text-main/60 text-xs">约 {readingTime} 分钟</span>}
             </div>
             <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight">{title}</h1>
-            <div class="mt-4 text-sm text-main/70">
+            <div class="text-main/70 mt-4 text-sm">
                 <FormattedDate date={publishDate} />
                 {
                     updatedDate && (

@@ -5,7 +5,7 @@ import Subscribe from '../../components/Subscribe.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllTags, getPostsByTag, sortItemsByDateDesc } from '../../utils/data-utils';
 
-const posts = (await getCollection('blog')).sort(sortItemsByDateDesc);
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
 const tags = getAllTags(posts).sort((tagA, tagB) => {
     const postCountTagA = getPostsByTag(posts, tagA.id).length;
     const postCountTagB = getPostsByTag(posts, tagB.id).length;
@@ -13,11 +13,7 @@ const tags = getAllTags(posts).sort((tagA, tagB) => {
 });
 ---
 
-<BaseLayout
-    title="主题"
-    description="浏览所有主题标签，发现感兴趣的内容"
-    showHeader={false}
->
+<BaseLayout title="主题" description="浏览所有主题标签，发现感兴趣的内容" showHeader={false}>
     <h1 class="mb-12 font-serif text-2xl italic sm:mb-16 sm:text-4xl">主题</h1>
     {
         tags.map((tag) => {
@@ -28,9 +24,7 @@ const tags = getAllTags(posts).sort((tagA, tagB) => {
                         <h2 class="font-serif text-xl leading-tight font-medium group-hover:underline group-hover:decoration-dashed group-hover:decoration-1 group-hover:underline-offset-4 sm:text-2xl">
                             #{tag.name}
                         </h2>
-                        <div class="mt-1 text-sm leading-normal text-main/70">
-                            {postCount} 篇文章
-                        </div>
+                        <div class="text-main/70 mt-1 text-sm leading-normal">{postCount} 篇文章</div>
                     </div>
                     <div class="hidden font-serif italic opacity-0 transition group-hover:opacity-100 sm:inline-flex sm:shrink-0 sm:items-center sm:gap-1">
                         查看 <ArrowRight class="h-4 w-4 fill-current" />
