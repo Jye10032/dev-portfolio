@@ -8,6 +8,7 @@ function buildStoryRoot() {
         <section data-home-story data-home-scene="open">
             <div class="home-story__stage-column">
                 <div data-home-stage><span data-home-command></span><span data-home-status></span></div>
+                <div><span data-home-chapter-index>01</span><span data-home-chapter-label>启园</span></div>
             </div>
             ${sceneIds
                 .map(
@@ -56,6 +57,17 @@ describe('home story controller', () => {
 
         expect(root.dataset.homeScene).toBe('interests');
         expect(root.querySelector('[data-home-status]')?.textContent).toBe('四志已列。');
+        controller.destroy();
+    });
+
+    it('updates the chapter indicator with the active scene', () => {
+        const root = buildStoryRoot();
+        const controller = createHomeStoryController(root, { reducedMotion: true });
+
+        controller.setScene('growth');
+
+        expect(root.querySelector('[data-home-chapter-index]')?.textContent).toBe('03');
+        expect(root.querySelector('[data-home-chapter-label]')?.textContent).toBe('生长');
         controller.destroy();
     });
 

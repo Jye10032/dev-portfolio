@@ -1,5 +1,5 @@
 ---
-import type { HomeStoryScene } from '../../data/home-story';
+import { HOME_STORY_SCENES, type HomeStoryScene } from '../../data/home-story';
 import HomeStoryStage from './HomeStoryStage.astro';
 
 type Props = {
@@ -7,6 +7,7 @@ type Props = {
 };
 
 const { scene } = Astro.props;
+const sceneIndex = HOME_STORY_SCENES.findIndex(({ id }) => id === scene.id) + 1;
 ---
 
 <section class="home-scene" data-home-story-scene={scene.id} aria-labelledby={`home-scene-${scene.id}`}>
@@ -14,6 +15,9 @@ const { scene } = Astro.props;
         <HomeStoryStage inline scene={scene} />
     </div>
     <p class="sr-only">{scene.command} {scene.response}</p>
+    <p class="home-scene__chapter" aria-hidden="true">
+        卷 · {String(sceneIndex).padStart(2, '0')} / {String(HOME_STORY_SCENES.length).padStart(2, '0')} · {scene.eyebrow}
+    </p>
     <p class="home-scene__eyebrow">{scene.eyebrow}</p>
     <h2 id={`home-scene-${scene.id}`} class="home-scene__title">{scene.title}</h2>
     <div class="home-scene__content"><slot /></div>

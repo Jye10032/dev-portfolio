@@ -38,6 +38,8 @@ export function createHomeStoryController(root: HTMLElement, options: Controller
     const scenes = Array.from(root.querySelectorAll<HTMLElement>('[data-home-story-scene]'));
     const desktopStage =
         root.querySelector<HTMLElement>(':scope > .home-story__stage-column [data-home-stage]') ?? root.querySelector<HTMLElement>('[data-home-stage]');
+    const chapterIndex = root.querySelector<HTMLElement>('[data-home-chapter-index]');
+    const chapterLabel = root.querySelector<HTMLElement>('[data-home-chapter-label]');
     const reducedMotion = options.reducedMotion ?? window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const typeDelay = options.typeDelay ?? 24;
     const workDelay = options.workDelay ?? 420;
@@ -98,6 +100,8 @@ export function createHomeStoryController(root: HTMLElement, options: Controller
         currentIndex = nextIndex;
         root.dataset.homeScene = sceneId;
         root.style.setProperty('--home-scene-index', String(nextIndex));
+        if (chapterIndex) chapterIndex.textContent = String(nextIndex + 1).padStart(2, '0');
+        if (chapterLabel) chapterLabel.textContent = HOME_STORY_SCENES[nextIndex].eyebrow;
         animation?.abort();
         animation = new AbortController();
 

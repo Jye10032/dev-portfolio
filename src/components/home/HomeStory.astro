@@ -21,6 +21,10 @@ const [openScene, interestsScene, growthScene, nowScene, readingScene, scrollSce
     <div class="home-story__stage-column">
         <div class="home-story__sticky">
             <HomeStoryStage scene={openScene} />
+            <div class="home-story__chapter" aria-live="polite" aria-atomic="true">
+                <span>卷 · <span data-home-chapter-index>01</span> / {String(HOME_STORY_SCENES.length).padStart(2, '0')}</span>
+                <span>状态 · <span data-home-chapter-label>{openScene.eyebrow}</span></span>
+            </div>
         </div>
     </div>
 
