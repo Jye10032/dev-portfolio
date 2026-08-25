@@ -3,33 +3,34 @@ import { getCollection } from 'astro:content';
 import Button from '../components/Button.astro';
 import HomeStory from '../components/home/HomeStory.astro';
 import PostPreview from '../components/PostPreview.astro';
+import { HOME_FOCUS_AREAS, HOME_RECOMMENDATION_IDS } from '../data/home-story';
 import siteConfig from '../data/site-config';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/home-story.css';
-import { getAllTags, getFeaturedArticle, getHomepageRecommendations, getLatestPosts } from '../utils/data-utils';
+import { getAllTags, getHomepageFocusAreas, getHomepageRecommendations, getLatestPosts, getPostsByTag } from '../utils/data-utils';
+import { slugify } from '../utils/common-utils';
 
 const posts = await getCollection('blog', ({ data }) => !data.draft);
-const featuredArticle = getFeaturedArticle(posts);
-const recommendations = getHomepageRecommendations(posts);
+const recommendations = getHomepageRecommendations(posts, 3, HOME_RECOMMENDATION_IDS);
 const latestPosts = getLatestPosts(
-    posts.filter((p) => p.id !== featuredArticle?.id),
+    posts.filter((post) => !recommendations.some(({ id }) => id === post.id)),
     4
 );
 const tags = getAllTags(posts).slice(0, 6);
+const focusAreas = getHomepageFocusAreas(posts, HOME_FOCUS_AREAS);
+const publishYears = posts.map(({ data }) => new Date(data.publishDate).getUTCFullYear());
+const firstYear = publishYears.length > 0 ? Math.min(...publishYears) : new Date().getUTCFullYear();
+const latestYear = publishYears.length > 0 ? Math.max(...publishYears) : firstYear;
+const proofItems = [
+    { value: `${firstYear}—${latestYear}`, label: '持续记录' },
+    { value: String(posts.length), label: '公开写作' },
+    { value: String(focusAreas.length), label: '持续专题' },
+    { value: String(getPostsByTag(posts, slugify('题解')).length), label: '题解札记' }
+];
 ---
 
 <BaseLayout description={siteConfig.description} wide>
-    <HomeStory recommendations={recommendations} homeNow={siteConfig.homeNow} avatar={siteConfig.avatar} />
-
-    <!-- 精选长文 -->
-    {
-        featuredArticle && (
-            <section class="mb-16 sm:mb-24">
-                <h2 class="mb-8 font-serif text-xl italic sm:mb-12 sm:text-2xl">精选</h2>
-                <PostPreview post={featuredArticle} featured={true} headingLevel="h3" />
-            </section>
-        )
-    }
+    <HomeStory recommendations={recommendations} homeNow={siteConfig.homeNow} focusAreas={focusAreas} proofItems={proofItems} avatar={siteConfig.avatar} />
 
     <!-- 最新动态 -->
     {

@@ -43,7 +43,9 @@ export function createHomeStoryController(root: HTMLElement, options: Controller
     const reducedMotion = options.reducedMotion ?? window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const typeDelay = options.typeDelay ?? 24;
     const workDelay = options.workDelay ?? 420;
-    const inline = options.inline ?? window.matchMedia?.('(max-width: 1023px)').matches ?? false;
+    const inlineMediaQuery = window.matchMedia?.('(max-width: 1023px)');
+    const isInline = () => options.inline ?? inlineMediaQuery?.matches ?? false;
+    let inline = isInline();
     let currentIndex = -1;
     let animation: AbortController | undefined;
     let frameId = 0;
@@ -116,6 +118,9 @@ export function createHomeStoryController(root: HTMLElement, options: Controller
     const updateFromScroll = () => {
         frameId = 0;
         if (destroyed || scenes.length === 0) return;
+        const nextInline = isInline();
+        const layoutChanged = nextInline !== inline;
+        inline = nextInline;
         const activationLine = window.innerHeight * 0.58;
         let activeIndex = 0;
 
@@ -124,9 +129,9 @@ export function createHomeStoryController(root: HTMLElement, options: Controller
         });
 
         const activeScene = HOME_STORY_SCENES[activeIndex];
-        if (activeScene && activeIndex !== currentIndex) setScene(activeScene.id);
+        if (activeScene && (activeIndex !== currentIndex || layoutChanged)) setScene(activeScene.id);
 
-        if (activeScene?.id === 'scroll') {
+        if (activeScene?.id === 'proof') {
             const rect = scenes[activeIndex].getBoundingClientRect();
             const travel = Math.max(rect.height - window.innerHeight * 0.42, 1);
             const progress = Math.min(1, Math.max(0, (activationLine - rect.top) / travel));

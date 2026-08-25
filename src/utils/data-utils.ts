@@ -47,7 +47,20 @@ export function getLatestPosts(posts: CollectionEntry<'blog'>[], count: number =
     return [...posts].sort(sortItemsByDateDesc).slice(0, count);
 }
 
-export function getHomepageRecommendations(posts: CollectionEntry<'blog'>[], count: number = 3): CollectionEntry<'blog'>[] {
+export function getHomepageFocusAreas<T extends { tag: string }>(posts: CollectionEntry<'blog'>[], areas: readonly T[]): Array<T & { count: number }> {
+    return areas
+        .map((area) => ({
+            ...area,
+            count: getPostsByTag(posts, slugify(area.tag)).length
+        }))
+        .filter(({ count }) => count > 0);
+}
+
+export function getHomepageRecommendations(
+    posts: CollectionEntry<'blog'>[],
+    count: number = 3,
+    preferredIds: readonly string[] = []
+): CollectionEntry<'blog'>[] {
     const sorted = [...posts].sort(sortItemsByDateDesc);
     const selected: CollectionEntry<'blog'>[] = [];
 
@@ -57,6 +70,7 @@ export function getHomepageRecommendations(posts: CollectionEntry<'blog'>[], cou
         }
     };
 
+    preferredIds.forEach((id) => add(sorted.find((candidate) => candidate.id === id)));
     add(getFeaturedArticle(sorted));
     add(sorted.find((candidate) => isArticle(candidate) && !selected.some(({ id }) => id === candidate.id)));
     add(sorted.find((candidate) => isNote(candidate) && !selected.some(({ id }) => id === candidate.id)));

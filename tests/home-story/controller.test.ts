@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHomeStoryController } from '../../src/utils/home-story-controller';
 
-const sceneIds = ['open', 'interests', 'growth', 'now', 'reading', 'scroll', 'enter'];
+const sceneIds = ['open', 'focus', 'now', 'reading', 'proof', 'enter'];
 
 function buildStoryRoot() {
     document.body.innerHTML = `
@@ -41,10 +41,10 @@ describe('home story controller', () => {
         const root = buildStoryRoot();
         const controller = createHomeStoryController(root, { reducedMotion: true });
 
-        controller.setScene('growth');
+        controller.setScene('focus');
 
-        expect(root.dataset.homeScene).toBe('growth');
-        expect(root.querySelector('[data-home-command]')?.textContent).toContain('此园非库');
+        expect(root.dataset.homeScene).toBe('focus');
+        expect(root.querySelector('[data-home-command]')?.textContent).toContain('作品为证');
         controller.destroy();
     });
 
@@ -52,11 +52,11 @@ describe('home story controller', () => {
         const root = buildStoryRoot();
         const controller = createHomeStoryController(root, { reducedMotion: true });
 
-        controller.setScene('scroll');
-        controller.setScene('interests');
+        controller.setScene('proof');
+        controller.setScene('focus');
 
-        expect(root.dataset.homeScene).toBe('interests');
-        expect(root.querySelector('[data-home-status]')?.textContent).toBe('四志已列。');
+        expect(root.dataset.homeScene).toBe('focus');
+        expect(root.querySelector('[data-home-status]')?.textContent).toBe('三条实践脉络已列。');
         controller.destroy();
     });
 
@@ -64,10 +64,10 @@ describe('home story controller', () => {
         const root = buildStoryRoot();
         const controller = createHomeStoryController(root, { reducedMotion: true });
 
-        controller.setScene('growth');
+        controller.setScene('focus');
 
-        expect(root.querySelector('[data-home-chapter-index]')?.textContent).toBe('03');
-        expect(root.querySelector('[data-home-chapter-label]')?.textContent).toBe('生长');
+        expect(root.querySelector('[data-home-chapter-index]')?.textContent).toBe('02');
+        expect(root.querySelector('[data-home-chapter-label]')?.textContent).toBe('方向');
         controller.destroy();
     });
 
@@ -99,12 +99,45 @@ describe('home story controller', () => {
         const root = buildStoryRoot();
         const controller = createHomeStoryController(root, { reducedMotion: true, inline: true });
 
-        controller.setScene('growth');
+        controller.setScene('focus');
 
-        const growthStage = root.querySelector('[data-home-story-scene="growth"] [data-home-command]');
+        const focusStage = root.querySelector('[data-home-story-scene="focus"] [data-home-command]');
         const desktopStage = root.querySelector('.home-story__stage-column [data-home-command]');
-        expect(growthStage?.textContent).toContain('此园非库');
+        expect(focusStage?.textContent).toContain('作品为证');
         expect(desktopStage?.textContent).toBe('');
+        controller.destroy();
+    });
+
+    it('syncs the active scene when crossing into the mobile breakpoint', () => {
+        let mobile = false;
+        let queuedFrame: FrameRequestCallback | undefined;
+        vi.stubGlobal(
+            'matchMedia',
+            vi.fn((query: string) => ({
+                get matches() {
+                    return query === '(max-width: 1023px)' ? mobile : false;
+                }
+            }))
+        );
+        vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+            queuedFrame = callback;
+            return 1;
+        });
+
+        const root = buildStoryRoot();
+        root.querySelectorAll<HTMLElement>('[data-home-story-scene]').forEach((scene) => {
+            const top = scene.dataset.homeStoryScene === 'open' ? -1000 : scene.dataset.homeStoryScene === 'focus' ? 0 : 1000;
+            scene.getBoundingClientRect = () => ({ top, height: 600 }) as DOMRect;
+        });
+        const controller = createHomeStoryController(root, { reducedMotion: true });
+        controller.setScene('focus');
+
+        mobile = true;
+        queuedFrame?.(0);
+
+        const focusStage = root.querySelector('[data-home-story-scene="focus"] [data-home-command]');
+        expect(focusStage?.textContent).toContain('作品为证');
+        expect(root.dataset.homeScene).toBe('focus');
         controller.destroy();
     });
 
@@ -112,10 +145,10 @@ describe('home story controller', () => {
         const root = buildStoryRoot();
         const controller = createHomeStoryController(root, { reducedMotion: true });
 
-        controller.setScene('scroll');
+        controller.setScene('proof');
 
-        expect(root.querySelector('[data-home-command]')?.textContent).toBe('今添吾色，易其字，展此长卷。');
-        expect(root.querySelector('[data-home-status]')?.textContent).toBe('墨色已定。长卷已展。');
+        expect(root.querySelector('[data-home-command]')?.textContent).toBe('计其年月、文章、专题与题解。');
+        expect(root.querySelector('[data-home-status]')?.textContent).toBe('积累已有据可查。');
         controller.destroy();
     });
 });

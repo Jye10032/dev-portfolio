@@ -8,8 +8,8 @@ const siteConfig: SiteConfig = {
         alt: 'misaka.design 二次元头像'
     },
     title: 'misaka.design',
-    subtitle: '设计、AI 与持续成长',
-    description: '关于设计、AI，以及一个前端工程师如何持续成长。',
+    subtitle: '前端工程、AI 与持续实践',
+    description: '一个前端工程师关于 AI 工作流、复杂状态与工程复盘的持续记录。',
     headerNavLinks: [
         {
             text: '首页',
@@ -49,10 +49,26 @@ const siteConfig: SiteConfig = {
         }
     ],
     homeIntro: {
-        lead: '关于设计、AI，以及一个前端工程师如何持续成长。',
-        text: '这里先以中文写作为主，记录长文、札记和持续生长中的思考脉络。'
+        lead: '关于前端工程、AI 工作流与持续实践。',
+        text: '以中文记录可验证的项目、技术判断与工程复盘。'
     },
-    homeNow: [],
+    homeNow: [
+        {
+            label: '当前项目',
+            text: 'FEMentor：把固定题单扩展为具备追问、记忆与检索能力的模拟面试 Agent。',
+            href: '/tags/fementor'
+        },
+        {
+            label: '研究主题',
+            text: 'AI Agent 的上下文压缩、长期记忆与知识结构治理。',
+            href: '/blog/fementor-2-context-and-memory'
+        },
+        {
+            label: '近期整理',
+            text: 'VideoGaga 的状态模型、跨页面缓存与 Hydration 一致性。',
+            href: '/tags/videogaga'
+        }
+    ],
     subscribe: {
         enabled: false
     },

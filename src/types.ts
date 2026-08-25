@@ -22,9 +22,21 @@ export type HomeIntro = {
 };
 
 export type HomeNowItem = {
-    label: '最近在做' | '最近在读' | '最近思考';
+    label: '当前项目' | '研究主题' | '近期整理';
     text: string;
     href?: string;
+};
+
+export type HomeFocusArea = {
+    title: string;
+    description: string;
+    href: string;
+    count: number;
+};
+
+export type HomeProofItem = {
+    value: string;
+    label: string;
 };
 
 export type SubscribeForm = {

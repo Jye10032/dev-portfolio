@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import type { HomeNowItem, ImageInput } from '../../types';
-import { HOME_GROWTH_STATES, HOME_INTERESTS, HOME_STORY_SCENES } from '../../data/home-story';
+import type { HomeFocusArea, HomeNowItem, HomeProofItem, ImageInput } from '../../types';
+import { HOME_STORY_SCENES } from '../../data/home-story';
 import CustomImage from '../CustomImage.astro';
 import PostPreview from '../PostPreview.astro';
 import HomeStoryScene from './HomeStoryScene.astro';
@@ -10,11 +10,13 @@ import HomeStoryStage from './HomeStoryStage.astro';
 type Props = {
     recommendations: CollectionEntry<'blog'>[];
     homeNow?: HomeNowItem[];
+    focusAreas: HomeFocusArea[];
+    proofItems: HomeProofItem[];
     avatar?: ImageInput;
 };
 
-const { recommendations, homeNow = [], avatar } = Astro.props;
-const [openScene, interestsScene, growthScene, nowScene, readingScene, scrollScene, enterScene] = HOME_STORY_SCENES;
+const { recommendations, homeNow = [], focusAreas, proofItems, avatar } = Astro.props;
+const [openScene, focusScene, nowScene, readingScene, proofScene, enterScene] = HOME_STORY_SCENES;
 ---
 
 <section class="home-story" data-home-story data-home-scene="open" aria-label="misaka.design 首页导览">
@@ -48,35 +50,27 @@ const [openScene, interestsScene, growthScene, nowScene, readingScene, scrollSce
                         </figure>
                     )
                 }
-                <p class="home-intro__copy">收录设计、AI、前端，以及尚未想明白的问题。</p>
+                <p class="home-intro__copy">前端工程师，持续实践 AI 工作流、复杂状态管理与工程化问题。</p>
             </div>
         </HomeStoryScene>
 
-        <HomeStoryScene scene={interestsScene}>
-            <ol class="home-interest-list">
+        <HomeStoryScene scene={focusScene}>
+            <ol class="home-focus-list">
                 {
-                    HOME_INTERESTS.map((interest, index) => (
+                    focusAreas.map((area, index) => (
                         <li>
-                            <span>{String(index + 1).padStart(2, '0')}</span>
-                            {interest}
+                            <span class="home-focus-list__index">{String(index + 1).padStart(2, '0')}</span>
+                            <div>
+                                <h3>{area.title}</h3>
+                                <p>{area.description}</p>
+                                <a href={area.href}>
+                                    {area.count} 篇相关写作 <span aria-hidden="true">→</span>
+                                </a>
+                            </div>
                         </li>
                     ))
                 }
             </ol>
-        </HomeStoryScene>
-
-        <HomeStoryScene scene={growthScene}>
-            <p>这里不是完成品仓库。每段思考都有自己的成熟度，也允许在新的经验里被改写。</p>
-            <ul class="home-growth-list">
-                {
-                    HOME_GROWTH_STATES.map((state) => (
-                        <li>
-                            <span aria-hidden="true" />
-                            {state}
-                        </li>
-                    ))
-                }
-            </ul>
         </HomeStoryScene>
 
         <HomeStoryScene scene={nowScene}>
@@ -112,25 +106,18 @@ const [openScene, interestsScene, growthScene, nowScene, readingScene, scrollSce
             }
         </HomeStoryScene>
 
-        <HomeStoryScene scene={scrollScene}>
-            <div class="home-scroll-index">
-                <div>
-                    <span>所好</span>
-                    <p>{HOME_INTERESTS.join(' · ')}</p>
-                </div>
-                <div>
-                    <span>生长</span>
-                    <p>{HOME_GROWTH_STATES.join(' · ')}</p>
-                </div>
+        <HomeStoryScene scene={proofScene}>
+            <dl class="home-proof-list">
                 {
-                    recommendations.length > 0 && (
+                    proofItems.map((item) => (
                         <div>
-                            <span>荐读</span>
-                            <p>{recommendations.map(({ data }) => data.title).join(' · ')}</p>
+                            <dt>{item.value}</dt>
+                            <dd>{item.label}</dd>
                         </div>
-                    )
+                    ))
                 }
-            </div>
+            </dl>
+            <a class="home-proof-link" href="/timeline">沿时间线查看全部记录 <span aria-hidden="true">→</span></a>
         </HomeStoryScene>
 
         <HomeStoryScene scene={enterScene}>
