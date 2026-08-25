@@ -7,7 +7,7 @@ const siteConfig: SiteConfig = {
         src: avatar,
         alt: 'misaka.design 二次元头像'
     },
-    title: 'misaka.design',
+    title: 'misaka',
     subtitle: '前端工程、AI 与持续实践',
     description: '一个前端工程师关于 AI 工作流、复杂状态与工程复盘的持续记录。',
     headerNavLinks: [
@@ -30,16 +30,16 @@ const siteConfig: SiteConfig = {
         {
             text: '便利贴墙',
             href: '/wall'
+        },
+        {
+            text: '联系我',
+            href: '/contact'
         }
     ],
     footerNavLinks: [
         {
             text: '关于',
             href: '/about'
-        },
-        {
-            text: '联系',
-            href: '/contact'
         }
     ],
     socialLinks: [

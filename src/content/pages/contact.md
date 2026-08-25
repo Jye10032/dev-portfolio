@@ -1,14 +1,14 @@
 ---
-title: 联系
+title: 联系我
 seo:
-  title: 联系方式 - misaka.design
-  description: 当前站点暂未公开固定联系方式，后续会在这里补充真实可用的联系渠道
+  title: 联系 misaka
+  description: 通过 GitHub 联系 misaka，交流前端工程、AI Agent 与技术实践
 ---
 
-感谢你的来访。
+如果你想交流前端工程、AI Agent、技术写作，或者聊聊正在解决的问题，可以通过 GitHub 找到我。
 
-这个站点还在持续整理中，目前暂未公开固定邮箱或社交账号。
+## GitHub
 
-等真实可用的联系渠道确认后，我会在这里补充。
+<a href="https://github.com/Jye10032" target="_blank" rel="noreferrer">Jye10032</a>
 
-如果你只是想跟进新内容，现在可以先通过 [RSS](/rss.xml) 订阅更新。
+也可以通过 [RSS](/rss.xml) 跟进新内容。
