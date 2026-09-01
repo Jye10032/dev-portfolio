@@ -1,8 +1,25 @@
 import type { CollectionEntry } from 'astro:content';
 import { slugify } from './common-utils';
 
+export type BlogLanguage = CollectionEntry<'blog'>['data']['lang'];
+
 export function sortItemsByDateDesc(itemA: CollectionEntry<'blog' | 'projects'>, itemB: CollectionEntry<'blog' | 'projects'>) {
     return new Date(itemB.data.publishDate).getTime() - new Date(itemA.data.publishDate).getTime();
+}
+
+export function getPostHref(post: CollectionEntry<'blog'>): string {
+    return post.data.lang === 'en' ? `/en/blog/${post.id}/` : `/blog/${post.id}/`;
+}
+
+export function getPostsByLanguage(posts: CollectionEntry<'blog'>[], lang: BlogLanguage): CollectionEntry<'blog'>[] {
+    return posts.filter((post) => post.data.lang === lang);
+}
+
+export function findPostTranslation(post: CollectionEntry<'blog'>, posts: CollectionEntry<'blog'>[]): CollectionEntry<'blog'> | undefined {
+    if (!post.data.translationKey) return undefined;
+    return posts.find(
+        (candidate) => candidate.id !== post.id && candidate.data.lang !== post.data.lang && candidate.data.translationKey === post.data.translationKey
+    );
 }
 
 export function getAllTags(posts: CollectionEntry<'blog'>[]) {

@@ -1,0 +1,337 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from './Button.astro';
+import FormattedDate from './FormattedDate.astro';
+import PostPreview from './PostPreview.astro';
+import Subscribe from './Subscribe.astro';
+import { getPostHref } from '../utils/data-utils';
+import { slugify } from '../utils/common-utils';
+
+type Heading = { depth: number; slug: string; text: string };
+
+type Props = {
+    post: CollectionEntry<'blog'>;
+    prevPost: CollectionEntry<'blog'> | null;
+    nextPost: CollectionEntry<'blog'> | null;
+    translation?: CollectionEntry<'blog'>;
+    headings: Heading[];
+};
+
+const { post, prevPost, nextPost, translation, headings } = Astro.props;
+const { title, publishDate, updatedDate, excerpt, tags = [], seo, type, readingTime, lang } = post.data;
+const tableOfContents = type === 'article' && headings.filter((heading) => heading.depth === 2);
+const showTableOfContents = tableOfContents.length >= 3;
+const isEnglish = lang === 'en';
+const labels = isEnglish
+    ? {
+          article: 'Article',
+          note: 'Note',
+          minutes: (value: number) => `${value} min read`,
+          updated: 'Updated',
+          toc: 'On this page',
+          continueReading: 'Continue reading',
+          share: 'Share',
+          copied: 'Copied',
+          topics: 'Topics'
+      }
+    : {
+          article: '长文',
+          note: '札记',
+          minutes: (value: number) => `约 ${value} 分钟`,
+          updated: '更新于',
+          toc: '本文目录',
+          continueReading: '继续阅读',
+          share: '分享',
+          copied: '已复制',
+          topics: '文章主题'
+      };
+const typeLabel = type === 'article' ? labels.article : labels.note;
+const alternates = translation
+    ? [
+          { lang, href: getPostHref(post) },
+          { lang: translation.data.lang, href: getPostHref(translation) }
+      ]
+    : [];
+---
+
+<BaseLayout
+    title={seo?.title ?? title}
+    description={seo?.description ?? excerpt}
+    image={seo?.image}
+    pageType="article"
+    showHeader={false}
+    wide={showTableOfContents}
+    lang={lang}
+    alternates={alternates}
+>
+    {
+        type === 'article' && (
+            <div class="bg-muted fixed top-0 left-0 z-50 h-0.5 w-full">
+                <div id="reading-progress" class="bg-accent h-full transition-all duration-150" style="width: 0%" />
+            </div>
+        )
+    }
+
+    <div class:list={['post-layout', showTableOfContents && 'post-layout--with-toc']}>
+        <article class="post-article mb-16 sm:mb-24">
+            <header class="mb-8">
+                <div class="mb-4 flex flex-wrap items-center gap-3">
+                    <span class="border-main border px-2 py-1 text-xs opacity-60">{typeLabel}</span>
+                    {readingTime && <span class="text-main/60 text-xs">{labels.minutes(readingTime)}</span>}
+                    {
+                        translation && (
+                            <nav class="post-language-switch" aria-label={isEnglish ? 'Language' : '语言'}>
+                                <a href={getPostHref(translation)} lang={translation.data.lang} hreflang={translation.data.lang}>
+                                    {translation.data.lang === 'en' ? 'EN' : '中文'}
+                                </a>
+                            </nav>
+                        )
+                    }
+                </div>
+                <h1 class="font-sans text-3xl leading-tight font-bold sm:text-5xl sm:leading-tight">{title}</h1>
+                <div class="text-main/70 mt-4 text-sm">
+                    <FormattedDate date={publishDate} lang={lang} />
+                    {
+                        updatedDate && (
+                            <>
+                                {' '}
+                                <span>
+                                    ({labels.updated} <FormattedDate date={updatedDate} lang={lang} />)
+                                </span>
+                            </>
+                        )
+                    }
+                </div>
+            </header>
+
+            {
+                showTableOfContents && (
+                    <details class="post-toc post-toc--mobile">
+                        <summary>{labels.toc}</summary>
+                        <ol>
+                            {tableOfContents.map((heading) => (
+                                <li>
+                                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                                </li>
+                            ))}
+                        </ol>
+                    </details>
+                )
+            }
+
+            <div class="prose sm:prose-lg max-w-none">
+                <slot />
+            </div>
+            <div class="mt-8 flex flex-wrap items-center justify-between gap-6 text-sm sm:mt-12 sm:text-base">
+                {
+                    tags.length > 0 && (
+                        <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm" aria-label={labels.topics}>
+                            {tags.map((tag) => (isEnglish ? <span>#{tag}</span> : <a href={`/tags/${slugify(tag)}`}>#{tag}</a>))}
+                        </div>
+                    )
+                }
+                <Button
+                    class="copy-url-button"
+                    aria-label={labels.share}
+                    data-url={Astro.url.href}
+                    data-label-default={labels.share}
+                    data-label-success={labels.copied}
+                >
+                    {labels.share}
+                </Button>
+            </div>
+        </article>
+
+        {
+            showTableOfContents && (
+                <aside class="post-toc post-toc--desktop" aria-label={labels.toc}>
+                    <p>{labels.toc}</p>
+                    <ol>
+                        {tableOfContents.map((heading) => (
+                            <li>
+                                <a href={`#${heading.slug}`}>{heading.text}</a>
+                            </li>
+                        ))}
+                    </ol>
+                </aside>
+            )
+        }
+    </div>
+
+    <div class="post-after mx-auto max-w-3xl">
+        {
+            (prevPost || nextPost) && (
+                <div class="my-16 sm:my-24">
+                    <h2 class="mb-12 font-sans text-2xl font-bold sm:mb-16 sm:text-3xl">{labels.continueReading}</h2>
+                    {nextPost && <PostPreview post={nextPost} class="mb-10 sm:mb-12" headingLevel="h3" />}
+                    {prevPost && <PostPreview post={prevPost} class="mb-10 sm:mb-12" headingLevel="h3" />}
+                </div>
+            )
+        }
+        <Subscribe class="my-16 sm:my-24" />
+    </div>
+</BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const progressBar = document.getElementById('reading-progress');
+        const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('.post-toc a')];
+        const tocHeadings = tocLinks
+            .map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
+            .filter((heading): heading is HTMLElement => Boolean(heading));
+
+        if (progressBar || tocHeadings.length > 0) {
+            const updateReadingState = () => {
+                const scrollTop = window.scrollY;
+                if (progressBar) {
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                    progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+                }
+
+                if (tocHeadings.length > 0) {
+                    const activeHeading = [...tocHeadings].reverse().find((heading) => heading.offsetTop <= scrollTop + 160) ?? tocHeadings[0];
+                    tocLinks.forEach((link) => {
+                        const isActive = decodeURIComponent(link.hash.slice(1)) === activeHeading.id;
+                        if (isActive) link.setAttribute('aria-current', 'location');
+                        else link.removeAttribute('aria-current');
+                    });
+                }
+            };
+            window.addEventListener('scroll', updateReadingState, { passive: true });
+            updateReadingState();
+        }
+
+        const copyUrlButton = document.querySelector('.copy-url-button') as HTMLButtonElement;
+        copyUrlButton?.addEventListener('click', async () => {
+            const url = copyUrlButton.dataset.url || '';
+            await navigator.clipboard.writeText(url);
+            copyUrlButton.innerText = copyUrlButton.dataset.labelSuccess || '';
+            setTimeout(() => {
+                copyUrlButton.innerText = copyUrlButton.dataset.labelDefault || '';
+            }, 2500);
+        });
+    });
+</script>
+
+<style>
+    .post-layout {
+        max-width: 48rem;
+        margin-inline: auto;
+    }
+
+    .post-layout--with-toc {
+        position: relative;
+        left: 50%;
+        display: grid;
+        grid-template-columns: 16rem minmax(0, 48rem) 16rem;
+        align-items: start;
+        gap: 3rem;
+        width: min(86rem, calc(100vw - 4rem));
+        max-width: none;
+        transform: translateX(-50%);
+    }
+
+    .post-article {
+        min-width: 0;
+    }
+
+    .post-layout--with-toc .post-article {
+        grid-column: 2;
+    }
+
+    .post-language-switch {
+        margin-left: auto;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .post-toc {
+        font-size: 0.8125rem;
+        line-height: 1.45;
+    }
+
+    .post-toc--desktop {
+        position: sticky;
+        top: 2rem;
+        grid-column: 3;
+        padding-left: 1rem;
+        border-left: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+    }
+
+    .post-toc--desktop > p {
+        margin: 0 0 0.75rem;
+        font-weight: 700;
+    }
+
+    .post-toc ol {
+        display: grid;
+        gap: 0.55rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .post-toc li {
+        position: relative;
+    }
+
+    .post-toc a {
+        opacity: 0.68;
+    }
+
+    .post-toc a:hover,
+    .post-toc a:focus-visible,
+    .post-toc a[aria-current='location'] {
+        opacity: 1;
+    }
+
+    .post-toc a[aria-current='location'] {
+        font-weight: 700;
+    }
+
+    .post-toc--desktop a[aria-current='location']::before {
+        position: absolute;
+        top: 0.2em;
+        bottom: 0.2em;
+        left: -1.05rem;
+        width: 2px;
+        background: var(--text-main);
+        content: '';
+    }
+
+    .post-toc--mobile {
+        display: none;
+        margin-bottom: 2rem;
+        padding-block: 0.75rem;
+        border-block: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+    }
+
+    .post-toc--mobile summary {
+        cursor: pointer;
+        font-weight: 700;
+    }
+
+    .post-toc--mobile[open] summary {
+        margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 1439px) {
+        .post-layout--with-toc {
+            display: block;
+            position: static;
+            max-width: 48rem;
+            width: auto;
+            transform: none;
+        }
+
+        .post-toc--desktop {
+            display: none;
+        }
+
+        .post-toc--mobile {
+            display: block;
+        }
+    }
+</style>

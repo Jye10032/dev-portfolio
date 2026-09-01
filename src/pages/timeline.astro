@@ -2,7 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { slugify } from '../utils/common-utils';
-import { sortItemsByDateDesc } from '../utils/data-utils';
+import { getPostHref, sortItemsByDateDesc } from '../utils/data-utils';
 
 type TimelinePost = CollectionEntry<'blog'>;
 
@@ -21,7 +21,7 @@ type YearGroup = {
     months: MonthGroup[];
 };
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === 'zh-CN')).sort(sortItemsByDateDesc);
 const groupedPosts = new Map<number, Map<number, Map<number, TimelinePost[]>>>();
 
 for (const post of posts) {
@@ -93,7 +93,7 @@ const postTypeLabel = (post: TimelinePost) => (post.data.type === 'note' ? 'æœ­è
                                                                 ))}
                                                             </div>
                                                             <h4>
-                                                                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+                                                                <a href={getPostHref(post)}>{post.data.title}</a>
                                                             </h4>
                                                         </article>
                                                     ))}

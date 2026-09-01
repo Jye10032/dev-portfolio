@@ -5,23 +5,41 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout wide title="便利贴墙" description="灵感、碎片与实验的落脚点。">
+    <Fragment slot="head">
+        <script>
+            import { initWall } from '../utils/wall/wall-app';
+
+            let activeRoot: HTMLElement | null = null;
+            let cleanup: (() => void) | null = null;
+
+            function setup() {
+                const root = document.getElementById('wall-root');
+                if (!root || root === activeRoot) return;
+
+                cleanup?.();
+                activeRoot = root;
+                cleanup = initWall(root) ?? null;
+            }
+
+            function teardown() {
+                cleanup?.();
+                cleanup = null;
+                activeRoot = null;
+            }
+
+            setup();
+            document.addEventListener('DOMContentLoaded', setup, { once: true });
+            document.addEventListener('astro:page-load', setup);
+            document.addEventListener('astro:before-swap', teardown);
+        </script>
+    </Fragment>
+
     <section class="mb-8 sm:mb-10">
-        <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight mb-4">便利贴墙</h1>
-        <p class="text-lg text-main/80 leading-relaxed">灵感、碎片与实验的落脚点。</p>
+        <h1 class="mb-4 font-sans text-3xl leading-tight font-bold sm:text-5xl sm:leading-tight">便利贴墙</h1>
+        <p class="text-main/80 text-lg leading-relaxed">灵感、碎片与实验的落脚点。</p>
     </section>
     <div id="wall-root" class="relative">
         <WallCanvas />
         <WallPanel />
     </div>
 </BaseLayout>
-
-<script>
-    import { initWall } from '../utils/wall/wall-app';
-
-    function setup() {
-        const root = document.getElementById('wall-root');
-        if (root) initWall(root);
-    }
-
-    document.addEventListener('astro:page-load', setup);
-</script>

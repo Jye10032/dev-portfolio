@@ -6,13 +6,13 @@ import Header from '../components/Header.astro';
 import Nav from '../components/Nav.astro';
 import siteConfig from '../data/site-config';
 
-export type Props = HeadProps & { showHeader?: boolean; wide?: boolean };
+export type Props = HeadProps & { showHeader?: boolean; wide?: boolean; lang?: 'zh-CN' | 'en' };
 
-const { showHeader = true, wide = false, ...head } = Astro.props;
+const { showHeader = true, wide = false, lang = 'zh-CN', ...head } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="wrap-break-words antialiased">
+<html lang={lang} class="wrap-break-words">
     <head>
         <BaseHead {...head} />
         <script>
@@ -27,12 +27,13 @@ const { showHeader = true, wide = false, ...head } = Astro.props;
                 <script is:inline defer src={siteConfig.umami.scriptUrl ?? 'https://cloud.umami.is/script.js'} data-website-id={siteConfig.umami.websiteId} />
             )
         }
+        <slot name="head" />
     </head>
     <body class="bg-main text-main">
         <div class:list={['flex min-h-screen flex-col px-4 md:px-8', wide && 'wall-wide']}>
             <Nav />
             {showHeader && <Header />}
-            <main class:list={['mx-auto w-full grow', wide ? 'max-w-6xl' : 'max-w-3xl']}>
+            <main class:list={['mx-auto w-full grow', wide ? 'max-w-6xl' : 'max-w-3xl', !showHeader && 'pt-6 sm:pt-8']}>
                 <slot />
             </main>
             <Footer />

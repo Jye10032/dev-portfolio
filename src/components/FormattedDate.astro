@@ -1,13 +1,14 @@
 ---
-type Props = { date: Date };
+type Props = { date: Date; lang?: 'zh-CN' | 'en' };
 
-const { date } = Astro.props;
+const { date, lang = 'zh-CN' } = Astro.props;
 
 const year = date.getFullYear();
 const month = date.getMonth() + 1;
 const day = date.getDate();
+const label = lang === 'en' ? new Intl.DateTimeFormat('en', { year: 'numeric', month: 'long', day: 'numeric' }).format(date) : `${year}年${month}月${day}日`;
 ---
 
 <time datetime={date.toISOString()}>
-    {year}年{month}月{day}日
+    {label}
 </time>

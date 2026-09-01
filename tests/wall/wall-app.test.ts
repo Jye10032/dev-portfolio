@@ -6,6 +6,7 @@ function buildWallRoot() {
         '  <div class="wall-canvas">',
         '    <button id="wall-add" type="button">+ 新建</button>',
         '    <button id="wall-reset" type="button">重置墙</button>',
+        '    <p id="wall-empty" hidden>墙上还没有便利贴。</p>',
         '    <div id="wall-notes"></div>',
         '  </div>',
         '  <aside class="wall-panel" hidden>',
@@ -33,6 +34,23 @@ beforeEach(() => {
 });
 
 describe('wall app interactions', () => {
+    it('creates a note and enters editing when the add button is clicked', async () => {
+        const root = buildWallRoot();
+        const { initWall } = await import('../../src/utils/wall/wall-app');
+        const store = await import('../../src/utils/wall/store');
+
+        initWall(root);
+        const initialCount = store.getState().notes.length;
+        const addButton = root.querySelector('#wall-add') as HTMLButtonElement;
+        addButton.click();
+
+        const newNote = root.querySelector('.wall-note[data-id="test-uuid"]') as HTMLElement;
+        const content = newNote.querySelector('.wall-note__content') as HTMLElement;
+        expect(store.getState().notes).toHaveLength(initialCount + 1);
+        expect(newNote).not.toBeNull();
+        expect(content.contentEditable).toBe('true');
+    });
+
     it('requires confirmation before deleting a selected note', async () => {
         const confirmSpy = vi.fn(() => false);
         vi.stubGlobal('confirm', confirmSpy);
@@ -115,5 +133,49 @@ describe('wall app interactions', () => {
 
         expect(confirmSpy).toHaveBeenCalledTimes(1);
         expect(store.getState().notes.map((note) => note.id)).toEqual(['seed-1', 'seed-2', 'seed-3', 'seed-4']);
+    });
+
+    it('shows an explicit empty state without restoring deleted notes', async () => {
+        const root = buildWallRoot();
+        const store = await import('../../src/utils/wall/store');
+        store.setState({ version: 1, selectedId: null, notes: [] });
+
+        const { initWall } = await import('../../src/utils/wall/wall-app');
+        initWall(root);
+
+        const emptyState = root.querySelector('#wall-empty') as HTMLElement;
+        expect(emptyState.hidden).toBe(false);
+        expect(root.querySelectorAll('.wall-note')).toHaveLength(0);
+        expect(store.getState().notes).toHaveLength(0);
+    });
+
+    it('keeps rendered notes inside the visible canvas on load and resize', async () => {
+        const root = buildWallRoot();
+        const notesLayer = root.querySelector('#wall-notes') as HTMLElement;
+        let layerWidth = 360;
+        let layerHeight = 420;
+        vi.spyOn(notesLayer, 'getBoundingClientRect').mockImplementation(
+            () =>
+                ({ width: layerWidth, height: layerHeight, top: 0, right: layerWidth, bottom: layerHeight, left: 0, x: 0, y: 0, toJSON: () => ({}) }) as DOMRect
+        );
+
+        const originalRect = HTMLElement.prototype.getBoundingClientRect;
+        vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+            if ((this as HTMLElement).classList?.contains('wall-note')) {
+                return { width: 224, height: 120, top: 0, right: 224, bottom: 120, left: 0, x: 0, y: 0, toJSON: () => ({}) } as DOMRect;
+            }
+            return originalRect.call(this);
+        });
+
+        const { initWall } = await import('../../src/utils/wall/wall-app');
+        initWall(root);
+
+        const farNote = root.querySelector('.wall-note[data-id="seed-4"]') as HTMLElement;
+        expect(farNote.style.transform).toBe('translate(120px, 284px)');
+
+        layerWidth = 300;
+        layerHeight = 340;
+        window.dispatchEvent(new Event('resize'));
+        expect(farNote.style.transform).toBe('translate(60px, 204px)');
     });
 });

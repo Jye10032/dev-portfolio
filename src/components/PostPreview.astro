@@ -1,69 +1,83 @@
 ---
 import { type CollectionEntry } from 'astro:content';
-import ArrowRight from '../assets/icons/arrow-right.svg';
 import FormattedDate from './FormattedDate.astro';
 import { slugify } from '../utils/common-utils';
+import { getPostHref } from '../utils/data-utils';
 
 type Props = {
     post: CollectionEntry<'blog'>;
     class?: string;
     headingLevel?: 'h2' | 'h3';
     featured?: boolean;
+    index?: number;
 };
 
-const { post, class: className, headingLevel = 'h2', featured = false } = Astro.props;
-const { title, publishDate, updatedDate, excerpt, type, tags = [] } = post.data;
+const { post, class: className, headingLevel = 'h2', featured = false, index } = Astro.props;
+const { title, publishDate, updatedDate, excerpt, type, tags = [], lang } = post.data;
 const TitleTag = headingLevel;
-const typeLabel = type === 'article' ? '长文' : '札记';
+const isEnglish = lang === 'en';
+const typeLabel = type === 'article' ? (isEnglish ? 'Article' : '长文') : isEnglish ? 'Note' : '札记';
 ---
 
-<article class:list={['group', className]}>
-    <a class="flex items-start justify-between gap-8" href={`/blog/${post.id}/`}>
-        <div class="grow">
-            <div class="flex items-center gap-3">
-                <TitleTag
-                    class:list={[
-                        'font-serif leading-tight font-medium group-hover:underline group-hover:decoration-dashed group-hover:decoration-1 group-hover:underline-offset-4',
-                        featured ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'
-                    ]}
-                >
-                    {title}
-                </TitleTag>
-                <span class="text-main/60 border-main/20 shrink-0 rounded border px-1.5 py-0.5 text-xs">
-                    {typeLabel}
-                </span>
-            </div>
-            <div class="text-main/70 mt-1 text-sm leading-normal">
-                <FormattedDate date={publishDate} />
-                {
-                    updatedDate && (
-                        <>
-                            {' '}
-                            <span>
-                                (更新于 <FormattedDate date={updatedDate} />)
-                            </span>
-                        </>
-                    )
-                }
-            </div>
-            {excerpt && <div class:list={['mt-3 leading-normal', featured ? 'text-base' : 'text-sm']}>{excerpt}</div>}
-        </div>
-        <div class="hidden font-serif italic opacity-0 transition group-hover:opacity-100 sm:inline-flex sm:shrink-0 sm:items-center sm:gap-1">
-            阅读全文 <ArrowRight class="h-4 w-4 fill-current" />
-        </div>
-    </a>
+<article class:list={['post-index-item', index && 'post-index-item--numbered', className]}>
     {
-        tags.length > 0 && (
-            <div class="mt-4 flex flex-wrap gap-2" aria-label="文章主题">
-                {tags.map((tag) => (
-                    <a
-                        class="border-main/15 text-main/60 hover:text-accent rounded-full border px-2.5 py-1 text-xs transition-colors hover:border-[var(--accent)]"
-                        href={`/tags/${slugify(tag)}`}
-                    >
-                        #{tag}
-                    </a>
-                ))}
-            </div>
+        index && (
+            <span class="post-index-item__number" aria-hidden="true">
+                {String(index).padStart(2, '0')}.
+            </span>
         )
     }
+    <div class="post-index-item__content">
+        <TitleTag class:list={['font-sans leading-tight font-bold', featured ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl']}>
+            <a href={getPostHref(post)}>{title}</a>
+        </TitleTag>
+        <p class="mt-1 text-sm leading-normal opacity-70">
+            <FormattedDate date={publishDate} lang={lang} /> · {typeLabel}
+            {
+                updatedDate && (
+                    <>
+                        {' '}
+                        · {isEnglish ? 'Updated' : '更新于'} <FormattedDate date={updatedDate} lang={lang} />
+                    </>
+                )
+            }
+        </p>
+        {excerpt && <p class:list={['mt-3 leading-normal', featured ? 'text-base' : 'text-sm']}>{excerpt}</p>}
+        {
+            tags.length > 0 && (
+                <p class="mt-3 text-xs" aria-label={isEnglish ? 'Topics' : '文章主题'}>
+                    {isEnglish ? 'Topics: ' : '主题：'}
+                    {tags.map((tag, tagIndex) => (
+                        <>
+                            {isEnglish ? <span>#{tag}</span> : <a href={`/tags/${slugify(tag)}`}>#{tag}</a>}
+                            {tagIndex < tags.length - 1 ? (isEnglish ? ', ' : '、') : ''}
+                        </>
+                    ))}
+                </p>
+            )
+        }
+    </div>
 </article>
+
+<style>
+    .post-index-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.75rem;
+    }
+
+    .post-index-item--numbered {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .post-index-item__number {
+        padding-top: 0.15rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+
+    .post-index-item__content {
+        min-width: 0;
+    }
+</style>

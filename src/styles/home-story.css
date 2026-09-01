@@ -1,9 +1,48 @@
-.home-story {
+.home-story,
+body:has(.home-story) {
     --home-paper: #f7f5ef;
     --home-paper-deep: #eee9dc;
     --home-ink: #20201e;
     --home-ink-muted: #69675f;
     --home-vermilion: #a33a2b;
+}
+
+body:has(.home-story) {
+    --text-main: var(--home-ink);
+    --border-main: var(--home-ink);
+    --accent: var(--home-vermilion);
+    --accent-muted: #7c2d22;
+}
+
+body:has(.home-story) > div > nav {
+    padding-top: 2rem;
+    padding-bottom: 5.5rem;
+    border-bottom: 0;
+}
+
+body:has(.home-story) > div > nav a {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+body:has(.home-story) > div > header {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+body:has(.home-story) > div > header img {
+    border: 0;
+    border-radius: 999px;
+}
+
+body:has(.home-story) > div > header p:first-child {
+    font-family: var(--font-serif);
+    font-weight: 500;
+}
+
+.home-story {
     --home-scroll-progress: 0;
     display: grid;
     grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.2fr);
@@ -471,6 +510,13 @@
     --home-vermilion: #d46a55;
 }
 
+.dark body:has(.home-story) {
+    --text-main: #ece8dc;
+    --border-main: #ece8dc;
+    --accent: #d46a55;
+    --accent-muted: #e18a78;
+}
+
 @keyframes home-caret {
     50% {
         opacity: 0;
@@ -478,6 +524,10 @@
 }
 
 @media (max-width: 1023px) {
+    body:has(.home-story) > div > nav {
+        padding-bottom: 3.5rem;
+    }
+
     .home-story {
         display: block;
         width: 100%;

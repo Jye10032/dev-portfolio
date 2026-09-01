@@ -19,6 +19,7 @@ export function initWall(root: HTMLElement): (() => void) | void {
     const notesLayer = root.querySelector<HTMLElement>('#wall-notes');
     const addButton = root.querySelector<HTMLButtonElement>('#wall-add');
     const resetButton = root.querySelector<HTMLButtonElement>('#wall-reset');
+    const emptyState = root.querySelector<HTMLElement>('#wall-empty');
     const panel = root.querySelector<HTMLElement>('.wall-panel');
     if (!notesLayer || !addButton || !resetButton || !panel) return;
 
@@ -29,13 +30,26 @@ export function initWall(root: HTMLElement): (() => void) | void {
     function getClampedPosition(noteEl: HTMLElement, x: number, y: number) {
         const layerRect = notesLayer!.getBoundingClientRect();
         const noteRect = noteEl.getBoundingClientRect();
-        const maxX = Math.max(0, layerRect.width - noteRect.width);
-        const maxY = Math.max(0, layerRect.height - noteRect.height);
+        const minX = 16;
+        const minY = 64;
+        const maxX = Math.max(minX, layerRect.width - noteRect.width - 16);
+        const maxY = Math.max(minY, layerRect.height - noteRect.height - 16);
 
         return {
-            x: clamp(x, 0, maxX),
-            y: clamp(y, 0, maxY)
+            x: clamp(x, minX, maxX),
+            y: clamp(y, minY, maxY)
         };
+    }
+
+    function clampRenderedNotes(): void {
+        notesLayer!.querySelectorAll<HTMLElement>('.wall-note').forEach((el) => {
+            const x = parseFloat(el.dataset.x ?? '0') || 0;
+            const y = parseFloat(el.dataset.y ?? '0') || 0;
+            const position = getClampedPosition(el, x, y);
+            el.dataset.x = String(position.x);
+            el.dataset.y = String(position.y);
+            el.style.transform = `translate(${position.x}px, ${position.y}px)`;
+        });
     }
 
     function noteElement(note: Note): HTMLElement {
@@ -90,6 +104,8 @@ export function initWall(root: HTMLElement): (() => void) | void {
             fragment.appendChild(el);
         }
         notesLayer!.replaceChildren(fragment);
+        if (emptyState) emptyState.hidden = state.notes.length > 0;
+        requestAnimationFrame(clampRenderedNotes);
         renderPanel(state);
     }
 
@@ -174,11 +190,7 @@ export function initWall(root: HTMLElement): (() => void) | void {
                 const target = event.target as HTMLElement;
                 const id = target.dataset.id;
                 if (!id) return;
-                const { x, y } = getClampedPosition(
-                    target,
-                    parseFloat(target.dataset.x ?? '0') || 0,
-                    parseFloat(target.dataset.y ?? '0') || 0
-                );
+                const { x, y } = getClampedPosition(target, parseFloat(target.dataset.x ?? '0') || 0, parseFloat(target.dataset.y ?? '0') || 0);
                 patchNote(id, { x, y });
             }
         }
@@ -271,6 +283,11 @@ export function initWall(root: HTMLElement): (() => void) | void {
     };
     panel.addEventListener('transitionend', onPanelTransitionEnd);
 
+    const onResize = () => {
+        requestAnimationFrame(clampRenderedNotes);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+
     const unsubscribe = subscribe(render);
     render(getState());
 
@@ -283,6 +300,7 @@ export function initWall(root: HTMLElement): (() => void) | void {
         resetButton.removeEventListener('click', onResetClick);
         panel.removeEventListener('click', onPanelClick);
         panel.removeEventListener('transitionend', onPanelTransitionEnd);
+        window.removeEventListener('resize', onResize);
         draggable.unset();
         root.dataset.wallInit = 'false';
     };

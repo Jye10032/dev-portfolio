@@ -1,24 +1,14 @@
 ---
 import siteConfig from '../data/site-config';
 import CustomImage from './CustomImage.astro';
-
-const titleClass = 'text-theme-foreground font-serif text-2xl leading-tight font-medium sm:text-3xl';
-
-// 电波彩蛋:把 wordmark 末尾的 `.` 拆出来,便于单独加闪烁动画
-const title = siteConfig.title;
-const dotIndex = title.lastIndexOf('.');
-const wordmark = dotIndex > 0 ? { head: title.slice(0, dotIndex), tail: title.slice(dotIndex + 1) } : null;
-
-const TitleTag = siteConfig.avatar?.src ? 'p' : 'a';
-const titleAttrs = TitleTag === 'a' ? { href: '/' } : {};
 ---
 
-<header class="mx-auto mb-12 flex w-full max-w-3xl items-center gap-4 sm:mb-16">
+<header class="border-main mx-auto mb-12 flex w-full max-w-3xl items-center gap-4 border-b pt-6 pb-6 sm:mb-16 sm:pt-8">
     {
         siteConfig.avatar?.src && (
-            <a href="/">
+            <a href="/" aria-label="返回首页">
                 <CustomImage
-                    class="aspect-square w-16 rounded-full object-cover sm:w-20"
+                    class="border-main aspect-square w-16 border object-cover"
                     {...siteConfig.avatar}
                     loading="eager"
                     fetchpriority="high"
@@ -30,40 +20,8 @@ const titleAttrs = TitleTag === 'a' ? { href: '/' } : {};
             </a>
         )
     }
-    <div class="grow">
-        <TitleTag class:list={[titleClass, 'wordmark']} {...titleAttrs}>
-            {
-                wordmark ? (
-                    <>
-                        {wordmark.head}
-                        <span class="wordmark-dot" aria-hidden="true">
-                            .
-                        </span>
-                        {wordmark.tail}
-                    </>
-                ) : (
-                    title
-                )
-            }
-        </TitleTag>
-        {siteConfig.subtitle && <p class="text-sm leading-tight">{siteConfig.subtitle}</p>}
+    <div>
+        <p class="text-2xl leading-tight font-bold sm:text-3xl"><a href="/">{siteConfig.title}</a></p>
+        {siteConfig.subtitle && <p class="mt-1 text-sm leading-tight">{siteConfig.subtitle}</p>}
     </div>
 </header>
-
-<script>
-    // 电波彩蛋:每个会话只在首次进入时闪一次,站内跳转不再重复
-    function setupWordmarkSpark() {
-        const wordmark = document.querySelector('.wordmark');
-        if (!wordmark) return;
-        let seen = false;
-        try {
-            seen = sessionStorage.getItem('wordmark-sparked') === '1';
-        } catch {}
-        if (seen) return;
-        wordmark.classList.add('spark');
-        try {
-            sessionStorage.setItem('wordmark-sparked', '1');
-        } catch {}
-    }
-    document.addEventListener('astro:page-load', setupWordmarkSpark);
-</script>

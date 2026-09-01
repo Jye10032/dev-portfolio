@@ -11,9 +11,10 @@ export type Props = {
     description?: string;
     image?: ImageInput | undefined;
     pageType?: 'website' | 'article';
+    alternates?: Array<{ lang: 'zh-CN' | 'en'; href: string }>;
 };
 
-const { description = '', pageType = 'website' } = Astro.props;
+const { description = '', pageType = 'website', alternates = [] } = Astro.props;
 const title = [Astro.props.title, siteConfig.title].filter(Boolean).join(' | ');
 const image = Astro.props.image ?? siteConfig.image;
 let resolvedImage: { src: string; alt?: string } | undefined;
@@ -70,6 +71,7 @@ function formatCanonicalURL(url: string | URL) {
 
 <!-- Page Metadata -->
 <link rel="canonical" href={formatCanonicalURL(canonicalURL)} />
+{alternates.map((alternate) => <link rel="alternate" hreflang={alternate.lang} href={formatCanonicalURL(new URL(alternate.href, Astro.site))} />)}
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->

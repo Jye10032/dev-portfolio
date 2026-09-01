@@ -2,31 +2,55 @@
 
 ---
 
-<div class="wall-canvas relative min-h-[70vh] rounded-lg border border-main/10">
-    <div class="absolute top-3 left-3 z-50 flex gap-2">
+<div class="wall-canvas border-main/10 relative min-h-[70vh] rounded-lg border">
+    <div class="wall-toolbar absolute top-3 left-3 z-50 flex gap-2 rounded-md p-1">
         <button
             id="wall-add"
             type="button"
-            class="rounded-md border border-dashed border-main/30 bg-main/70 px-3 py-1.5 text-sm text-main/70 backdrop-blur transition-colors hover:border-(--accent) hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+            class="border-main/30 text-main/70 hover:text-accent rounded border border-dashed px-3 py-1.5 text-sm transition-colors hover:border-(--accent) focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
         >
             + 新建
         </button>
         <button
             id="wall-reset"
             type="button"
-            class="rounded-md border border-main/15 bg-main/70 px-3 py-1.5 text-sm text-main/55 backdrop-blur transition-colors hover:border-main/35 hover:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
+            class="border-main/15 text-main/55 hover:border-main/35 hover:text-main rounded border px-3 py-1.5 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent)"
         >
             重置墙
         </button>
     </div>
+    <p id="wall-empty" class="wall-empty" hidden>墙上还没有便利贴。用左上角的新建按钮记下第一条灵感。</p>
     <div id="wall-notes" class="absolute inset-0 overflow-hidden rounded-lg"></div>
 </div>
 
 <style>
     /* 点阵画布背景 */
     .wall-canvas {
-        background-image: radial-gradient(circle, var(--bg-muted) 1px, transparent 1px);
+        background-color: var(--wall-paper);
+        background-image: radial-gradient(circle, var(--wall-dot) 1px, transparent 1px);
         background-size: 24px 24px;
+    }
+
+    .wall-toolbar {
+        background: color-mix(in srgb, var(--wall-paper) 88%, transparent);
+        box-shadow: 0 1px 5px rgb(0 0 0 / 0.08);
+        backdrop-filter: blur(8px);
+    }
+
+    .wall-empty {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        width: min(24rem, calc(100% - 3rem));
+        margin: 0;
+        transform: translate(-50%, -50%);
+        color: var(--note-text);
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        text-align: center;
+        opacity: 0.55;
+        pointer-events: none;
     }
 
     /* 便签基础样式:便签 DOM 由客户端动态渲染,需要 :global 穿透 */
@@ -43,6 +67,7 @@
         touch-action: none;
         white-space: pre-wrap;
         overflow-wrap: break-word;
+        max-width: calc(100% - 2rem);
     }
 
     :global(.wall-note):focus {

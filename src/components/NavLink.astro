@@ -13,8 +13,7 @@ const isActive = href === pathname || href === pathname.replace(/\/$/, '');
     class:list={[
         className,
         {
-            'underline decoration-1 underline-offset-2 text-accent': isActive,
-            'hover:text-accent-muted transition-colors': !isActive
+            'font-bold no-underline': isActive
         }
     ]}
     href={href}
