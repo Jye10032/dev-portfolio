@@ -1,11 +1,12 @@
 ---
-title: "FEMentor（二）：上下文压缩与长期记忆"
-publishDate: "2026-03-17"
+title: 'FEMentor（二）：上下文压缩与长期记忆'
+publishDate: '2026-03-17'
 type: article
 draft: false
-tags: ["FEMentor", "上下文工程", "长期记忆"]
-excerpt: "较早回答不能无限塞进 Prompt，也不能直接丢弃。FEMentor 将当前会话上下文和跨场次记忆拆成了两套生命周期。"
+tags: ['FEMentor', '上下文工程', '长期记忆']
+excerpt: '较早回答不能无限塞进 Prompt，也不能直接丢弃。FEMentor 将当前会话上下文和跨场次记忆拆成了两套生命周期。'
 readingTime: 7
+translationKey: 'fementor-2-context-and-memory'
 ---
 
 模拟面试进行得越久，历史问题、回答、评分和薄弱点就越多。如果把全部原文放进每次 LLM 请求，成本和噪音会持续增长；如果只保留最近几轮，面试官又会忘记前面已经确认过的信息。

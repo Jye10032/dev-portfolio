@@ -27,6 +27,10 @@ const blog = defineCollection({
             draft: z.boolean().default(false),
             type: z.enum(['article', 'note']).default('article'),
             lang: z.enum(['zh-CN', 'en']).default('zh-CN'),
+            publicSlug: z
+                .string()
+                .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+                .optional(),
             translationKey: z.string().optional(),
             readingTime: z.number().optional(),
             tags: z.array(z.string()).default([]),

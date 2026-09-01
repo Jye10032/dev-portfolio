@@ -7,8 +7,13 @@ export function sortItemsByDateDesc(itemA: CollectionEntry<'blog' | 'projects'>,
     return new Date(itemB.data.publishDate).getTime() - new Date(itemA.data.publishDate).getTime();
 }
 
+export function getPostSlug(post: CollectionEntry<'blog'>): string {
+    return post.data.publicSlug ?? post.id;
+}
+
 export function getPostHref(post: CollectionEntry<'blog'>): string {
-    return post.data.lang === 'en' ? `/en/blog/${post.id}/` : `/blog/${post.id}/`;
+    const slug = getPostSlug(post);
+    return post.data.lang === 'en' ? `/en/blog/${slug}/` : `/blog/${slug}/`;
 }
 
 export function getPostsByLanguage(posts: CollectionEntry<'blog'>[], lang: BlogLanguage): CollectionEntry<'blog'>[] {

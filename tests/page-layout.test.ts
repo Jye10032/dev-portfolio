@@ -54,6 +54,7 @@ describe('content page layout contract', () => {
         expect(baseHead).toContain('hreflang={alternate.lang}');
         expect(blogDetail).toContain("getPostsByLanguage(allPosts, 'zh-CN')");
         expect(englishBlogDetail).toContain("getPostsByLanguage(allPosts, 'en')");
+        expect(englishBlogDetail).toContain('params: { id: getPostSlug(post) }');
         expect(blogPost).toContain('class="post-language-switch"');
     });
 

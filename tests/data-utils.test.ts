@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { describe, expect, it } from 'vitest';
-import { findPostTranslation, getHomepageFocusAreas, getHomepageRecommendations, getPostHref, getPostsByLanguage } from '../src/utils/data-utils';
+import { findPostTranslation, getHomepageFocusAreas, getHomepageRecommendations, getPostHref, getPostSlug, getPostsByLanguage } from '../src/utils/data-utils';
 
 function post(
     id: string,
@@ -8,7 +8,8 @@ function post(
     type: 'article' | 'note' = 'article',
     tags: string[] = [],
     lang: 'zh-CN' | 'en' = 'zh-CN',
-    translationKey?: string
+    translationKey?: string,
+    publicSlug?: string
 ) {
     return {
         id,
@@ -19,6 +20,7 @@ function post(
             draft: false,
             lang,
             translationKey,
+            publicSlug,
             isFeatured: false,
             tags
         }
@@ -27,12 +29,13 @@ function post(
 
 describe('localized blog helpers', () => {
     const chinese = post('agent-workflow', '2026-04-03', 'article', [], 'zh-CN', 'agent-workflow');
-    const english = post('agent-workflow-en', '2026-04-04', 'article', [], 'en', 'agent-workflow');
+    const english = post('agent-workflow-en', '2026-04-04', 'article', [], 'en', 'agent-workflow', 'agent-workflow');
     const unrelated = post('unrelated', '2026-04-05');
 
     it('keeps the established Chinese route and prefixes English posts', () => {
         expect(getPostHref(chinese)).toBe('/blog/agent-workflow/');
-        expect(getPostHref(english)).toBe('/en/blog/agent-workflow-en/');
+        expect(getPostHref(english)).toBe('/en/blog/agent-workflow/');
+        expect(getPostSlug(english)).toBe('agent-workflow');
     });
 
     it('filters language editions explicitly', () => {
