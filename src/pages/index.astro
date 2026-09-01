@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Button from '../components/Button.astro';
 import HomeStory from '../components/home/HomeStory.astro';
 import PostPreview from '../components/PostPreview.astro';
+import VisitorStats from '../components/home/VisitorStats.astro';
 import { HOME_FOCUS_AREAS, HOME_RECOMMENDATION_IDS } from '../data/home-story';
 import siteConfig from '../data/site-config';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -10,7 +11,7 @@ import '../styles/home-story.css';
 import { getAllTags, getHomepageFocusAreas, getHomepageRecommendations, getLatestPosts, getPostsByTag } from '../utils/data-utils';
 import { slugify } from '../utils/common-utils';
 
-const posts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'zh-CN');
 const recommendations = getHomepageRecommendations(posts, 3, HOME_RECOMMENDATION_IDS);
 const latestPosts = getLatestPosts(
     posts.filter((post) => !recommendations.some(({ id }) => id === post.id)),
@@ -31,6 +32,8 @@ const proofItems = [
 
 <BaseLayout description={siteConfig.description} wide>
     <HomeStory recommendations={recommendations} homeNow={siteConfig.homeNow} focusAreas={focusAreas} proofItems={proofItems} avatar={siteConfig.avatar} />
+
+    <VisitorStats />
 
     <!-- 最新动态 -->
     {

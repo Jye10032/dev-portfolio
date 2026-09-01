@@ -1,0 +1,112 @@
+<section class="home-index-section home-index-section--compact" aria-labelledby="visitor-stats-heading">
+    <div class="home-index-section__title">
+        <h2 id="visitor-stats-heading">访客</h2>
+    </div>
+    <div data-visitor-stats>
+        <p class="visitor-stats__intro">这里记录本站被阅读的次数。</p>
+        <dl class="visitor-stats__list" aria-live="polite">
+            <div>
+                <dt>今日浏览</dt>
+                <dd data-visitor-value="today">—</dd>
+            </div>
+            <div>
+                <dt>累计浏览</dt>
+                <dd data-visitor-value="total">—</dd>
+            </div>
+            <div>
+                <dt>独立访客</dt>
+                <dd data-visitor-value="visitors">—</dd>
+            </div>
+        </dl>
+        <p class="visitor-stats__status" data-visitor-status role="status">正在读取访问记录…</p>
+    </div>
+</section>
+
+<script>
+    type VisitorResponse = {
+        today: { pageviews: number };
+        total: { pageviews: number; visitors: number };
+    };
+
+    function initVisitorStats() {
+        document.querySelectorAll<HTMLElement>('[data-visitor-stats]:not([data-visitor-ready])').forEach(async (root) => {
+            root.dataset.visitorReady = 'true';
+            const status = root.querySelector<HTMLElement>('[data-visitor-status]');
+            const setValue = (name: string, value: number) => {
+                const target = root.querySelector<HTMLElement>(`[data-visitor-value="${name}"]`);
+                if (target) target.textContent = value.toLocaleString('zh-CN');
+            };
+
+            try {
+                const response = await fetch('/api/visitors');
+                if (!response.ok) throw new Error(`Visitor request failed with ${response.status}`);
+                const data = (await response.json()) as VisitorResponse;
+                setValue('today', data.today.pageviews);
+                setValue('total', data.total.pageviews);
+                setValue('visitors', data.total.visitors);
+                if (status) status.textContent = '数据来自 Umami，约每 5 分钟更新。';
+            } catch {
+                if (status) status.textContent = '访问记录暂时不可用。';
+            }
+        });
+    }
+
+    initVisitorStats();
+    document.addEventListener('astro:page-load', initVisitorStats);
+</script>
+
+<style>
+    .home-index-section--compact {
+        display: grid;
+        grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
+        gap: clamp(2rem, 6vw, 5rem);
+        margin-block: 6rem;
+        padding-top: 2rem;
+        border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    }
+
+    .home-index-section__title h2 {
+        margin: 0;
+        color: var(--accent);
+        font-family: var(--font-serif);
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .visitor-stats__intro,
+    .visitor-stats__status {
+        margin: 0;
+        color: color-mix(in srgb, currentColor 62%, transparent);
+        font-size: 0.8rem;
+    }
+
+    .visitor-stats__list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        margin-block: 1.25rem;
+    }
+
+    .visitor-stats__list div {
+        padding-block: 0.75rem;
+        border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    }
+
+    .visitor-stats__list dt {
+        font-size: 0.75rem;
+        opacity: 0.65;
+    }
+
+    .visitor-stats__list dd {
+        margin: 0.35rem 0 0;
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+    }
+
+    @media (max-width: 767px) {
+        .home-index-section--compact,
+        .visitor-stats__list {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

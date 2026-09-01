@@ -56,6 +56,7 @@ export type Subscribe = {
 export type UmamiAnalytics = {
     websiteId: string;
     scriptUrl?: string;
+    shareId?: string;
 };
 
 export type SiteConfig = {

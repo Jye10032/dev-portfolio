@@ -50,7 +50,7 @@ const siteConfig: SiteConfig = {
     ],
     homeIntro: {
         lead: '关于前端工程、AI 工作流与持续实践。',
-        text: '以中文记录可验证的项目、技术判断与工程复盘。'
+        text: '记录可验证的项目、技术判断与工程复盘。'
     },
     homeNow: [
         {
@@ -74,7 +74,8 @@ const siteConfig: SiteConfig = {
     },
     umami: {
         websiteId: 'f4bacde3-1afc-45e7-84c3-1a3a6ea8361c',
-        scriptUrl: 'https://cloud.umami.is/script.js'
+        scriptUrl: 'https://cloud.umami.is/script.js',
+        shareId: '9iiz26oQSHf4SGZS'
     },
     postsPerPage: 8,
     projectsPerPage: 8
