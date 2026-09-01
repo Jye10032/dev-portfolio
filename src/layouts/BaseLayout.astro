@@ -4,6 +4,7 @@ import BaseHead, { type Props as HeadProps } from '../components/BaseHead.astro'
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Nav from '../components/Nav.astro';
+import siteConfig from '../data/site-config';
 
 export type Props = HeadProps & { showHeader?: boolean; wide?: boolean };
 
@@ -21,6 +22,11 @@ const { showHeader = true, wide = false, ...head } = Astro.props;
         </script>
         <ClientRouter />
         <script is:inline src="/theme-toggle.js"></script>
+        {
+            siteConfig.umami?.websiteId && (
+                <script is:inline defer src={siteConfig.umami.scriptUrl ?? 'https://cloud.umami.is/script.js'} data-website-id={siteConfig.umami.websiteId} />
+            )
+        }
     </head>
     <body class="bg-main text-main">
         <div class:list={['flex min-h-screen flex-col px-4 md:px-8', wide && 'wall-wide']}>

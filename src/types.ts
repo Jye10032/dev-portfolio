@@ -53,6 +53,11 @@ export type Subscribe = {
     form?: SubscribeForm;
 };
 
+export type UmamiAnalytics = {
+    websiteId: string;
+    scriptUrl?: string;
+};
+
 export type SiteConfig = {
     website: string;
     avatar?: ImageInput;
@@ -67,6 +72,7 @@ export type SiteConfig = {
     homeIntro?: HomeIntro;
     homeNow?: HomeNowItem[];
     subscribe?: Subscribe;
+    umami?: UmamiAnalytics;
     postsPerPage?: number;
     projectsPerPage?: number;
 };
