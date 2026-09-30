@@ -1,0 +1,70 @@
+---
+import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import Pagination from './Pagination.astro';
+import PostPreview from './PostPreview.astro';
+
+/**
+ * Shared body for every paginated post listing (/blog, /blog/articles,
+ * /blog/notes, /tags/<tag>). Pages supply their own heading via the
+ * `header` slot and differ only in how they select posts.
+ */
+type Props = { page: Page<CollectionEntry<'blog'>>; emptyText?: string };
+
+const { page, emptyText = '这里还没有内容。' } = Astro.props;
+const posts = page.data;
+---
+
+<slot name="header" />
+
+{
+    posts.length > 0 ? (
+        <ol class="post-archive">
+            {posts.map((post) => (
+                <li class="post-archive__item">
+                    <PostPreview post={post} />
+                </li>
+            ))}
+        </ol>
+    ) : (
+        <p class="post-archive__empty">{emptyText}</p>
+    )
+}
+
+{page.lastPage > 1 && <Pagination page={page} class="post-archive__pager" />}
+
+<style>
+    .post-archive {
+        display: grid;
+        gap: 2.5rem;
+        list-style: none;
+    }
+
+    @media (min-width: 40rem) {
+        .post-archive {
+            gap: 3rem;
+        }
+    }
+
+    .post-archive__item {
+        min-width: 0;
+    }
+
+    .post-archive__empty {
+        border: 1px dashed var(--border-main);
+        padding: 2rem;
+        text-align: center;
+        opacity: 0.7;
+    }
+
+    /* Passed into Pagination as a class prop, so it lands outside this scope. */
+    :global(.post-archive__pager) {
+        margin: 4rem 0;
+    }
+
+    @media (min-width: 40rem) {
+        :global(.post-archive__pager) {
+            margin: 6rem 0;
+        }
+    }
+</style>

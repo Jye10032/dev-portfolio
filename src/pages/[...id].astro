@@ -4,28 +4,50 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
     const pages = await getCollection('pages', ({ data }) => !data.draft);
-    return pages.map((page) => {
-        return {
-            params: { id: page.id },
-            props: { page }
-        };
-    });
+    return pages.map((entry) => ({
+        params: { id: entry.id },
+        props: { entry }
+    }));
 }
 
-type Props = { page: CollectionEntry<'pages'> };
+type Props = { entry: CollectionEntry<'pages'> };
 
-const { page } = Astro.props;
-const { title, seo } = page.data;
-const { Content } = await render(page);
+const { entry } = Astro.props;
+const { title, seo } = entry.data;
+const { Content } = await render(entry);
 ---
 
-<BaseLayout title={seo?.title ?? title} description={seo?.description} image={seo?.image} showHeader={false}>
-    <article class="mb-16 sm:mb-24">
-        <header class="mb-8">
-            <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight">{title}</h1>
-        </header>
+<BaseLayout title={seo?.title ?? title} description={seo?.description} image={seo?.image}>
+    <article class="standalone-page">
+        <h1 class="standalone-page__title">{title}</h1>
         <div class="prose sm:prose-lg max-w-none">
             <Content />
         </div>
     </article>
 </BaseLayout>
+
+<style>
+    .standalone-page {
+        margin-bottom: 4rem;
+    }
+
+    @media (min-width: 40rem) {
+        .standalone-page {
+            margin-bottom: 6rem;
+        }
+    }
+
+    .standalone-page__title {
+        margin-bottom: 2rem;
+        font-family: var(--font-serif);
+        font-size: 1.875rem;
+        font-weight: 500;
+        line-height: 1.25;
+    }
+
+    @media (min-width: 40rem) {
+        .standalone-page__title {
+            font-size: 3rem;
+        }
+    }
+</style>

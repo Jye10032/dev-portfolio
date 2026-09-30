@@ -1,33 +1,64 @@
 ---
+import type { Page } from 'astro';
 import ArrowLeft from '../assets/icons/arrow-left.svg';
 import ArrowRight from '../assets/icons/arrow-right.svg';
 import IconButton from './IconButton.astro';
 
+type Props = { page: Page<unknown>; class?: string };
+
 const { page, class: className } = Astro.props;
+const { currentPage, lastPage, url } = page;
 ---
 
-<nav aria-label="分页" class:list={['relative px-12 py-2 text-center', className]}>
+<nav class:list={['pager', className]} aria-label="分页">
     {
-        page.url.prev && (
-            <IconButton
-                class="absolute top-1/2 left-0 -translate-y-1/2"
-                href={page.url.prev}
-                aria-label={`前往第 ${page.currentPage - 1} 页，共 ${page.lastPage} 页`}
-            >
-                <ArrowLeft class="h-5 w-5 fill-current" />
+        url.prev && (
+            <IconButton class="pager__control pager__control--prev" href={url.prev} aria-label={`上一页（第 ${currentPage - 1} 页，共 ${lastPage} 页）`}>
+                <ArrowLeft class="pager__icon" />
             </IconButton>
         )
     }
-    <span class="text-sm" aria-current="page">第 {page.currentPage} / {page.lastPage} 页</span>
+
+    <p class="pager__position">第 {currentPage} / {lastPage} 页</p>
+
     {
-        page.url.next && (
-            <IconButton
-                class="absolute top-1/2 right-0 -translate-y-1/2"
-                href={page.url.next}
-                aria-label={`前往第 ${page.currentPage + 1} 页，共 ${page.lastPage} 页`}
-            >
-                <ArrowRight class="h-5 w-5 fill-current" />
+        url.next && (
+            <IconButton class="pager__control pager__control--next" href={url.next} aria-label={`下一页（第 ${currentPage + 1} 页，共 ${lastPage} 页）`}>
+                <ArrowRight class="pager__icon" />
             </IconButton>
         )
     }
 </nav>
+
+<style>
+    .pager {
+        position: relative;
+        padding: 0.5rem 3rem;
+        text-align: center;
+    }
+
+    .pager__position {
+        font-size: 0.875rem;
+    }
+
+    /* Rendered inside IconButton, so these sit outside this component's scope. */
+    .pager :global(.pager__control) {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .pager :global(.pager__control--prev) {
+        left: 0;
+    }
+
+    .pager :global(.pager__control--next) {
+        right: 0;
+    }
+
+    .pager :global(.pager__icon) {
+        height: 1.25rem;
+        width: 1.25rem;
+        fill: currentColor;
+    }
+</style>

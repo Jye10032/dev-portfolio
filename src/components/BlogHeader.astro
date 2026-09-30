@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { getAllTags, getPostsByTag } from '../utils/data-utils';
+import { getAllTags } from '../utils/data-utils';
 
 type Props = {
     active?: 'all' | 'articles' | 'notes';
@@ -8,10 +8,8 @@ type Props = {
 
 const { active = 'all' } = Astro.props;
 const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'zh-CN');
-const popularTags = getAllTags(posts)
-    .map((tag) => ({ ...tag, count: getPostsByTag(posts, tag.id).length }))
-    .sort((tagA, tagB) => tagB.count - tagA.count || tagA.name.localeCompare(tagB.name, 'zh-CN'))
-    .slice(0, 10);
+// getAllTags carries counts and is already ordered most-used first.
+const popularTags = getAllTags(posts).slice(0, 10);
 
 const typeLinks = [
     { id: 'all', href: '/blog', label: '全部' },
@@ -21,7 +19,8 @@ const typeLinks = [
 ---
 
 <header class="mb-12 sm:mb-16">
-    <h1 class="mb-8 font-sans text-3xl leading-tight font-bold sm:text-5xl">写作</h1>
+    <!-- The nav already says where you are; keep the h1 for document outline only. -->
+    <h1 class="sr-only">写作</h1>
 
     <nav class="flex flex-wrap gap-2 text-sm" aria-label="内容类型">
         {

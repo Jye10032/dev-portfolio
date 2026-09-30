@@ -1,57 +1,55 @@
+/**
+ * Colour-scheme switching. Loaded un-deferred from <head> so the stored choice
+ * applies before first paint, which avoids a flash of the wrong palette.
+ *
+ * Storage access may throw (Safari private mode, blocked cookies), so every
+ * read and write is guarded and degrades to the system preference.
+ */
 (function () {
-    const root = document.documentElement;
+    var STORAGE_KEY = 'theme';
+    var root = document.documentElement;
 
-    function getStoredTheme() {
+    function readPreference() {
         try {
-            return localStorage.getItem('theme');
-        } catch {
-            return null;
+            var stored = window.localStorage.getItem(STORAGE_KEY);
+            if (stored === 'dark' || stored === 'light') return stored;
+        } catch (error) {
+            /* fall through to the system preference */
+        }
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function savePreference(theme) {
+        try {
+            window.localStorage.setItem(STORAGE_KEY, theme);
+        } catch (error) {
+            /* the choice still applies for this page view */
         }
     }
 
-    function storeTheme(theme) {
-        try {
-            localStorage.setItem('theme', theme);
-        } catch {}
+    function render(theme) {
+        root.classList.toggle('dark', theme === 'dark');
     }
 
-    function getSystemTheme() {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
+    function bindControls() {
+        var controls = document.querySelectorAll('[data-theme-toggle]');
+        for (var i = 0; i < controls.length; i += 1) {
+            controls[i].onclick = function () {
+                var next = root.classList.contains('dark') ? 'light' : 'dark';
+                render(next);
+                savePreference(next);
+            };
         }
-        return 'light';
     }
 
-    function getActiveTheme() {
-        const stored = getStoredTheme();
-        return stored || getSystemTheme();
-    }
+    render(readPreference());
 
-    function applyTheme(theme) {
-        const isDark = theme === 'dark';
-        root.classList.toggle('dark', isDark);
-    }
+    document.addEventListener('astro:page-load', bindControls);
 
-    function setupThemeToggle() {
-        const button = document.getElementById('theme-toggle');
-        if (!button) return;
-
-        button.onclick = () => {
-            const isDark = root.classList.toggle('dark');
-            const theme = isDark ? 'dark' : 'light';
-            storeTheme(theme);
-        };
-    }
-
-    // Set initial theme
-    applyTheme(getActiveTheme());
-
-    // Attach toggle listener on first load
-    document.addEventListener('astro:page-load', setupThemeToggle);
-
-    // Re-apply theme after navigation
-    document.addEventListener('astro:after-swap', () => {
-        applyTheme(getActiveTheme());
-        setupThemeToggle();
+    // View transitions replace <body>, so the class on <html> survives but the
+    // control itself is a fresh node that needs rebinding.
+    document.addEventListener('astro:after-swap', function () {
+        render(readPreference());
+        bindControls();
     });
 })();

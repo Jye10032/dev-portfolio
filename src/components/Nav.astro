@@ -1,20 +1,144 @@
 ---
+import siteConfig from '../data/site-config';
+import CustomImage from './CustomImage.astro';
 import NavLink from './NavLink.astro';
 import ThemeToggle from './ThemeToggle.astro';
-import siteConfig from '../data/site-config';
 
-const navLinks = siteConfig.headerNavLinks ?? [];
+const { avatar, title, subtitle, headerNavLinks } = siteConfig;
+const navLinks = headerNavLinks ?? [];
 ---
 
-<nav class="border-main mx-auto flex w-full max-w-6xl items-start justify-between gap-6 border-b py-5" aria-label="主导航">
-    <ul class="flex flex-wrap gap-x-5 gap-y-1">
-        {
-            navLinks.map((link) => (
-                <li>
-                    <NavLink href={link.href}>{link.text}</NavLink>
-                </li>
-            ))
-        }
-    </ul>
-    <ThemeToggle />
+<nav class="site-nav" aria-label="主导航">
+    <!-- max-w-3xl matches the reading column; `page-shell--wide` widens it to 6xl. -->
+    <div class="site-nav__inner mx-auto w-full max-w-3xl">
+        <a class="site-nav__identity" href="/">
+            {
+                avatar?.src && (
+                    <CustomImage
+                        class="site-nav__avatar"
+                        src={avatar.src}
+                        alt={avatar.alt}
+                        loading="eager"
+                        fetchpriority="high"
+                        width={64}
+                        height={64}
+                        widths={[64, 128]}
+                        sizes="32px"
+                    />
+                )
+            }
+            <span class="site-nav__name">{title}</span>
+            {subtitle && <span class="site-nav__subtitle">{subtitle}</span>}
+        </a>
+
+        <ul class="site-nav__links">
+            {
+                navLinks.map((link) => (
+                    <li>
+                        <NavLink href={link.href}>{link.text}</NavLink>
+                    </li>
+                ))
+            }
+        </ul>
+
+        <div class="site-nav__actions">
+            <ThemeToggle />
+        </div>
+    </div>
 </nav>
+
+<style>
+    .site-nav__inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1.25rem;
+        border-bottom: 1px solid var(--border-main);
+        padding: 0.85rem 0;
+    }
+
+    .site-nav__identity {
+        display: flex;
+        flex: none;
+        align-items: center;
+        gap: 0.55rem;
+        text-decoration: none;
+    }
+
+    .site-nav__identity:hover,
+    .site-nav__identity:focus-visible {
+        text-decoration: none;
+    }
+
+    /* Rendered by CustomImage, so it sits outside this component's scope. */
+    .site-nav__identity :global(.site-nav__avatar) {
+        width: 1.75rem;
+        aspect-ratio: 1 / 1;
+        border: 1px solid var(--border-main);
+        object-fit: cover;
+    }
+
+    .site-nav__name {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .site-nav__identity:hover .site-nav__name {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+    }
+
+    .site-nav__subtitle {
+        display: none;
+        border-left: 1px solid var(--border-main);
+        padding-left: 0.75rem;
+        font-size: 0.8125rem;
+        line-height: 1.3;
+        opacity: 0.65;
+    }
+
+    /*
+     * Narrow screens: identity and the toggle share row one, links wrap to row two.
+     * From 48rem everything sits on a single row with the toggle pushed right.
+     */
+    .site-nav__links {
+        order: 3;
+        flex-basis: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.25rem;
+        list-style: none;
+    }
+
+    .site-nav__identity {
+        order: 1;
+    }
+
+    .site-nav__actions {
+        order: 2;
+        flex: none;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+    }
+
+    @media (min-width: 48rem) {
+        .site-nav__links {
+            order: 2;
+            flex-basis: auto;
+            margin-left: 0.75rem;
+        }
+
+        .site-nav__actions {
+            order: 3;
+        }
+    }
+
+    @media (min-width: 64rem) {
+        .site-nav__subtitle {
+            display: block;
+        }
+    }
+</style>

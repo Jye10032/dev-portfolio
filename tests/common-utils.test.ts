@@ -13,4 +13,18 @@ describe('slugify', () => {
     it('removes punctuation without returning an empty slug', () => {
         expect(slugify('C++')).toBe('c');
     });
+
+    it('strips diacritics', () => {
+        expect(slugify('Café Déjà')).toBe('cafe-deja');
+    });
+
+    it('does not leave leading or trailing hyphens that would break routes', () => {
+        expect(slugify('  -- Hello, World! -- ')).toBe('hello-world');
+        expect(slugify('***')).toBe('');
+    });
+
+    it('returns an empty slug for missing input', () => {
+        expect(slugify()).toBe('');
+        expect(slugify('')).toBe('');
+    });
 });

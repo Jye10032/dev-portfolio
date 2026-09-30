@@ -1,42 +1,36 @@
 ---
 import siteConfig from '../data/site-config';
 
-const socialLinks = siteConfig.socialLinks ?? [];
 const navLinks = siteConfig.footerNavLinks ?? [];
-const currentYear = new Date().getFullYear();
+const socialLinks = siteConfig.socialLinks ?? [];
+const year = new Date().getFullYear();
 
-function isExternalLink(href: string) {
-    return /^https?:///.test(href);
-}
+const isExternal = (href: string) => /^https?:\/\//i.test(href);
 ---
 
-<footer class="mx-auto w-full max-w-3xl pt-12 pb-10 sm:pt-24 sm:pb-14">
+<footer class="site-footer mx-auto w-full max-w-3xl">
     {
         navLinks.length > 0 && (
-            <nav class="mb-4 flex flex-wrap gap-x-6 gap-y-1" aria-label="Footer navigation">
+            <nav class="site-footer__nav" aria-label="页脚导航">
                 {navLinks.map((link) => (
-                    <a class="font-serif hover:underline hover:underline-offset-2" href={link.href}>
+                    <a class="site-footer__nav-link" href={link.href}>
                         {link.text}
                     </a>
                 ))}
             </nav>
         )
     }
-    <div
-        class:list={[
-            'border-main flex flex-col gap-4 border-t border-dashed pt-6',
-            { 'sm:flex-row-reverse sm:items-center sm:justify-between': socialLinks.length > 0 }
-        ]}
-    >
+
+    <div class:list={['site-footer__base', socialLinks.length > 0 && 'site-footer__base--split']}>
         {
             socialLinks.length > 0 && (
-                <div class="flex flex-wrap gap-x-4 gap-y-1">
+                <div class="site-footer__social">
                     {socialLinks.map((link) => (
                         <a
-                            class="inline-flex items-center justify-center text-sm hover:underline hover:underline-offset-2"
+                            class="site-footer__social-link"
                             href={link.href}
-                            target={isExternalLink(link.href) ? '_blank' : undefined}
-                            rel={isExternalLink(link.href) ? 'noopener noreferrer' : undefined}
+                            target={isExternal(link.href) ? '_blank' : undefined}
+                            rel={isExternal(link.href) ? 'noopener noreferrer' : undefined}
                         >
                             {link.text}
                         </a>
@@ -44,9 +38,58 @@ function isExternalLink(href: string) {
                 </div>
             )
         }
-        <p class="text-sm">
-            &copy; {currentYear}
-            <a class="hover:underline hover:underline-offset-2" href="/">{siteConfig.title}</a>。持续更新中。
+        <p class="site-footer__legal">
+            &copy; {year} <a href="/">{siteConfig.title}</a>。持续更新中。
         </p>
     </div>
 </footer>
+
+<style>
+    .site-footer {
+        padding: 3rem 0 2.5rem;
+    }
+
+    @media (min-width: 40rem) {
+        .site-footer {
+            padding: 6rem 0 3.5rem;
+        }
+    }
+
+    .site-footer__nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .site-footer__nav-link {
+        font-family: var(--font-serif);
+    }
+
+    .site-footer__base {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        border-top: 1px dashed var(--border-main);
+        padding-top: 1.5rem;
+    }
+
+    @media (min-width: 40rem) {
+        .site-footer__base--split {
+            flex-direction: row-reverse;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+
+    .site-footer__social {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1rem;
+    }
+
+    .site-footer__social-link,
+    .site-footer__legal {
+        font-size: 0.875rem;
+    }
+</style>

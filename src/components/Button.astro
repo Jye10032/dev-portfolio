@@ -1,24 +1,44 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-type AnchorProps = HTMLAttributes<'a'> & { href: string; type?: never };
-type ButtonProps = HTMLAttributes<'button'> & { href?: never };
-
-type Props = ButtonProps | AnchorProps;
+/** Renders an `<a>` when `href` is given, otherwise a `<button>`. */
+type Props = (HTMLAttributes<'a'> & { href: string }) | (HTMLAttributes<'button'> & { href?: undefined });
 
 const { href, class: className, ...rest } = Astro.props;
-const buttonClasses =
-    'inline-flex items-center justify-center border border-main bg-transparent px-3 py-1.5 font-sans leading-tight text-main no-underline hover:bg-main hover:text-bg-main hover:no-underline focus-visible:no-underline';
+const Tag = href ? 'a' : 'button';
 ---
 
-{
-    href ? (
-        <a href={href} class:list={[buttonClasses, className]} {...rest}>
-            <slot />
-        </a>
-    ) : (
-        <button class:list={[buttonClasses, 'cursor-pointer', className]} {...rest}>
-            <slot />
-        </button>
-    )
-}
+<Tag class:list={['ui-button', className]} href={href} {...rest}>
+    <slot />
+</Tag>
+
+<style>
+    .ui-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-main);
+        background-color: transparent;
+        padding: 0.375rem 0.75rem;
+        font-family: var(--font-sans);
+        line-height: 1.25;
+        color: var(--text-main);
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+            background-color 160ms ease,
+            color 160ms ease;
+    }
+
+    .ui-button:hover,
+    .ui-button:focus-visible {
+        background-color: var(--text-main);
+        color: var(--bg-main);
+        text-decoration: none;
+    }
+
+    .ui-button:focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: 2px;
+    }
+</style>

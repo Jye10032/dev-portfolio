@@ -1,0 +1,88 @@
+---
+title: 产品方法论与 PRD 撰写
+question: 网上有没有现成的产品方法论和 PRD 撰写、竞品分析技巧？
+excerpt: 把提出者和研究机构的一手资料收进来，按「明确问题 → 竞品分析 → PRD 表达」三段拼成一条可执行的链路。
+accent: mint
+status: synthesized
+skill: album-curation
+publishDate: 2026-09-29
+tags:
+    - 产品方法论
+    - 需求分析
+    - 竞品分析
+entries:
+    - title: Job Stories
+      url: https://www.intercom.com/blog/using-job-stories-design-features-ui-ux/
+      source: Intercom
+      kind: framework
+      core: 用「情境、动机、期望结果」三段式描述需求，替代「作为某类用户，我想要……」的人物设定写法。
+      takeaway: 它把需求的锚点从「用户是谁」换成「用户在什么情境下想达成什么」，这一步直接决定了后面调研问对不对。人物画像容易编，情境编不出来。
+      apply: 把「优化房型展示」这类模糊目标转成具体的用户决策问题，用它来确定调研目标。
+    - title: 双钻模型 Double Diamond
+      url: https://www.designcouncil.org.uk/resources/the-double-diamond/
+      source: Design Council
+      kind: framework
+      core: 发现问题、定义问题、探索方案、验证交付四个阶段，两次「发散—收敛」，允许反复迭代。
+      takeaway: 它最大的价值不是流程本身，而是随时能回答「我现在是在研究问题，还是在评估方案」。混掉这两件事是需求文档写垮的主因。
+      apply: 作为整体分析流程的坐标系，给每份研究材料标上所处阶段。
+    - title: 竞品可用性评估
+      url: https://www.nngroup.com/articles/competitive-usability-evaluations/
+      source: NN/g
+      kind: method
+      core: 围绕一个设计问题去比较不同产品的做法、优缺点和可借鉴之处，而不是逐个罗列功能。
+      takeaway: 「围绕设计问题」是关键约束。没有问题作锚，竞品分析就退化成功能清单截图，读的人得不出任何结论。
+      apply: 作为竞品研究的通用方法，指导选对象、定范围和写结论。
+    - title: 产品与服务比较（对比表）
+      url: https://www.nngroup.com/articles/comparison-tables/
+      source: NN/g
+      kind: method
+      core: 统一可比较属性、突出差异、解释陌生字段、降低记忆负担。
+      takeaway: 这条最贴近同房型多 goods、套餐、会员权益这类选择场景。它给的四条约束可以直接当验收标准用，不用再翻译一遍。
+      apply: 评审比较类界面时逐条对照，尤其是「解释陌生字段」这条最常被漏。
+    - title: 十大可用性原则
+      url: https://www.nngroup.com/articles/ten-usability-heuristics/
+      source: NN/g
+      kind: framework
+      core: 状态反馈、一致性、用户控制、错误预防、识别优于记忆等十条启发式原则。
+      takeaway: 它的用法是当检查清单，不是当评分表。给产品评价提供可复用的维度，避免报告只在描述控件长什么样。
+      apply: 写竞品报告的评价段落时逐条过一遍，每条只保留真正有发现的。
+    - title: 用户旅程图
+      url: https://www.nngroup.com/articles/journey-mapping-101/
+      source: NN/g
+      kind: method
+      core: 围绕用户目标组织阶段、动作、想法与感受，跨渠道呈现完整体验。
+      takeaway: 「动作」这一层可以从产品里直接观察，但「想法与感受」必须有用户研究材料支撑。没有材料就跳过这两行，别补脑内小剧场。
+      apply: 分析跨页面流程、信息断点和重复操作。
+    - title: PRD 指南
+      url: https://www.atlassian.com/agile/product-management/requirements
+      source: Atlassian
+      kind: template
+      core: 目标、背景、假设、用户故事、交互设计、待决问题和范围边界。
+      takeaway: 「假设」和「待决问题」这两栏是多数自制 PRD 模板缺的。它们把没想清楚的地方显式留在文档里，比假装想清楚了有用得多。
+      apply: 作为从研究发现整理到需求文档的结构参考。
+    - title: Example Mapping
+      url: https://cucumber.io/blog/bdd/example-mapping-introduction/
+      source: Cucumber
+      kind: method
+      core: 用「用户故事、规则、具体例子、未决问题」四色卡片把一条需求拆到可验收。
+      takeaway: 它和 PRD 指南是互补的：PRD 给骨架，Example Mapping 负责把业务规则和边界情况逼出来。一个需求如果举不出三个具体例子，说明还没想清楚。
+      apply: 补齐 PRD 中的业务规则、边界情况和验收条件。
+    - title: 机会解决方案树
+      url: https://www.producttalk.org/opportunity-solution-trees/
+      source: Product Talk
+      author: Teresa Torres
+      kind: framework
+      core: 连接目标、用户机会、候选方案和假设验证，形成一棵可追溯的决策树。
+      takeaway: 后续引入的候选。原作者强调机会必须来自客户访谈等真实输入，这也是它的使用门槛：没有访谈材料就用不了，硬用只会让 AI 凭空生成「用户痛点」。
+      apply: 等手上有用户研究材料的任务再引入，不要在材料空缺时套这个框架。
+---
+
+这一轮的问题是「有没有现成的产品方法论」，答案是有，而且不需要自创。把提出者和研究机构的一手资料摊开看，它们各自解决的其实是**同一条链路上的不同环节**：
+
+**明确问题**：Job Stories 负责把模糊目标转成具体的用户决策问题，双钻模型负责回答「我现在在哪一段」。这两个先用，因为它们决定后面的调研问对不对。
+
+**竞品分析**：NN/g 那四篇构成一套完整工具——「竞品可用性评估」定方法，「产品与服务比较」定比较类界面的具体约束，「十大可用性原则」给评价维度，「用户旅程图」看跨页面流程。注意四篇的抽象层级不同，不要平铺着用。
+
+**PRD 表达**：Atlassian 给结构骨架，Example Mapping 负责把业务规则和边界情况逼出来。这两个是互补关系，不是可选其一。
+
+有一条贯穿所有材料的约束值得单独拎出来：**凡是涉及「用户想法与感受」「用户痛点」的部分，都必须有研究材料支撑**。用户旅程图的下两行、机会解决方案树的机会节点，都卡在这个前提上。这也是把这套方法交给 AI 执行时最容易破防的地方——它会很顺畅地把空缺补成看起来合理的句子。所以机会解决方案树先不引入，等有访谈材料的任务再说。

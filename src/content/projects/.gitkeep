@@ -1,0 +1,2 @@
+# Keeps the projects collection directory present so the glob loader has a base
+# to scan. Delete this file once the first real project is added.

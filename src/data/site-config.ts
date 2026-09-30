@@ -20,6 +20,10 @@ const siteConfig: SiteConfig = {
             href: '/blog'
         },
         {
+            text: '专辑',
+            href: '/albums'
+        },
+        {
             text: '时间线',
             href: '/timeline'
         },
@@ -69,9 +73,6 @@ const siteConfig: SiteConfig = {
             href: '/tags/videogaga'
         }
     ],
-    subscribe: {
-        enabled: false
-    },
     umami: {
         websiteId: 'f4bacde3-1afc-45e7-84c3-1a3a6ea8361c',
         scriptUrl: 'https://cloud.umami.is/script.js',

@@ -10,17 +10,48 @@ import { sortItemsByDateDesc } from '../../utils/data-utils';
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
     const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
     if (projects.length === 0) return [];
-    return paginate(projects, { pageSize: siteConfig.projectsPerPage || 6 });
+    return paginate(projects, { pageSize: siteConfig.projectsPerPage ?? 8 });
 }
 
 type Props = { page: Page<CollectionEntry<'projects'>> };
 
 const { page } = Astro.props;
-const portfolio = page.data;
 ---
 
-<BaseLayout title="Portfolio" description="Explore a diverse portfolio showcasing my passion and expertise" showHeader={false}>
-    <h1 class="mb-12 font-serif text-2xl leading-tight italic sm:mb-16 sm:text-4xl">Projects</h1>
-    {portfolio.map((project) => <ProjectPreview project={project} class="mb-10 sm:mb-12" />)}
-    <Pagination page={page} class="my-16 sm:my-24" />
+<BaseLayout title="项目" description="做过的项目与实践记录。">
+    <h1 class="sr-only">项目</h1>
+
+    <ol class="project-index__list">
+        {
+            page.data.map((project) => (
+                <li class="project-index__item">
+                    <ProjectPreview project={project} />
+                </li>
+            ))
+        }
+    </ol>
+
+    {page.lastPage > 1 && <Pagination page={page} class="project-index__pager" />}
 </BaseLayout>
+
+<style>
+    .project-index__list {
+        display: grid;
+        gap: 2.5rem;
+        list-style: none;
+    }
+
+    @media (min-width: 40rem) {
+        .project-index__list {
+            gap: 3rem;
+        }
+    }
+
+    .project-index__item {
+        min-width: 0;
+    }
+
+    :global(.project-index__pager) {
+        margin: 4rem 0;
+    }
+</style>

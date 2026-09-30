@@ -1,38 +1,30 @@
 ---
 import { getCollection } from 'astro:content';
-import Subscribe from '../../components/Subscribe.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllTags, getPostsByTag, sortItemsByDateDesc } from '../../utils/data-utils';
+import { getAllTags, sortItemsByDateDesc } from '../../utils/data-utils';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === 'zh-CN')).sort(sortItemsByDateDesc);
-const tags = getAllTags(posts).sort((tagA, tagB) => {
-    const postCountTagA = getPostsByTag(posts, tagA.id).length;
-    const postCountTagB = getPostsByTag(posts, tagB.id).length;
-    return postCountTagB - postCountTagA;
-});
+// getAllTags already returns counts, ordered most-used first.
+const tags = getAllTags(posts);
 ---
 
-<BaseLayout wide title="主题" description="浏览所有主题标签，发现感兴趣的内容" showHeader={false}>
+<BaseLayout wide title="主题" description="浏览所有主题标签，发现感兴趣的内容">
     <section class="tag-index">
         <header class="tag-index__intro">
-            <h1>主题</h1>
+            <h1 class="sr-only">主题</h1>
             <p>按关键词浏览文章与札记。</p>
         </header>
         <div class="tag-index__directory" aria-label="全部主题">
             {
-                tags.map((tag) => {
-                    const postCount = getPostsByTag(posts, tag.id).length;
-                    return (
-                        <a class="tag-index__item" href={`/tags/${tag.id}`}>
-                            <span class="tag-index__name">#{tag.name}</span>
-                            <span class="tag-index__count">{String(postCount).padStart(2, '0')}</span>
-                        </a>
-                    );
-                })
+                tags.map((tag) => (
+                    <a class="tag-index__item" href={`/tags/${tag.id}`}>
+                        <span class="tag-index__name">#{tag.name}</span>
+                        <span class="tag-index__count">{String(tag.count).padStart(2, '0')}</span>
+                    </a>
+                ))
             }
         </div>
     </section>
-    <Subscribe class="my-16 sm:my-24" />
 </BaseLayout>
 
 <style>
@@ -48,15 +40,8 @@ const tags = getAllTags(posts).sort((tagA, tagB) => {
         align-self: start;
     }
 
-    .tag-index__intro h1 {
-        margin: 0;
-        font-size: clamp(1.875rem, 4vw, 3rem);
-        font-weight: 700;
-        line-height: 1.15;
-    }
-
     .tag-index__intro p {
-        margin: 0.75rem 0 0;
+        margin: 0;
         font-size: 0.9375rem;
         opacity: 0.65;
     }

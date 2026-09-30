@@ -1,0 +1,381 @@
+---
+import { ALBUM_ENTRY_KIND_LABELS } from '../../utils/album-constants';
+import { getEntryDomain, type AlbumEntry } from '../../utils/album-utils';
+
+type Props = { entries: AlbumEntry[]; accent: string; albumTitle: string };
+
+const { entries, accent, albumTitle } = Astro.props;
+---
+
+<section class="album-entries" data-album-entries data-album-view="table" style={`--album-accent: var(--note-${accent})`}>
+    <header class="album-entries__head">
+        <h2 class="album-entries__title">
+            方法清单
+            <span class="album-entries__count">{entries.length}</span>
+        </h2>
+        <div class="album-entries__toggle" role="group" aria-label="切换方法清单视图">
+            <button class="album-entries__toggle-button" type="button" data-album-view-button="table" aria-pressed="true">表格</button>
+            <button class="album-entries__toggle-button" type="button" data-album-view-button="cards" aria-pressed="false">卡片</button>
+        </div>
+    </header>
+
+    <div class="album-entries__table-wrap">
+        <table class="album-entries__table">
+            <caption class="sr-only">{albumTitle}收录的方法，逐行列出原文出处、核心内容，以及我的总结与应用方式。</caption>
+            <thead>
+                <tr>
+                    <th scope="col">方法与原文</th>
+                    <th scope="col">核心内容</th>
+                    <th scope="col">我的总结与应用</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    entries.map((entry: AlbumEntry) => (
+                        <tr>
+                            <th scope="row">
+                                <a class="album-entries__source-link" href={entry.url} target="_blank" rel="noopener noreferrer">
+                                    {entry.title}
+                                    <span aria-hidden="true"> ↗</span>
+                                    <span class="sr-only">（在新标签页打开原文）</span>
+                                </a>
+                                <span class="album-entries__origin">
+                                    {entry.source}
+                                    {entry.author ? ` · ${entry.author}` : ''}
+                                </span>
+                            </th>
+                            <td>{entry.core}</td>
+                            <td>
+                                <span class="album-entries__cell-text">{entry.takeaway}</span>
+                                {entry.apply && <span class="album-entries__cell-apply">应用：{entry.apply}</span>}
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <ol class="album-entries__cards">
+        {
+            entries.map((entry: AlbumEntry, index: number) => (
+                <li class="album-entry" style={`--album-delay: ${Math.min(index, 7) * 50}ms`}>
+                    <p class="album-entry__meta">
+                        <span class="album-entry__kind">{ALBUM_ENTRY_KIND_LABELS[entry.kind]}</span>
+                        <span class="album-entry__origin">
+                            {entry.source}
+                            {entry.author ? ` · ${entry.author}` : ''}
+                        </span>
+                        <span class="album-entry__domain">{getEntryDomain(entry.url)}</span>
+                    </p>
+
+                    <h3 class="album-entry__title">
+                        <a href={entry.url} target="_blank" rel="noopener noreferrer">
+                            {entry.title}
+                            <span aria-hidden="true"> ↗</span>
+                            <span class="sr-only">（在新标签页打开原文）</span>
+                        </a>
+                    </h3>
+
+                    <dl class="album-entry__fields">
+                        <dt>核心内容</dt>
+                        <dd>{entry.core}</dd>
+                        <dt>我的总结</dt>
+                        <dd>{entry.takeaway}</dd>
+                        {entry.apply && (
+                            <>
+                                <dt>如何应用</dt>
+                                <dd>{entry.apply}</dd>
+                            </>
+                        )}
+                    </dl>
+
+                    {entry.quote && <blockquote class="album-entry__quote">{entry.quote}</blockquote>}
+
+                    {
+                        entry.deepDive && (
+                            <p class="album-entry__deep-dive">
+                                <a class="link-underline" href={entry.deepDive}>
+                                    展开成文 →
+                                </a>
+                            </p>
+                        )
+                    }
+                </li>
+            ))
+        }
+    </ol>
+
+    <script>
+        import { initAlbumView } from '../../scripts/album-view';
+
+        let cleanup: (() => void) | null = null;
+
+        function setup() {
+            const root = document.querySelector<HTMLElement>('[data-album-entries]');
+            cleanup?.();
+            cleanup = root ? initAlbumView(root) : null;
+        }
+
+        setup();
+        document.addEventListener('astro:page-load', setup);
+        document.addEventListener('astro:before-swap', () => {
+            cleanup?.();
+            cleanup = null;
+        });
+    </script>
+</section>
+
+<style>
+    .album-entries {
+        --album-accent: var(--note-yellow);
+        margin-top: 3rem;
+    }
+
+    .album-entries__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        border-bottom: 1px solid var(--border-main);
+        padding-bottom: 0.6rem;
+    }
+
+    .album-entries__title {
+        font-family: var(--font-sans);
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .album-entries__count {
+        margin-left: 0.3rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.8rem;
+        font-weight: 400;
+        opacity: 0.6;
+    }
+
+    .album-entries__toggle {
+        display: flex;
+        border: 1px solid var(--border-main);
+    }
+
+    .album-entries__toggle-button {
+        padding: 0.2rem 0.75rem;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        cursor: pointer;
+    }
+
+    .album-entries__toggle-button + .album-entries__toggle-button {
+        border-left: 1px solid var(--border-main);
+    }
+
+    .album-entries__toggle-button[aria-pressed='true'] {
+        background-color: var(--text-main);
+        color: var(--bg-main);
+    }
+
+    .album-entries__toggle-button:focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: 2px;
+    }
+
+    .album-entries__table-wrap {
+        margin-top: 1.25rem;
+        overflow-x: auto;
+    }
+
+    .album-entries__table {
+        width: 100%;
+        min-width: 44rem;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        text-align: left;
+    }
+
+    .album-entries__table th,
+    .album-entries__table td {
+        border-bottom: 1px solid var(--border-main);
+        padding: 0.85rem 0.9rem;
+        vertical-align: top;
+    }
+
+    .album-entries__table thead th {
+        border-bottom-width: 2px;
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .album-entries__table tbody th {
+        width: 14rem;
+        font-weight: 400;
+    }
+
+    .album-entries__table tbody tr:hover {
+        background-color: var(--album-accent);
+        color: var(--note-text);
+    }
+
+    .album-entries__source-link {
+        display: block;
+        font-family: var(--font-sans);
+        font-weight: 700;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+    }
+
+    .album-entries__origin,
+    .album-entries__cell-apply {
+        display: block;
+        margin-top: 0.3rem;
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    .album-entries__cell-apply {
+        margin-top: 0.5rem;
+        border-top: 1px dashed var(--border-main);
+        padding-top: 0.4rem;
+        opacity: 0.85;
+    }
+
+    /* Two views, one source of truth: the toggle flips a data attribute. */
+    .album-entries__cards {
+        margin-top: 1.25rem;
+        display: grid;
+        gap: 1rem;
+        list-style: none;
+    }
+
+    .album-entries[data-album-view='table'] .album-entries__cards {
+        display: none;
+    }
+
+    .album-entries[data-album-view='cards'] .album-entries__table-wrap {
+        display: none;
+    }
+
+    .album-entry {
+        border: 1px solid var(--border-main);
+        border-left-width: 4px;
+        border-left-color: var(--border-main);
+        background-color: var(--bg-main);
+        padding: 1.1rem 1.2rem;
+        transition: box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .album-entry:hover {
+        box-shadow: 4px 4px 0 var(--album-accent);
+    }
+
+    .album-entry__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.5;
+    }
+
+    .album-entry__kind {
+        border: 1px solid var(--border-main);
+        background-color: var(--album-accent);
+        color: var(--note-text);
+        padding: 0.05rem 0.4rem;
+    }
+
+    .album-entry__origin {
+        font-weight: 700;
+    }
+
+    .album-entry__domain {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        opacity: 0.55;
+    }
+
+    .album-entry__title {
+        margin-top: 0.5rem;
+        font-family: var(--font-sans);
+        font-size: 1.0625rem;
+        font-weight: 700;
+        line-height: 1.4;
+    }
+
+    .album-entry__fields {
+        margin-top: 0.8rem;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.35rem 0.9rem;
+        font-size: 0.875rem;
+        line-height: 1.75;
+    }
+
+    .album-entry__fields dt {
+        white-space: nowrap;
+        font-size: 0.75rem;
+        padding-top: 0.28rem;
+        opacity: 0.6;
+    }
+
+    .album-entry__quote {
+        margin-top: 0.9rem;
+        border-left: 2px solid var(--border-main);
+        padding-left: 0.9rem;
+        font-size: 0.875rem;
+        line-height: 1.75;
+        opacity: 0.85;
+    }
+
+    .album-entry__deep-dive {
+        margin-top: 0.9rem;
+        font-size: 0.8rem;
+    }
+
+    /* Narrow screens: the table cannot stay readable, so cards are the only view. */
+    @media (max-width: 47.99rem) {
+        .album-entries__toggle {
+            display: none;
+        }
+
+        .album-entries[data-album-view='table'] .album-entries__table-wrap {
+            display: none;
+        }
+
+        .album-entries[data-album-view='table'] .album-entries__cards {
+            display: grid;
+        }
+
+        .album-entry__fields {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.1rem;
+        }
+
+        .album-entry__fields dt {
+            padding-top: 0.5rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .album-entry {
+            animation: album-entry-in 380ms cubic-bezier(0.22, 1, 0.36, 1) var(--album-delay, 0ms) both;
+        }
+    }
+
+    @keyframes album-entry-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>

@@ -2,25 +2,55 @@
 import { Image } from 'astro:assets';
 import type { ImageInput } from '../types';
 
+/**
+ * Wraps `astro:assets` so callers can pass either a local import (optimised at
+ * build time) or a plain URL string (passed through untouched).
+ */
 type Props = ImageInput & {
     class?: string;
     width?: number;
     height?: number;
-    sizes?: string;
     widths?: number[];
+    sizes?: string;
     format?: 'avif' | 'webp' | 'png' | 'jpg' | 'jpeg';
     loading?: 'lazy' | 'eager';
     fetchpriority?: 'high' | 'low' | 'auto';
     decoding?: 'async' | 'sync' | 'auto';
 };
 
-const { src, alt = '', class: className, loading = 'lazy', fetchpriority, decoding = 'async', ...rest } = Astro.props as Props;
+const {
+    src,
+    alt = '',
+    class: className,
+    width,
+    height,
+    widths,
+    sizes,
+    format,
+    loading = 'lazy',
+    fetchpriority,
+    decoding = 'async'
+} = Astro.props as Props;
+
+const isRemote = typeof src === 'string';
 ---
 
 {
-    typeof src === 'string' ? (
-        <img class={className} src={src} alt={alt} loading={loading} decoding={decoding} />
+    isRemote ? (
+        <img class={className} src={src as string} alt={alt} width={width} height={height} loading={loading} decoding={decoding} fetchpriority={fetchpriority} />
     ) : (
-        <Image class={className} src={src} alt={alt} loading={loading} fetchpriority={fetchpriority} decoding={decoding} {...(rest as any)} />
+        <Image
+            class={className}
+            src={src as ImageMetadata}
+            alt={alt}
+            width={width}
+            height={height}
+            widths={widths}
+            sizes={sizes}
+            format={format}
+            loading={loading}
+            decoding={decoding}
+            fetchpriority={fetchpriority}
+        />
     )
 }

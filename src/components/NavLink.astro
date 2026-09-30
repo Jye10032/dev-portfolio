@@ -3,21 +3,21 @@ import type { HTMLAttributes } from 'astro/types';
 
 type Props = HTMLAttributes<'a'>;
 
-const { href, class: className, ...props } = Astro.props;
+const { href, class: className, ...rest } = Astro.props;
 
-const { pathname } = Astro.url;
-const isActive = href === pathname || href === pathname.replace(/\/$/, '');
+/** Trailing slashes differ between dev and build output, so normalise both sides. */
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const linkPath = String(href ?? '').replace(/\/+$/, '') || '/';
+const isCurrent = linkPath === currentPath;
 ---
 
-<a
-    class:list={[
-        className,
-        {
-            'font-bold no-underline': isActive
-        }
-    ]}
-    href={href}
-    {...props}
->
+<a class:list={['nav-link', className]} href={href} aria-current={isCurrent ? 'page' : undefined} {...rest}>
     <slot />
 </a>
+
+<style>
+    .nav-link[aria-current='page'] {
+        font-weight: 700;
+        text-decoration: none;
+    }
+</style>

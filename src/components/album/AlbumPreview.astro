@@ -1,0 +1,194 @@
+---
+import { ALBUM_STATUS_LABELS } from '../../utils/album-constants';
+import { getAlbumHref, getAlbumSources, type Album } from '../../utils/album-utils';
+import { slugify } from '../../utils/common-utils';
+import FormattedDate from '../FormattedDate.astro';
+
+type Props = { album: Album; index?: number };
+
+const { album, index = 0 } = Astro.props;
+const { title, question, excerpt, accent, status, tags, entries, publishDate, updatedDate } = album.data;
+
+const sources = getAlbumSources(album);
+const visibleSources = sources.slice(0, 3);
+const hiddenSourceCount = sources.length - visibleSources.length;
+const tagIds = tags.map((tag) => slugify(tag)).join(' ');
+---
+
+<article
+    class="album-card"
+    data-album-tags={tagIds}
+    style={`--album-accent: var(--note-${accent}); --album-delay: ${Math.min(index, 7) * 60}ms`}
+>
+    <a class="album-card__link" href={getAlbumHref(album)}>
+        <span class="album-card__spine" aria-hidden="true"></span>
+
+        <div class="album-card__body">
+            <p class="album-card__meta">
+                <span class="album-card__status">{ALBUM_STATUS_LABELS[status]}</span>
+                <span aria-hidden="true">·</span>
+                <span>{entries.length} 个方法</span>
+            </p>
+
+            <h2 class="album-card__title">{title}</h2>
+
+            <p class="album-card__question">
+                <span class="album-card__question-label">问题</span>
+                <span>「{question}」</span>
+            </p>
+
+            {excerpt && <p class="album-card__excerpt">{excerpt}</p>}
+
+            {
+                visibleSources.length > 0 && (
+                    <p class="album-card__sources" aria-label="收录来源">
+                        {visibleSources.map((source) => (
+                            <span class="album-card__source">{source.name}</span>
+                        ))}
+                        {hiddenSourceCount > 0 && <span class="album-card__source album-card__source--more">+{hiddenSourceCount}</span>}
+                    </p>
+                )
+            }
+
+            <p class="album-card__date">
+                {updatedDate ? '更新于 ' : ''}<FormattedDate date={updatedDate ?? publishDate} />
+            </p>
+        </div>
+    </a>
+</article>
+
+<style>
+    .album-card {
+        --album-accent: var(--note-yellow);
+        --album-delay: 0ms;
+        min-width: 0;
+    }
+
+    .album-card__link {
+        position: relative;
+        display: flex;
+        height: 100%;
+        gap: 0;
+        border: 1px solid var(--border-main);
+        background-color: var(--bg-main);
+        text-decoration: none;
+        transition:
+            transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .album-card__link:hover,
+    .album-card__link:focus-visible {
+        text-decoration: none;
+        transform: translate(-3px, -3px);
+        box-shadow: 5px 5px 0 var(--border-main);
+    }
+
+    .album-card__link:focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: 3px;
+    }
+
+    .album-card__spine {
+        width: 0.75rem;
+        flex: none;
+        border-right: 1px solid var(--border-main);
+        background-color: var(--album-accent);
+    }
+
+    .album-card__body {
+        min-width: 0;
+        padding: 1.25rem 1.25rem 1rem;
+    }
+
+    .album-card__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        opacity: 0.7;
+    }
+
+    .album-card__status {
+        border: 1px solid var(--border-main);
+        padding: 0.05rem 0.4rem;
+    }
+
+    .album-card__title {
+        margin-top: 0.6rem;
+        font-family: var(--font-sans);
+        font-size: 1.375rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .album-card__question {
+        margin-top: 0.6rem;
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        opacity: 0.85;
+    }
+
+    .album-card__question-label {
+        flex: none;
+        align-self: flex-start;
+        border-bottom: 1px solid var(--border-main);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        opacity: 0.7;
+    }
+
+    .album-card__excerpt {
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.7;
+    }
+
+    .album-card__sources {
+        margin-top: 0.9rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .album-card__source {
+        border: 1px solid var(--border-main);
+        background-color: var(--album-accent);
+        color: var(--note-text);
+        padding: 0.05rem 0.4rem;
+        font-size: 0.7rem;
+        line-height: 1.5;
+    }
+
+    .album-card__source--more {
+        background-color: transparent;
+        color: inherit;
+    }
+
+    .album-card__date {
+        margin-top: 0.9rem;
+        font-size: 0.75rem;
+        opacity: 0.6;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .album-card {
+            animation: album-card-in 420ms cubic-bezier(0.22, 1, 0.36, 1) var(--album-delay) both;
+        }
+    }
+
+    @keyframes album-card-in {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>

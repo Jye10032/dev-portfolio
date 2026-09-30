@@ -3,8 +3,13 @@ import { slugify } from './common-utils';
 
 export type BlogLanguage = CollectionEntry<'blog'>['data']['lang'];
 
-export function sortItemsByDateDesc(itemA: CollectionEntry<'blog' | 'projects'>, itemB: CollectionEntry<'blog' | 'projects'>) {
-    return new Date(itemB.data.publishDate).getTime() - new Date(itemA.data.publishDate).getTime();
+type DatedEntry = CollectionEntry<'blog' | 'projects'>;
+
+const publishedAt = (item: DatedEntry) => new Date(item.data.publishDate).getTime();
+
+/** Comparator for newest-first ordering. */
+export function sortItemsByDateDesc(itemA: DatedEntry, itemB: DatedEntry): number {
+    return publishedAt(itemB) - publishedAt(itemA);
 }
 
 export function getPostSlug(post: CollectionEntry<'blog'>): string {
@@ -27,23 +32,32 @@ export function findPostTranslation(post: CollectionEntry<'blog'>, posts: Collec
     );
 }
 
-export function getAllTags(posts: CollectionEntry<'blog'>[]) {
-    const tags: string[] = [...new Set(posts.flatMap((post) => post.data.tags || []).filter(Boolean))];
-    return tags
-        .map((tag) => {
-            return {
-                name: tag,
-                id: slugify(tag)
-            };
-        })
-        .filter((obj, pos, arr) => {
-            return arr.map((mapObj) => mapObj.id).indexOf(obj.id) === pos;
-        });
+export type TagSummary = { name: string; id: string; count: number };
+
+/**
+ * Tags across the given posts, de-duplicated by slug and already ordered
+ * most-used first. Tags that slugify to nothing are dropped so no route is
+ * generated for them.
+ */
+export function getAllTags(posts: CollectionEntry<'blog'>[]): TagSummary[] {
+    const bySlug = new Map<string, TagSummary>();
+
+    for (const post of posts) {
+        for (const tag of post.data.tags ?? []) {
+            const id = slugify(tag);
+            if (!id) continue;
+
+            const existing = bySlug.get(id);
+            if (existing) existing.count += 1;
+            else bySlug.set(id, { name: tag, id, count: 1 });
+        }
+    }
+
+    return [...bySlug.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh-CN'));
 }
 
-export function getPostsByTag(posts: CollectionEntry<'blog'>[], tagId: string) {
-    const filteredPosts: CollectionEntry<'blog'>[] = posts.filter((post) => (post.data.tags || []).map((tag) => slugify(tag)).includes(tagId));
-    return filteredPosts;
+export function getPostsByTag(posts: CollectionEntry<'blog'>[], tagId: string): CollectionEntry<'blog'>[] {
+    return posts.filter((post) => (post.data.tags ?? []).some((tag) => slugify(tag) === tagId));
 }
 
 export function isArticle(post: CollectionEntry<'blog'>): boolean {

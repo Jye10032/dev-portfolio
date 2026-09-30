@@ -1,11 +1,20 @@
-export function slugify(input?: string) {
+const DIACRITICS = /[̀-ͯ]/g;
+const DISALLOWED = /[^\p{Letter}\p{Number}\s-]/gu;
+const SEPARATORS = /[\s-]+/g;
+
+/**
+ * Builds a URL-safe slug. CJK characters are letters under `\p{Letter}`, so they
+ * survive intact — tag routes such as `/tags/个人成长` depend on that.
+ */
+export function slugify(input?: string): string {
     if (!input) return '';
 
-    let slug = input.toLowerCase().trim();
-
-    slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    slug = slug.replace(/[^\p{Letter}\p{Number}\s-]/gu, ' ').trim();
-    slug = slug.replace(/[\s-]+/g, '-');
-
-    return slug;
+    return input
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(DIACRITICS, '')
+        .replace(DISALLOWED, ' ')
+        .trim()
+        .replace(SEPARATORS, '-')
+        .replace(/^-+|-+$/g, '');
 }

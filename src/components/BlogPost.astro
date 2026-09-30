@@ -4,7 +4,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from './Button.astro';
 import FormattedDate from './FormattedDate.astro';
 import PostPreview from './PostPreview.astro';
-import Subscribe from './Subscribe.astro';
 import { getPostHref } from '../utils/data-utils';
 import { slugify } from '../utils/common-utils';
 
@@ -47,6 +46,9 @@ const labels = isEnglish
           topics: '文章主题'
       };
 const typeLabel = type === 'article' ? labels.article : labels.note;
+// Newer post first. Built here rather than in the template because Astro's
+// markup expressions are parsed without TypeScript annotations.
+const relatedPosts = [nextPost, prevPost].filter((entry): entry is CollectionEntry<'blog'> => Boolean(entry));
 const alternates = translation
     ? [
           { lang, href: getPostHref(post) },
@@ -60,7 +62,6 @@ const alternates = translation
     description={seo?.description ?? excerpt}
     image={seo?.image}
     pageType="article"
-    showHeader={false}
     wide={showTableOfContents}
     lang={lang}
     alternates={alternates}
@@ -132,11 +133,11 @@ const alternates = translation
                     )
                 }
                 <Button
-                    class="copy-url-button"
+                    data-share-url={Astro.url.href}
+                    data-share-idle={labels.share}
+                    data-share-done={labels.copied}
+                    aria-live="polite"
                     aria-label={labels.share}
-                    data-url={Astro.url.href}
-                    data-label-default={labels.share}
-                    data-label-success={labels.copied}
                 >
                     {labels.share}
                 </Button>
@@ -161,15 +162,19 @@ const alternates = translation
 
     <div class="post-after mx-auto max-w-3xl">
         {
-            (prevPost || nextPost) && (
-                <div class="my-16 sm:my-24">
-                    <h2 class="mb-12 font-sans text-2xl font-bold sm:mb-16 sm:text-3xl">{labels.continueReading}</h2>
-                    {nextPost && <PostPreview post={nextPost} class="mb-10 sm:mb-12" headingLevel="h3" />}
-                    {prevPost && <PostPreview post={prevPost} class="mb-10 sm:mb-12" headingLevel="h3" />}
-                </div>
+            relatedPosts.length > 0 && (
+                <nav class="post-related" aria-label={labels.continueReading}>
+                    <h2 class="post-related__title">{labels.continueReading}</h2>
+                    <ol class="post-related__list">
+                        {relatedPosts.map((entry) => (
+                            <li>
+                                <PostPreview post={entry} headingLevel="h3" />
+                            </li>
+                        ))}
+                    </ol>
+                </nav>
             )
         }
-        <Subscribe class="my-16 sm:my-24" />
     </div>
 </BaseLayout>
 
@@ -203,15 +208,26 @@ const alternates = translation
             updateReadingState();
         }
 
-        const copyUrlButton = document.querySelector('.copy-url-button') as HTMLButtonElement;
-        copyUrlButton?.addEventListener('click', async () => {
-            const url = copyUrlButton.dataset.url || '';
-            await navigator.clipboard.writeText(url);
-            copyUrlButton.innerText = copyUrlButton.dataset.labelSuccess || '';
-            setTimeout(() => {
-                copyUrlButton.innerText = copyUrlButton.dataset.labelDefault || '';
-            }, 2500);
-        });
+        const shareButton = document.querySelector<HTMLElement>('[data-share-url]');
+        if (shareButton) {
+            let resetTimer: ReturnType<typeof setTimeout> | undefined;
+
+            shareButton.addEventListener('click', async () => {
+                const { shareUrl = '', shareIdle = '', shareDone = '' } = shareButton.dataset;
+
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                } catch {
+                    return; // Clipboard denied or unavailable: leave the label alone.
+                }
+
+                shareButton.textContent = shareDone;
+                clearTimeout(resetTimer);
+                resetTimer = setTimeout(() => {
+                    shareButton.textContent = shareIdle;
+                }, 2400);
+            });
+        }
     });
 </script>
 
@@ -235,6 +251,42 @@ const alternates = translation
 
     .post-article {
         min-width: 0;
+    }
+
+    .post-related {
+        margin: 4rem 0;
+    }
+
+    @media (min-width: 40rem) {
+        .post-related {
+            margin: 6rem 0;
+        }
+    }
+
+    .post-related__title {
+        margin-bottom: 3rem;
+        font-family: var(--font-sans);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    @media (min-width: 40rem) {
+        .post-related__title {
+            margin-bottom: 4rem;
+            font-size: 1.875rem;
+        }
+    }
+
+    .post-related__list {
+        display: grid;
+        gap: 2.5rem;
+        list-style: none;
+    }
+
+    @media (min-width: 40rem) {
+        .post-related__list {
+            gap: 3rem;
+        }
     }
 
     .post-layout--with-toc .post-article {

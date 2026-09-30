@@ -52,8 +52,8 @@ const postTypeLabel = (post: TimelinePost) => (post.data.type === 'note' ? '札�
 
 <BaseLayout title="时间线" description="按年月日浏览 misaka.design 的全部写作记录。">
     <header class="timeline-header">
+        <h1 class="sr-only">时间线</h1>
         <p class="timeline-kicker">Writing archive</p>
-        <h1>时间线</h1>
         <p>沿着日期，回看每一篇公开写作。</p>
     </header>
 
@@ -127,15 +127,6 @@ const postTypeLabel = (post: TimelinePost) => (post.data.type === 'note' ? '札�
         letter-spacing: 0.12em;
         line-height: 1.4;
         text-transform: uppercase;
-    }
-
-    .timeline-header h1 {
-        margin: 0 0 1rem;
-        font-family: var(--font-serif);
-        font-size: clamp(2.5rem, 8vw, 4.5rem);
-        font-weight: 500;
-        letter-spacing: 0;
-        line-height: 1;
     }
 
     .timeline-header > p:last-child {

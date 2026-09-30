@@ -9,13 +9,6 @@ export type Link = {
     href: string;
 };
 
-export type Hero = {
-    title?: string;
-    text?: string;
-    image?: ImageInput;
-    actions?: Link[];
-};
-
 export type HomeIntro = {
     lead?: string;
     text?: string;
@@ -39,20 +32,6 @@ export type HomeProofItem = {
     label: string;
 };
 
-export type SubscribeForm = {
-    action: string;
-    emailFieldName?: string;
-    hiddenFields?: { name: string; value: string }[];
-    honeypotFieldName?: string;
-};
-
-export type Subscribe = {
-    enabled?: boolean;
-    title?: string;
-    text?: string;
-    form?: SubscribeForm;
-};
-
 export type UmamiAnalytics = {
     websiteId: string;
     scriptUrl?: string;
@@ -69,10 +48,8 @@ export type SiteConfig = {
     headerNavLinks?: Link[];
     footerNavLinks?: Link[];
     socialLinks?: Link[];
-    hero?: Hero;
     homeIntro?: HomeIntro;
     homeNow?: HomeNowItem[];
-    subscribe?: Subscribe;
     umami?: UmamiAnalytics;
     postsPerPage?: number;
     projectsPerPage?: number;

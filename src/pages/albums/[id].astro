@@ -1,0 +1,294 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import AlbumEntries from '../../components/album/AlbumEntries.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ALBUM_STATUS_LABELS } from '../../utils/album-constants';
+import { getAlbumHref, getAlbumSources, sortAlbumsByDateDesc } from '../../utils/album-utils';
+import { slugify } from '../../utils/common-utils';
+
+export async function getStaticPaths() {
+    const albums = (await getCollection('albums', ({ data }) => !data.draft)).sort(sortAlbumsByDateDesc);
+    return albums.map((album, index) => ({
+        params: { id: album.id },
+        props: {
+            album,
+            prevAlbum: index + 1 !== albums.length ? albums[index + 1] : null,
+            nextAlbum: index !== 0 ? albums[index - 1] : null
+        }
+    }));
+}
+
+type Props = {
+    album: CollectionEntry<'albums'>;
+    prevAlbum: CollectionEntry<'albums'> | null;
+    nextAlbum: CollectionEntry<'albums'> | null;
+};
+
+const { album, prevAlbum, nextAlbum } = Astro.props;
+const { title, question, excerpt, accent, status, skill, tags, entries, publishDate, updatedDate, seo } = album.data;
+const { Content } = await render(album);
+const sources = getAlbumSources(album);
+---
+
+<BaseLayout wide title={title} description={excerpt ?? question} image={seo?.image} pageType="article">
+    <article class="album-detail" style={`--album-accent: var(--note-${accent})`}>
+        <nav class="album-detail__back" aria-label="返回">
+            <a class="link-underline" href="/albums">← 全部专辑</a>
+        </nav>
+
+        <header class="album-detail__head">
+            <p class="album-detail__meta">
+                <span class="album-detail__status">{ALBUM_STATUS_LABELS[status]}</span>
+                <span aria-hidden="true">·</span>
+                <span>{entries.length} 个方法</span>
+                <span aria-hidden="true">·</span>
+                <span>{sources.length} 个来源</span>
+                <span aria-hidden="true">·</span>
+                <span>
+                    {updatedDate ? '更新于 ' : ''}<FormattedDate date={updatedDate ?? publishDate} />
+                </span>
+            </p>
+
+            <h1 class="album-detail__title">{title}</h1>
+
+            <div class="album-detail__question">
+                <p class="album-detail__question-label">起点问题</p>
+                <p class="album-detail__question-text">{question}</p>
+            </div>
+
+            {
+                tags.length > 0 && (
+                    <p class="album-detail__tags" aria-label="专辑主题">
+                        {tags.map((tag) => (
+                            <a class="album-detail__tag" href={`/albums?tag=${slugify(tag)}`}>
+                                #{tag}
+                            </a>
+                        ))}
+                    </p>
+                )
+            }
+        </header>
+
+        <div class="album-detail__synthesis prose max-w-none">
+            <Content />
+        </div>
+
+        <AlbumEntries {entries} {accent} albumTitle={title} />
+
+        {
+            sources.length > 0 && (
+                <footer class="album-detail__sources">
+                    <h2 class="album-detail__sources-title">来源分布</h2>
+                    <ul class="album-detail__sources-list">
+                        {sources.map((source) => (
+                            <li>
+                                <span>{source.name}</span>
+                                <span class="album-detail__sources-count">{source.count}</span>
+                            </li>
+                        ))}
+                    </ul>
+                    {skill && <p class="album-detail__skill">维护此专辑的 skill：<code>{skill}</code></p>}
+                </footer>
+            )
+        }
+
+        {
+            (prevAlbum || nextAlbum) && (
+                <nav class="album-detail__nav" aria-label="其他专辑">
+                    {nextAlbum ? (
+                        <a class="album-detail__nav-link" href={getAlbumHref(nextAlbum)}>
+                            <span>← 更新的专辑</span>
+                            <strong>{nextAlbum.data.title}</strong>
+                        </a>
+                    ) : (
+                        <span />
+                    )}
+                    {prevAlbum && (
+                        <a class="album-detail__nav-link album-detail__nav-link--end" href={getAlbumHref(prevAlbum)}>
+                            <span>更早的专辑 →</span>
+                            <strong>{prevAlbum.data.title}</strong>
+                        </a>
+                    )}
+                </nav>
+            )
+        }
+    </article>
+</BaseLayout>
+
+<style>
+    .album-detail {
+        --album-accent: var(--note-yellow);
+        max-width: 52rem;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .album-detail__back {
+        padding: 1.5rem 0 1rem;
+        font-size: 0.85rem;
+    }
+
+    .album-detail__head {
+        border-top: 2px solid var(--border-main);
+        padding-top: 1.25rem;
+    }
+
+    .album-detail__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        opacity: 0.75;
+    }
+
+    .album-detail__status {
+        border: 1px solid var(--border-main);
+        background-color: var(--album-accent);
+        color: var(--note-text);
+        padding: 0.05rem 0.45rem;
+        opacity: 1;
+    }
+
+    .album-detail__title {
+        margin-top: 0.7rem;
+        font-family: var(--font-sans);
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    @media (min-width: 40rem) {
+        .album-detail__title {
+            font-size: 2.5rem;
+        }
+    }
+
+    .album-detail__question {
+        margin-top: 1.25rem;
+        border: 1px solid var(--border-main);
+        border-left-width: 4px;
+        background-color: var(--album-accent);
+        color: var(--note-text);
+        padding: 0.9rem 1.1rem;
+    }
+
+    .album-detail__question-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        opacity: 0.7;
+    }
+
+    .album-detail__question-text {
+        margin-top: 0.3rem;
+        font-family: var(--font-serif);
+        font-size: 1.0625rem;
+        line-height: 1.7;
+    }
+
+    .album-detail__tags {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .album-detail__tag {
+        border-bottom: 1px solid var(--border-main);
+    }
+
+    .album-detail__synthesis {
+        margin-top: 2rem;
+    }
+
+    .album-detail__sources {
+        margin-top: 3rem;
+        border-top: 1px solid var(--border-main);
+        padding-top: 1.25rem;
+    }
+
+    .album-detail__sources-title {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .album-detail__sources-list {
+        margin-top: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        list-style: none;
+    }
+
+    .album-detail__sources-list li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid var(--border-main);
+        padding: 0.1rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .album-detail__sources-count {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.7rem;
+        opacity: 0.6;
+    }
+
+    .album-detail__skill {
+        margin-top: 0.9rem;
+        font-size: 0.78rem;
+        opacity: 0.7;
+    }
+
+    .album-detail__nav {
+        margin-top: 3rem;
+        display: grid;
+        gap: 1rem;
+        border-top: 1px solid var(--border-main);
+        padding-top: 1.5rem;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 40rem) {
+        .album-detail__nav {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    .album-detail__nav-link {
+        display: grid;
+        gap: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .album-detail__nav-link strong {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    .album-detail__nav-link:hover {
+        text-decoration: none;
+    }
+
+    .album-detail__nav-link:hover strong {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+    }
+
+    .album-detail__nav-link--end {
+        text-align: left;
+    }
+
+    @media (min-width: 40rem) {
+        .album-detail__nav-link--end {
+            text-align: right;
+        }
+    }
+</style>

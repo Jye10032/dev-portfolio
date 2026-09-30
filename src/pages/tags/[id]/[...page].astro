@@ -1,41 +1,65 @@
 ---
 import type { GetStaticPathsOptions, Page } from 'astro';
 import { type CollectionEntry, getCollection } from 'astro:content';
-import Pagination from '../../../components/Pagination.astro';
-import PostPreview from '../../../components/PostPreview.astro';
-import Subscribe from '../../../components/Subscribe.astro';
+import PostArchive from '../../../components/PostArchive.astro';
 import siteConfig from '../../../data/site-config';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getAllTags, getPostsByTag, sortItemsByDateDesc } from '../../../utils/data-utils';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
     const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === 'zh-CN')).sort(sortItemsByDateDesc);
-    const tags = getAllTags(posts);
 
-    return tags.flatMap((tag) => {
-        const filteredPosts = getPostsByTag(posts, tag.id);
-        return paginate(filteredPosts, {
+    return getAllTags(posts).flatMap((tag) =>
+        paginate(getPostsByTag(posts, tag.id), {
             params: { id: tag.id },
-            pageSize: siteConfig.postsPerPage || 4
-        });
-    });
+            props: { tagName: tag.name },
+            pageSize: siteConfig.postsPerPage ?? 8
+        })
+    );
 }
 
-type Props = { page: Page<CollectionEntry<'blog'>> };
+type Props = { page: Page<CollectionEntry<'blog'>>; tagName: string };
 
-const { page } = Astro.props;
-const blog = page.data;
-const params = Astro.params;
-const allPosts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'zh-CN');
-const allTags = getAllTags(allPosts);
-const currentTag = allTags.find((tag) => {
-    return tag.id === params.id;
-});
+const { page, tagName } = Astro.props;
 ---
 
-<BaseLayout title={`#${currentTag?.name}`} description={`关于「${currentTag?.name}」的所有文章`} showHeader={false}>
-    <h1 class="mb-12 font-sans text-3xl leading-tight font-bold sm:mb-16 sm:text-5xl">#{currentTag?.name}</h1>
-    {blog.map((post) => <PostPreview post={post} class="mb-10 sm:mb-12" />)}
-    <Pagination page={page} class="my-16 sm:my-24" />
-    <Subscribe class="my-16 sm:my-24" />
+<BaseLayout title={`#${tagName}`} description={`关于「${tagName}」的所有文章`}>
+    <PostArchive {page} emptyText={`还没有关于「${tagName}」的文章。`}>
+        <header slot="header" class="tag-archive__head">
+            <h1 class="tag-archive__title">#{tagName}</h1>
+            <p class="tag-archive__count">{page.total} 篇</p>
+        </header>
+    </PostArchive>
 </BaseLayout>
+
+<style>
+    .tag-archive__head {
+        margin-bottom: 3rem;
+    }
+
+    @media (min-width: 40rem) {
+        .tag-archive__head {
+            margin-bottom: 4rem;
+        }
+    }
+
+    .tag-archive__title {
+        font-family: var(--font-sans);
+        font-size: 1.875rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    @media (min-width: 40rem) {
+        .tag-archive__title {
+            font-size: 3rem;
+        }
+    }
+
+    .tag-archive__count {
+        margin-top: 0.5rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+</style>

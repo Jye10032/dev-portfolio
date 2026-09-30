@@ -2,38 +2,44 @@
 import { ClientRouter } from 'astro:transitions';
 import BaseHead, { type Props as HeadProps } from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import Nav from '../components/Nav.astro';
 import siteConfig from '../data/site-config';
 
-export type Props = HeadProps & { showHeader?: boolean; wide?: boolean; lang?: 'zh-CN' | 'en' };
+/**
+ * The site shell: head tags, nav, content slot, footer.
+ * Deliberately thin — modules bring their own layout inside the slot.
+ *
+ * The nav carries the site identity, so there is no separate header block.
+ * `wide` widens the shell to 6xl for canvas-style pages (便利贴墙, 专辑, 主题).
+ */
+export type Props = HeadProps & { wide?: boolean; lang?: 'zh-CN' | 'en' };
 
-const { showHeader = true, wide = false, lang = 'zh-CN', ...head } = Astro.props;
+const { wide = false, lang = 'zh-CN', ...head } = Astro.props;
 ---
 
 <!doctype html>
 <html lang={lang} class="wrap-break-words">
     <head>
         <BaseHead {...head} />
-        <script>
-            if (localStorage.theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            }
-        </script>
-        <ClientRouter />
+        <!-- Un-deferred so the stored colour scheme lands before first paint. -->
         <script is:inline src="/theme-toggle.js"></script>
+        <ClientRouter />
         {
             siteConfig.umami?.websiteId && (
-                <script is:inline defer src={siteConfig.umami.scriptUrl ?? 'https://cloud.umami.is/script.js'} data-website-id={siteConfig.umami.websiteId} />
+                <script
+                    is:inline
+                    defer
+                    src={siteConfig.umami.scriptUrl ?? 'https://cloud.umami.is/script.js'}
+                    data-website-id={siteConfig.umami.websiteId}
+                />
             )
         }
         <slot name="head" />
     </head>
     <body class="bg-main text-main">
-        <div class:list={['flex min-h-screen flex-col px-4 md:px-8', wide && 'wall-wide']}>
+        <div class:list={['page-shell flex min-h-screen flex-col px-4 md:px-8', wide && 'page-shell--wide']}>
             <Nav />
-            {showHeader && <Header />}
-            <main class:list={['mx-auto w-full grow', wide ? 'max-w-6xl' : 'max-w-3xl', !showHeader && 'pt-6 sm:pt-8']}>
+            <main class:list={['mx-auto w-full grow pt-8 sm:pt-10', wide ? 'max-w-6xl' : 'max-w-3xl']}>
                 <slot />
             </main>
             <Footer />
@@ -42,10 +48,10 @@ const { showHeader = true, wide = false, lang = 'zh-CN', ...head } = Astro.props
 </html>
 
 <style>
-    .wall-wide :global(header),
-    .wall-wide :global(main),
-    .wall-wide :global(footer),
-    .wall-wide :global(nav > div) {
+    /* Nav, main and footer each cap themselves at 3xl; widen them together. */
+    .page-shell--wide :global(main),
+    .page-shell--wide :global(footer),
+    .page-shell--wide :global(nav > div) {
         max-width: var(--container-6xl);
     }
 </style>

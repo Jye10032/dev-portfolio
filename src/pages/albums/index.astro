@@ -1,0 +1,156 @@
+---
+import { getCollection } from 'astro:content';
+import AlbumPreview from '../../components/album/AlbumPreview.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { countAlbumEntries, getAllAlbumTags, sortAlbumsByDateDesc } from '../../utils/album-utils';
+
+const albums = (await getCollection('albums', ({ data }) => !data.draft)).sort(sortAlbumsByDateDesc);
+const tags = getAllAlbumTags(albums);
+const entryCount = countAlbumEntries(albums);
+---
+
+<BaseLayout wide title="专辑" description="按专题收藏网上值得吸收的方法，附上我的总结、应用方式和原文出处。">
+    <div class="album-index" data-album-index>
+        <header class="album-index__intro">
+            <h1 class="sr-only">专辑</h1>
+            <p class="album-index__lead">按专题收藏网上值得吸收的方法，每条都写清核心内容、我的总结和怎么用，并保留原文出处。</p>
+            <p class="album-index__stats" data-album-filter-status>共 {albums.length} 个专辑</p>
+            <p class="album-index__stats-detail">累计收录 {entryCount} 个方法，来自 {tags.length} 个主题。</p>
+        </header>
+
+        {
+            tags.length > 0 && (
+                <div class="album-index__filter" role="group" aria-label="按主题筛选专辑">
+                    <button class="album-index__filter-button" type="button" data-album-filter="all" aria-pressed="true">
+                        全部
+                    </button>
+                    {tags.map((tag) => (
+                        <button class="album-index__filter-button" type="button" data-album-filter={tag.id} aria-pressed="false">
+                            #{tag.name}
+                            <span class="album-index__filter-count">{tag.count}</span>
+                        </button>
+                    ))}
+                </div>
+            )
+        }
+
+        {
+            albums.length > 0 ? (
+                <div class="album-index__grid">
+                    {albums.map((album, index) => (
+                        <AlbumPreview album={album} index={index} />
+                    ))}
+                </div>
+            ) : (
+                <p class="album-index__empty">还没有专辑。第一个专辑写在 src/content/albums/ 下。</p>
+            )
+        }
+    </div>
+
+    <script>
+        import { initAlbumFilter } from '../../scripts/album-filter';
+
+        let cleanup: (() => void) | null = null;
+
+        function setup() {
+            const root = document.querySelector<HTMLElement>('[data-album-index]');
+            cleanup?.();
+            cleanup = root ? initAlbumFilter(root) : null;
+        }
+
+        setup();
+        document.addEventListener('astro:page-load', setup);
+        document.addEventListener('astro:before-swap', () => {
+            cleanup?.();
+            cleanup = null;
+        });
+    </script>
+</BaseLayout>
+
+<style>
+    .album-index__intro {
+        padding: 0 0 1.75rem;
+    }
+
+    .album-index__lead {
+        max-width: 42rem;
+        line-height: 1.7;
+    }
+
+    .album-index__intro > p + p {
+        margin-top: 0.5rem;
+    }
+
+    .album-index__stats {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+
+    .album-index__stats-detail {
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+
+    .album-index__filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        border-top: 1px solid var(--border-main);
+        border-bottom: 1px solid var(--border-main);
+        padding: 0.85rem 0;
+    }
+
+    .album-index__filter-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: 1px solid var(--border-main);
+        padding: 0.15rem 0.6rem;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        cursor: pointer;
+        transition: background-color 160ms ease;
+    }
+
+    .album-index__filter-button[aria-pressed='true'] {
+        background-color: var(--text-main);
+        color: var(--bg-main);
+    }
+
+    .album-index__filter-button:focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: 2px;
+    }
+
+    .album-index__filter-count {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.7rem;
+        opacity: 0.6;
+    }
+
+    .album-index__filter-button[aria-pressed='true'] .album-index__filter-count {
+        opacity: 0.8;
+    }
+
+    .album-index__grid {
+        margin: 2rem 0 4rem;
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 48rem) {
+        .album-index__grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    .album-index__empty {
+        margin: 2rem 0 4rem;
+        border: 1px dashed var(--border-main);
+        padding: 2rem;
+        text-align: center;
+        opacity: 0.7;
+    }
+</style>

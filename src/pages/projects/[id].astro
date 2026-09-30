@@ -6,44 +6,101 @@ import { sortItemsByDateDesc } from '../../utils/data-utils';
 
 export async function getStaticPaths() {
     const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
-    const projectCount = projects.length;
+    const lastIndex = projects.length - 1;
+
     return projects.map((project, index) => ({
         params: { id: project.id },
         props: {
             project,
-            prevProject: index + 1 !== projectCount ? projects[index + 1] : null,
-            nextProject: index !== 0 ? projects[index - 1] : null
+            olderProject: index < lastIndex ? projects[index + 1] : null,
+            newerProject: index > 0 ? projects[index - 1] : null
         }
     }));
 }
 
 type Props = {
     project: CollectionEntry<'projects'>;
-    prevProject: CollectionEntry<'projects'>;
-    nextProject: CollectionEntry<'projects'>;
+    olderProject: CollectionEntry<'projects'> | null;
+    newerProject: CollectionEntry<'projects'> | null;
 };
 
-const { project, prevProject, nextProject } = Astro.props;
+const { project, olderProject, newerProject } = Astro.props;
 const { title, description, seo } = project.data;
 const { Content } = await render(project);
+const related = [newerProject, olderProject].filter((entry): entry is CollectionEntry<'projects'> => Boolean(entry));
 ---
 
-<BaseLayout title={seo?.title ?? title} description={seo?.description ?? description} image={seo?.image} pageType="article" showHeader={false}>
-    <article class="mb-16 sm:mb-24">
-        <header class="mb-8">
-            <h1 class="font-serif text-3xl leading-tight font-medium sm:text-5xl sm:leading-tight">{title}</h1>
+<BaseLayout title={seo?.title ?? title} description={seo?.description ?? description} image={seo?.image} pageType="article">
+    <article class="project-detail">
+        <header class="project-detail__head">
+            <h1 class="project-detail__title">{title}</h1>
+            {description && <p class="project-detail__lead">{description}</p>}
         </header>
         <div class="prose sm:prose-lg max-w-none">
             <Content />
         </div>
     </article>
+
     {
-        (prevProject || nextProject) && (
-            <div class="my-16 sm:my-24">
-                <h2 class="mb-12 font-serif text-xl italic sm:mb-16 sm:text-2xl">View Next</h2>
-                {nextProject && <ProjectPreview project={nextProject} class="mb-10 sm:mb-12" headingLevel="h3" />}
-                {prevProject && <ProjectPreview project={prevProject} class="mb-10 sm:mb-12" headingLevel="h3" />}
-            </div>
+        related.length > 0 && (
+            <nav class="project-detail__related" aria-label="其他项目">
+                <h2 class="project-detail__related-title">其他项目</h2>
+                <ol class="project-detail__related-list">
+                    {related.map((entry) => (
+                        <li>
+                            <ProjectPreview project={entry} headingLevel="h3" />
+                        </li>
+                    ))}
+                </ol>
+            </nav>
         )
     }
 </BaseLayout>
+
+<style>
+    .project-detail {
+        margin-bottom: 4rem;
+    }
+
+    .project-detail__head {
+        margin-bottom: 2rem;
+    }
+
+    .project-detail__title {
+        font-family: var(--font-serif);
+        font-size: 1.875rem;
+        font-weight: 500;
+        line-height: 1.25;
+    }
+
+    @media (min-width: 40rem) {
+        .project-detail__title {
+            font-size: 3rem;
+        }
+    }
+
+    .project-detail__lead {
+        margin-top: 0.75rem;
+        line-height: 1.7;
+        opacity: 0.85;
+    }
+
+    .project-detail__related {
+        margin: 4rem 0;
+        border-top: 1px solid var(--border-main);
+        padding-top: 2rem;
+    }
+
+    .project-detail__related-title {
+        margin-bottom: 2rem;
+        font-family: var(--font-sans);
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .project-detail__related-list {
+        display: grid;
+        gap: 2.5rem;
+        list-style: none;
+    }
+</style>

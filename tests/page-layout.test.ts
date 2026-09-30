@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 const globalStyles = readFileSync(resolve('src/styles/global.css'), 'utf8');
 const baseLayout = readFileSync(resolve('src/layouts/BaseLayout.astro'), 'utf8');
-const siteHeader = readFileSync(resolve('src/components/Header.astro'), 'utf8');
+const siteNav = readFileSync(resolve('src/components/Nav.astro'), 'utf8');
 const blogDetail = readFileSync(resolve('src/pages/blog/[id].astro'), 'utf8');
 const projectDetail = readFileSync(resolve('src/pages/projects/[id].astro'), 'utf8');
 const tagsIndex = readFileSync(resolve('src/pages/tags/index.astro'), 'utf8');
@@ -23,12 +23,21 @@ describe('content page layout contract', () => {
     });
 
     it('keeps all page content clear of the navigation divider', () => {
-        expect(siteHeader).toMatch(/<header class="[^"]*\bpt-6\b[^"]*\bsm:pt-8\b/);
-        expect(baseLayout).toContain("!showHeader && 'pt-6 sm:pt-8'");
+        expect(baseLayout).toContain("'mx-auto w-full grow pt-8 sm:pt-10'");
         expect(blogDetail).not.toContain('detail-page');
         expect(projectDetail).not.toContain('detail-page');
         expect(globalStyles).not.toContain('.detail-page');
         expect(tagsIndex).not.toMatch(/\.tag-index\s*\{[\s\S]*?padding-top:/);
+    });
+
+    it('carries the site identity inside the nav, aligned with the reading column', () => {
+        // The separate header block is gone; the nav is the only identity surface.
+        expect(baseLayout).not.toContain('showHeader');
+        expect(baseLayout).not.toContain('components/Header.astro');
+        expect(siteNav).toContain('class="site-nav__identity" href="/"');
+        expect(siteNav).toContain('site-nav__avatar');
+        expect(siteNav).toMatch(/site-nav__inner mx-auto w-full max-w-3xl/);
+        expect(baseLayout).toMatch(/\.page-shell--wide :global\(nav > div\)[\s\S]*?max-width:\s*var\(--container-6xl\)/);
     });
 
     it('uses a sticky two-column tag directory that collapses on mobile', () => {
@@ -51,7 +60,7 @@ describe('content page layout contract', () => {
 
     it('connects paired language editions without changing Chinese post URLs', () => {
         expect(baseLayout).toContain('<html lang={lang}');
-        expect(baseHead).toContain('hreflang={alternate.lang}');
+        expect(baseHead).toMatch(/alternates\.map\([\s\S]*?rel="alternate" hreflang=\{lang\} href=/);
         expect(blogDetail).toContain("getPostsByLanguage(allPosts, 'zh-CN')");
         expect(englishBlogDetail).toContain("getPostsByLanguage(allPosts, 'en')");
         expect(englishBlogDetail).toContain('params: { id: getPostSlug(post) }');
