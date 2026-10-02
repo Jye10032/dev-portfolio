@@ -1,0 +1,105 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectDemo from './ProjectDemo.astro';
+
+type Props = {
+    project: CollectionEntry<'projects'>;
+    index: number;
+};
+
+const { project, index } = Astro.props;
+const { title, description, demo, embed, demoHeight } = project.data;
+const hasDemo = Boolean(demo && embed);
+const titleId = `project-title-${project.id}`;
+---
+
+<article class:list={['project-showcase', { 'project-showcase--with-demo': hasDemo }]} aria-labelledby={titleId}>
+    <div class="project-showcase__intro">
+        <p class="project-showcase__number">项目 / {String(index).padStart(2, '0')}</p>
+        <h2 id={titleId} class="project-showcase__title"><a href={`/projects/${project.id}/`}>{title}</a></h2>
+        {description && <p class="project-showcase__description">{description}</p>}
+        <div class="project-showcase__links">
+            <a href={`/projects/${project.id}/`}>项目详情 <span aria-hidden="true">→</span></a>
+            {
+                demo && !embed && (
+                    <a href={demo} target="_blank" rel="noopener noreferrer">
+                        访问网站 <span aria-hidden="true">↗</span>
+                    </a>
+                )
+            }
+        </div>
+    </div>
+    {hasDemo && demo && <ProjectDemo id={`project-demo-${project.id}`} src={demo} title={title} height={demoHeight} variant="showcase" />}
+</article>
+
+<style>
+    .project-showcase {
+        display: grid;
+        align-items: start;
+        gap: 2rem;
+        padding-block: clamp(2rem, 5vw, 4rem);
+        border-top: 1px solid color-mix(in srgb, var(--border-main) 25%, transparent);
+    }
+
+    .project-showcase__intro {
+        min-width: 0;
+    }
+
+    .project-showcase__number {
+        margin-bottom: 1.25rem;
+        color: var(--accent-muted);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+    }
+
+    .project-showcase__title {
+        max-width: 22ch;
+        font-family: var(--font-serif);
+        font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+        font-weight: 500;
+        line-height: 1.25;
+    }
+
+    .project-showcase__description {
+        max-width: 38ch;
+        margin-top: 1.5rem;
+        color: var(--accent-muted);
+        font-size: 0.9375rem;
+        line-height: 1.9;
+    }
+
+    .project-showcase__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .project-showcase__links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+        font-size: 0.875rem;
+        text-decoration: underline;
+        text-underline-offset: 0.3em;
+    }
+
+    .project-showcase a:focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: 4px;
+    }
+
+    @media (min-width: 64rem) {
+        .project-showcase--with-demo {
+            grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 2fr);
+            gap: clamp(2rem, 4vw, 4rem);
+        }
+
+        .project-showcase__intro {
+            position: sticky;
+            top: 4rem;
+            padding-top: 0.5rem;
+        }
+    }
+</style>

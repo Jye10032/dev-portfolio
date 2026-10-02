@@ -2,7 +2,7 @@
 import type { GetStaticPathsOptions, Page } from 'astro';
 import { type CollectionEntry, getCollection } from 'astro:content';
 import Pagination from '../../components/Pagination.astro';
-import ProjectPreview from '../../components/ProjectPreview.astro';
+import ProjectShowcase from '../../components/ProjectShowcase.astro';
 import siteConfig from '../../data/site-config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { sortItemsByDateDesc } from '../../utils/data-utils';
@@ -18,14 +18,17 @@ type Props = { page: Page<CollectionEntry<'projects'>> };
 const { page } = Astro.props;
 ---
 
-<BaseLayout title="项目" description="做过的项目与实践记录。">
-    <h1 class="sr-only">项目</h1>
+<BaseLayout title="项目" description="项目介绍与可直接操作的在线演示。" wide>
+    <header class="project-index__header">
+        <h1>项目</h1>
+        <p>从项目简介开始，直接体验它的功能。</p>
+    </header>
 
     <ol class="project-index__list">
         {
-            page.data.map((project) => (
+            page.data.map((project, index) => (
                 <li class="project-index__item">
-                    <ProjectPreview project={project} />
+                    <ProjectShowcase project={project} index={page.start + index + 1} />
                 </li>
             ))
         }
@@ -35,16 +38,27 @@ const { page } = Astro.props;
 </BaseLayout>
 
 <style>
-    .project-index__list {
-        display: grid;
-        gap: 2.5rem;
-        list-style: none;
+    .project-index__header {
+        padding-block: 1rem clamp(2rem, 5vw, 4rem);
     }
 
-    @media (min-width: 40rem) {
-        .project-index__list {
-            gap: 3rem;
-        }
+    .project-index__header h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(2.25rem, 4vw, 3.5rem);
+        font-weight: 500;
+        line-height: 1.2;
+    }
+
+    .project-index__header p {
+        margin-top: 1rem;
+        color: var(--accent-muted);
+        line-height: 1.75;
+    }
+
+    .project-index__list {
+        display: grid;
+        margin-bottom: 3rem;
+        list-style: none;
     }
 
     .project-index__item {

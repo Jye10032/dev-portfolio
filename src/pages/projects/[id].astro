@@ -1,6 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import ProjectPreview from '../../components/ProjectPreview.astro';
+import ProjectDemo from '../../components/ProjectDemo.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { sortItemsByDateDesc } from '../../utils/data-utils';
 
@@ -25,7 +26,7 @@ type Props = {
 };
 
 const { project, olderProject, newerProject } = Astro.props;
-const { title, description, seo } = project.data;
+const { title, description, seo, demo, embed, demoHeight } = project.data;
 const { Content } = await render(project);
 const related = [newerProject, olderProject].filter((entry): entry is CollectionEntry<'projects'> => Boolean(entry));
 ---
@@ -35,8 +36,16 @@ const related = [newerProject, olderProject].filter((entry): entry is Collection
         <header class="project-detail__head">
             <h1 class="project-detail__title">{title}</h1>
             {description && <p class="project-detail__lead">{description}</p>}
+            {
+                demo && !embed && (
+                    <a class="project-detail__external link-underline" href={demo} target="_blank" rel="noopener noreferrer">
+                        访问网站 ↗
+                    </a>
+                )
+            }
         </header>
-        <div class="prose sm:prose-lg max-w-none">
+        {demo && embed && <ProjectDemo id={`project-demo-${project.id}`} src={demo} title={title} height={demoHeight} />}
+        <div class="project-detail__body prose sm:prose-lg max-w-none">
             <Content />
         </div>
     </article>
@@ -64,6 +73,17 @@ const related = [newerProject, olderProject].filter((entry): entry is Collection
 
     .project-detail__head {
         margin-bottom: 2rem;
+    }
+
+    .project-detail__head,
+    .project-detail__body {
+        max-width: var(--container-3xl);
+        margin-inline: auto;
+    }
+
+    .project-detail__external {
+        display: inline-block;
+        margin-top: 1rem;
     }
 
     .project-detail__title {

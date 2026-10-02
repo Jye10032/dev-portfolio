@@ -61,14 +61,26 @@ const pages = defineCollection({
 const projects = defineCollection({
     loader: markdownIn('projects'),
     schema: ({ image }) =>
-        z.object({
-            title: z.string(),
-            description: z.string().optional(),
-            publishDate: z.coerce.date(),
-            draft: z.boolean().default(false),
-            isFeatured: z.boolean().default(false),
-            seo: seo(image)
-        })
+        z
+            .object({
+                title: z.string(),
+                description: z.string().optional(),
+                publishDate: z.coerce.date(),
+                draft: z.boolean().default(false),
+                isFeatured: z.boolean().default(false),
+                demo: z
+                    .string()
+                    .url()
+                    .refine((url) => url.startsWith('https://'), '演示地址必须使用 HTTPS')
+                    .optional(),
+                embed: z.boolean().default(false),
+                demoHeight: z.number().int().min(320).max(1200).default(640),
+                seo: seo(image)
+            })
+            .refine((project) => !project.embed || Boolean(project.demo), {
+                message: '开启内嵌演示时需要填写 demo 地址',
+                path: ['demo']
+            })
 });
 
 const albumEntrySchema = z.object({

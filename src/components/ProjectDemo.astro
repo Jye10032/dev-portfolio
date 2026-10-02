@@ -1,0 +1,186 @@
+---
+type Props = {
+    id: string;
+    src: string;
+    title: string;
+    height?: number;
+    variant?: 'detail' | 'showcase';
+};
+
+const { id, src, title, height = 640, variant = 'detail' } = Astro.props;
+const headingId = `${id}-title`;
+const frameId = `${id}-frame`;
+const Heading = variant === 'showcase' ? 'h3' : 'h2';
+---
+
+<project-demo class:list={['project-demo', { 'project-demo--showcase': variant === 'showcase' }]}>
+    <section aria-labelledby={headingId}>
+        <div class="project-demo__toolbar">
+            <Heading id={headingId}>在线体验</Heading>
+            <div class="project-demo__actions">
+                {
+                    variant === 'detail' && (
+                        <button type="button" data-demo-expand aria-pressed="false" aria-controls={frameId} hidden>
+                            展开体验
+                        </button>
+                    )
+                }
+                <a href={src} target="_blank" rel="noopener noreferrer">新窗口打开 <span aria-hidden="true">↗</span></a>
+            </div>
+        </div>
+        <iframe
+            id={frameId}
+            class="project-demo__frame"
+            src={src}
+            title={`${title} — 交互演示`}
+            height={height}
+            style={`--demo-height: ${height}px`}
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
+            allow="fullscreen"></iframe>
+        <p class="project-demo__hint">可直接在窗口中操作。若显示异常或登录受限，请使用「新窗口打开」。</p>
+    </section>
+</project-demo>
+
+<script>
+    class ProjectDemo extends HTMLElement {
+        private cleanup?: () => void;
+
+        connectedCallback() {
+            this.cleanup?.();
+            const button = this.querySelector<HTMLButtonElement>('[data-demo-expand]');
+            const shell = this.closest('.page-shell');
+            if (!button || !shell) return;
+
+            const toggle = () => {
+                const expanded = shell.classList.toggle('page-shell--demo-expanded');
+                button.setAttribute('aria-pressed', String(expanded));
+                button.textContent = expanded ? '收起体验' : '展开体验';
+            };
+
+            button.hidden = false;
+            button.setAttribute('aria-pressed', 'false');
+            button.textContent = '展开体验';
+            button.addEventListener('click', toggle);
+
+            this.cleanup = () => {
+                button.removeEventListener('click', toggle);
+                shell.classList.remove('page-shell--demo-expanded');
+            };
+        }
+
+        disconnectedCallback() {
+            this.cleanup?.();
+        }
+    }
+
+    if (!customElements.get('project-demo')) {
+        customElements.define('project-demo', ProjectDemo);
+    }
+</script>
+
+<style>
+    .project-demo {
+        display: block;
+        min-width: 0;
+        margin-block: 2rem 3rem;
+    }
+
+    .project-demo__toolbar,
+    .project-demo__actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.25rem;
+    }
+
+    .project-demo__toolbar {
+        justify-content: space-between;
+        padding-bottom: 0.75rem;
+    }
+
+    .project-demo__toolbar :is(h2, h3) {
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .project-demo__actions a,
+    .project-demo__actions button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        min-height: 2.75rem;
+        color: var(--text-main);
+        font: inherit;
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .project-demo__actions button {
+        border: 1px solid var(--border-main);
+        background: var(--bg-main);
+        padding: 0.375rem 0.75rem;
+    }
+
+    .project-demo__actions button:hover,
+    .project-demo__actions button[aria-pressed='true'] {
+        background: var(--text-main);
+        color: var(--bg-main);
+    }
+
+    .project-demo__actions :focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: 4px;
+    }
+
+    .project-demo__actions button[hidden] {
+        display: none;
+    }
+
+    .project-demo__frame {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        height: var(--demo-height);
+        border: 1px solid var(--border-main);
+        background: var(--bg-muted);
+        color-scheme: normal;
+    }
+
+    .project-demo__hint {
+        margin-top: 0.75rem;
+        color: var(--accent-muted);
+        font-size: 0.8125rem;
+        line-height: 1.65;
+    }
+
+    .project-demo--showcase {
+        margin-block: 0;
+    }
+
+    .project-demo--showcase .project-demo__frame {
+        height: min(var(--demo-height), 72svh);
+        min-height: 480px;
+    }
+
+    :global(.page-shell--demo-expanded > main) {
+        max-width: var(--container-6xl);
+    }
+
+    @media (max-width: 55.999rem) {
+        .project-demo__actions button {
+            display: none;
+        }
+    }
+
+    @media (max-width: 40rem) {
+        .project-demo__frame,
+        .project-demo--showcase .project-demo__frame {
+            height: min(var(--demo-height), 75svh);
+            min-height: 360px;
+        }
+    }
+</style>

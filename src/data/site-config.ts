@@ -20,6 +20,10 @@ const siteConfig: SiteConfig = {
             href: '/blog'
         },
         {
+            text: '项目',
+            href: '/projects'
+        },
+        {
             text: '专辑',
             href: '/albums'
         },
