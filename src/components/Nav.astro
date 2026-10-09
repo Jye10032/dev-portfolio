@@ -6,12 +6,15 @@ import ThemeToggle from './ThemeToggle.astro';
 
 const { avatar, title, subtitle, headerNavLinks } = siteConfig;
 const navLinks = headerNavLinks ?? [];
+
+/* The identity is the only link to `/`, so it carries the current-page state. */
+const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 ---
 
 <nav class="site-nav" aria-label="主导航">
     <!-- max-w-3xl matches the reading column; `page-shell--wide` widens it to 6xl. -->
     <div class="site-nav__inner mx-auto w-full max-w-3xl">
-        <a class="site-nav__identity" href="/">
+        <a class="site-nav__identity" href="/" aria-current={isHome ? 'page' : undefined}>
             {
                 avatar?.src && (
                     <CustomImage

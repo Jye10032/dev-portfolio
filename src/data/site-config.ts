@@ -10,11 +10,10 @@ const siteConfig: SiteConfig = {
     title: 'misaka',
     subtitle: '前端工程、AI 与持续实践',
     description: '一个前端工程师关于 AI 工作流、复杂状态与工程复盘的持续记录。',
+    // Content destinations only. `/` is reached through the nav identity, and
+    // the index-style and contact entries live in the footer, so the top row
+    // stays on one line at every width.
     headerNavLinks: [
-        {
-            text: '首页',
-            href: '/'
-        },
         {
             text: '写作',
             href: '/blog'
@@ -32,22 +31,24 @@ const siteConfig: SiteConfig = {
             href: '/timeline'
         },
         {
-            text: '主题',
-            href: '/tags'
-        },
-        {
             text: '便利贴墙',
             href: '/wall'
-        },
-        {
-            text: '联系我',
-            href: '/contact'
         }
     ],
+    // `/tags` is also linked from BlogHeader, but a tag archive has no way back
+    // to the directory, so the footer keeps it reachable from every page.
     footerNavLinks: [
         {
             text: '关于',
             href: '/about'
+        },
+        {
+            text: '主题',
+            href: '/tags'
+        },
+        {
+            text: '联系我',
+            href: '/contact'
         }
     ],
     socialLinks: [
