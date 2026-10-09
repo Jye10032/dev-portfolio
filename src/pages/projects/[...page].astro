@@ -5,10 +5,10 @@ import Pagination from '../../components/Pagination.astro';
 import ProjectShowcase from '../../components/ProjectShowcase.astro';
 import siteConfig from '../../data/site-config';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { sortItemsByDateDesc } from '../../utils/data-utils';
+import { sortProjectsByOrder } from '../../utils/data-utils';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
-    const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
+    const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortProjectsByOrder);
     if (projects.length === 0) return [];
     return paginate(projects, { pageSize: siteConfig.projectsPerPage ?? 8 });
 }
@@ -21,7 +21,7 @@ const { page } = Astro.props;
 <BaseLayout title="项目" description="项目介绍与可直接操作的在线演示。" wide>
     <header class="project-index__header">
         <h1>项目</h1>
-        <p>从项目简介开始，直接体验它的功能。</p>
+        <p>上下滚动浏览项目，直接体验它的功能。</p>
     </header>
 
     <ol class="project-index__list">
@@ -37,7 +37,15 @@ const { page } = Astro.props;
     {page.lastPage > 1 && <Pagination page={page} class="project-index__pager" />}
 </BaseLayout>
 
+<script>
+    import '../../scripts/project-motion';
+</script>
+
 <style>
+    :global(html.project-motion-active) {
+        scroll-behavior: auto;
+    }
+
     .project-index__header {
         padding-block: 1rem clamp(2rem, 5vw, 4rem);
     }
@@ -62,7 +70,9 @@ const { page } = Astro.props;
     }
 
     .project-index__item {
+        display: grid;
         min-width: 0;
+        min-height: calc(100svh - 2rem);
     }
 
     :global(.project-index__pager) {

@@ -8,6 +8,7 @@ type Props = {
 };
 
 const { id, src, title, height = 640, variant = 'detail' } = Astro.props;
+const desktopWidth = 1440;
 const headingId = `${id}-title`;
 const frameId = `${id}-frame`;
 const Heading = variant === 'showcase' ? 'h3' : 'h2';
@@ -28,18 +29,20 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
                 <a href={src} target="_blank" rel="noopener noreferrer">新窗口打开 <span aria-hidden="true">↗</span></a>
             </div>
         </div>
-        <iframe
-            id={frameId}
-            class="project-demo__frame"
-            src={src}
-            title={`${title} — 交互演示`}
-            height={height}
-            style={`--demo-height: ${height}px`}
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
-            allow="fullscreen"></iframe>
-        <p class="project-demo__hint">可直接在窗口中操作。若显示异常或登录受限，请使用「新窗口打开」。</p>
+        <div class="project-demo__viewport" style={`--demo-width: ${desktopWidth}; --demo-height: ${height}`}>
+            <iframe
+                id={frameId}
+                class="project-demo__frame"
+                src={src}
+                title={`${title} — 交互演示`}
+                width={desktopWidth}
+                height={height}
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
+                allow="fullscreen"></iframe>
+        </div>
+        <p class="project-demo__hint">桌面画面等比缩放，可直接操作和滚动。需要更大画面或登录受限时，请使用「新窗口打开」。</p>
     </section>
 </project-demo>
 
@@ -49,24 +52,40 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
 
         connectedCallback() {
             this.cleanup?.();
+            const viewport = this.querySelector<HTMLElement>('.project-demo__viewport');
+            const frame = this.querySelector<HTMLIFrameElement>('iframe');
+            if (!viewport || !frame) return;
+
+            // Only scale the rendered surface; keep the embedded site's layout viewport unchanged.
+            const resize = (width = viewport.clientWidth) => {
+                const scale = width / Number(frame.width);
+                viewport.style.setProperty('--demo-scale', String(scale));
+            };
+            const observer = new ResizeObserver(([entry]) => resize(entry.contentRect.width));
+            observer.observe(viewport);
+            resize();
+
             const button = this.querySelector<HTMLButtonElement>('[data-demo-expand]');
             const shell = this.closest('.page-shell');
-            if (!button || !shell) return;
 
             const toggle = () => {
+                if (!button || !shell) return;
                 const expanded = shell.classList.toggle('page-shell--demo-expanded');
                 button.setAttribute('aria-pressed', String(expanded));
                 button.textContent = expanded ? '收起体验' : '展开体验';
             };
 
-            button.hidden = false;
-            button.setAttribute('aria-pressed', 'false');
-            button.textContent = '展开体验';
-            button.addEventListener('click', toggle);
+            if (button && shell) {
+                button.hidden = false;
+                button.setAttribute('aria-pressed', 'false');
+                button.textContent = '展开体验';
+                button.addEventListener('click', toggle);
+            }
 
             this.cleanup = () => {
-                button.removeEventListener('click', toggle);
-                shell.classList.remove('page-shell--demo-expanded');
+                observer.disconnect();
+                button?.removeEventListener('click', toggle);
+                if (button) shell?.classList.remove('page-shell--demo-expanded');
             };
         }
 
@@ -140,13 +159,25 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
         display: none;
     }
 
+    .project-demo__viewport {
+        position: relative;
+        width: 100%;
+        aspect-ratio: var(--demo-width) / var(--demo-height);
+        overflow: hidden;
+        background: var(--bg-muted);
+    }
+
     .project-demo__frame {
+        position: absolute;
+        inset: 0 auto auto 0;
         display: block;
         box-sizing: border-box;
-        width: 100%;
-        height: var(--demo-height);
+        width: calc(var(--demo-width) * 1px);
+        max-width: none;
+        height: calc(var(--demo-height) * 1px);
         border: 1px solid var(--border-main);
-        background: var(--bg-muted);
+        transform: scale(var(--demo-scale, 1));
+        transform-origin: top left;
         color-scheme: normal;
     }
 
@@ -161,11 +192,6 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
         margin-block: 0;
     }
 
-    .project-demo--showcase .project-demo__frame {
-        height: min(var(--demo-height), 72svh);
-        min-height: 480px;
-    }
-
     :global(.page-shell--demo-expanded > main) {
         max-width: var(--container-6xl);
     }
@@ -173,14 +199,6 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
     @media (max-width: 55.999rem) {
         .project-demo__actions button {
             display: none;
-        }
-    }
-
-    @media (max-width: 40rem) {
-        .project-demo__frame,
-        .project-demo--showcase .project-demo__frame {
-            height: min(var(--demo-height), 75svh);
-            min-height: 360px;
         }
     }
 </style>

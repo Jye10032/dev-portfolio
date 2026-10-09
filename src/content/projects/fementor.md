@@ -2,6 +2,7 @@
 title: 'FEMentor · 前端面试训练'
 description: '从简历和目标岗位出发，通过动态追问、记忆与检索，完成一场有针对性的模拟面试。'
 publishDate: '2026-10-02'
+order: 1
 demo: 'https://fementor.misaka.design/'
 embed: true
 demoHeight: 760

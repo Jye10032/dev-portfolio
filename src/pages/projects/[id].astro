@@ -3,10 +3,10 @@ import { type CollectionEntry, getCollection, render } from 'astro:content';
 import ProjectPreview from '../../components/ProjectPreview.astro';
 import ProjectDemo from '../../components/ProjectDemo.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { sortItemsByDateDesc } from '../../utils/data-utils';
+import { sortProjectsByOrder } from '../../utils/data-utils';
 
 export async function getStaticPaths() {
-    const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortItemsByDateDesc);
+    const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(sortProjectsByOrder);
     const lastIndex = projects.length - 1;
 
     return projects.map((project, index) => ({

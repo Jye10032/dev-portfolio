@@ -12,6 +12,11 @@ export function sortItemsByDateDesc(itemA: DatedEntry, itemB: DatedEntry): numbe
     return publishedAt(itemB) - publishedAt(itemA);
 }
 
+/** Explicit project positions come first; otherwise show newest projects first. */
+export function sortProjectsByOrder(itemA: CollectionEntry<'projects'>, itemB: CollectionEntry<'projects'>): number {
+    return (itemA.data.order ?? Number.MAX_SAFE_INTEGER) - (itemB.data.order ?? Number.MAX_SAFE_INTEGER) || sortItemsByDateDesc(itemA, itemB);
+}
+
 export function getPostSlug(post: CollectionEntry<'blog'>): string {
     return post.data.publicSlug ?? post.id;
 }
