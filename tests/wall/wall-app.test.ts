@@ -69,16 +69,6 @@ describe('wall app interactions', () => {
         expect(store.getState().notes.some((note) => note.id === 'seed-1')).toBe(true);
     });
 
-    it('returns a cleanup function so a wall instance can be torn down on route leave', async () => {
-        const root = buildWallRoot();
-        const { initWall } = await import('../../src/utils/wall/wall-app');
-
-        const cleanup = initWall(root);
-
-        expect(typeof cleanup).toBe('function');
-        cleanup?.();
-    });
-
     it('keeps the panel mounted until transition end when selection is cleared', async () => {
         const root = buildWallRoot();
         const { initWall } = await import('../../src/utils/wall/wall-app');

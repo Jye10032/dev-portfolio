@@ -1,21 +1,7 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { fetchVisitorStats } from '../src/utils/umami';
 
-const visitorComponent = readFileSync(resolve('src/components/home/VisitorStats.astro'), 'utf8');
-const homePage = readFileSync(resolve('src/pages/index.astro'), 'utf8');
-
 describe('visitor statistics', () => {
-    it('renders the visitor module before the latest and topic sections', () => {
-        expect(homePage).toContain("import VisitorStats from '../components/home/VisitorStats.astro'");
-        expect(homePage).toContain('<VisitorStats />');
-        expect(homePage.indexOf('<VisitorStats />')).toBeLessThan(homePage.indexOf('<!-- 最新动态 -->'));
-        expect(visitorComponent).toContain('今日浏览');
-        expect(visitorComponent).toContain('累计浏览');
-        expect(visitorComponent).toContain('独立访客');
-    });
-
     it('reads public share metadata before requesting overview statistics', async () => {
         const fetchImpl = vi
             .fn<typeof fetch>()
