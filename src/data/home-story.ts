@@ -67,19 +67,19 @@ export const HOME_FOCUS_AREAS: readonly HomeFocusDefinition[] = [
         title: 'AI Agent 与知识系统',
         description: '动态追问、上下文压缩、长期记忆、RAG 与知识图谱。',
         tag: 'FEMentor',
-        href: '/tags/fementor'
+        href: '/tags/fementor/'
     },
     {
         title: '前端系统与状态边界',
         description: '复杂流程状态、跨页面缓存、Service Worker 与 Hydration 一致性。',
         tag: 'VideoGaga',
-        href: '/tags/videogaga'
+        href: '/tags/videogaga/'
     },
     {
         title: '基础能力与工程复盘',
         description: '算法、数据结构、JavaScript 边界，以及对实验结论的重新审视。',
         tag: '题解',
-        href: '/tags/题解'
+        href: '/tags/题解/'
     }
 ] as const;
 

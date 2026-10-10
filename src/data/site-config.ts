@@ -16,23 +16,23 @@ const siteConfig: SiteConfig = {
     headerNavLinks: [
         {
             text: '写作',
-            href: '/blog'
+            href: '/blog/'
         },
         {
             text: '项目',
-            href: '/projects'
+            href: '/projects/'
         },
         {
             text: '专辑',
-            href: '/albums'
+            href: '/albums/'
         },
         {
             text: '时间线',
-            href: '/timeline'
+            href: '/timeline/'
         },
         {
             text: '便利贴墙',
-            href: '/wall'
+            href: '/wall/'
         }
     ],
     // `/tags` is also linked from BlogHeader, but a tag archive has no way back
@@ -40,15 +40,15 @@ const siteConfig: SiteConfig = {
     footerNavLinks: [
         {
             text: '关于',
-            href: '/about'
+            href: '/about/'
         },
         {
             text: '主题',
-            href: '/tags'
+            href: '/tags/'
         },
         {
             text: '联系我',
-            href: '/contact'
+            href: '/contact/'
         }
     ],
     socialLinks: [
@@ -65,17 +65,17 @@ const siteConfig: SiteConfig = {
         {
             label: '当前项目',
             text: 'FEMentor：把固定题单扩展为具备追问、记忆与检索能力的模拟面试 Agent。',
-            href: '/tags/fementor'
+            href: '/tags/fementor/'
         },
         {
             label: '研究主题',
             text: 'AI Agent 的上下文压缩、长期记忆与知识结构治理。',
-            href: '/blog/fementor-2-context-and-memory'
+            href: '/blog/fementor-2-context-and-memory/'
         },
         {
             label: '近期整理',
             text: 'VideoGaga 的状态模型、跨页面缓存与 Hydration 一致性。',
-            href: '/tags/videogaga'
+            href: '/tags/videogaga/'
         }
     ],
     umami: {

@@ -17,7 +17,7 @@ const tags = getAllTags(posts);
         <div class="tag-index__directory" aria-label="全部主题">
             {
                 tags.map((tag) => (
-                    <a class="tag-index__item" href={`/tags/${tag.id}`}>
+                    <a class="tag-index__item" href={`/tags/${tag.id}/`}>
                         <span class="tag-index__name">#{tag.name}</span>
                         <span class="tag-index__count">{String(tag.count).padStart(2, '0')}</span>
                     </a>

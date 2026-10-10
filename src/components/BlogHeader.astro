@@ -12,9 +12,9 @@ const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang
 const popularTags = getAllTags(posts).slice(0, 10);
 
 const typeLinks = [
-    { id: 'all', href: '/blog', label: '全部' },
-    { id: 'articles', href: '/blog/articles', label: '长文' },
-    { id: 'notes', href: '/blog/notes', label: '札记' }
+    { id: 'all', href: '/blog/', label: '全部' },
+    { id: 'articles', href: '/blog/articles/', label: '长文' },
+    { id: 'notes', href: '/blog/notes/', label: '札记' }
 ] as const;
 ---
 
@@ -41,11 +41,11 @@ const typeLinks = [
             <nav class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs" aria-label="热门主题">
                 <span class="mr-1 opacity-60">主题</span>
                 {popularTags.map((tag) => (
-                    <a href={`/tags/${tag.id}`} class="py-1">
+                    <a href={`/tags/${tag.id}/`} class="py-1">
                         #{tag.name}
                     </a>
                 ))}
-                <a class="py-1" href="/tags">
+                <a class="py-1" href="/tags/">
                     全部主题
                 </a>
             </nav>

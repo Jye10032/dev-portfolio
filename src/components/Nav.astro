@@ -14,7 +14,7 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 <nav class="site-nav" aria-label="主导航">
     <!-- max-w-3xl matches the reading column; `page-shell--wide` widens it to 6xl. -->
     <div class="site-nav__inner mx-auto w-full max-w-3xl">
-        <a class="site-nav__identity" href="/" data-astro-reload aria-current={isHome ? 'page' : undefined}>
+        <a class="site-nav__identity" href="/" aria-current={isHome ? 'page' : undefined}>
             {
                 avatar?.src && (
                     <CustomImage
@@ -38,7 +38,7 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
             {
                 navLinks.map((link) => (
                     <li>
-                        <NavLink href={link.href} data-astro-reload>
+                        <NavLink href={link.href}>
                             {link.text}
                         </NavLink>
                     </li>

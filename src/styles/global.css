@@ -25,6 +25,11 @@
     --note-text: #1a1a1a;
     --wall-paper: #fbf8ef;
     --wall-dot: #d8d0bd;
+    --wall-tape: rgb(255 255 255 / 0.45);
+    --wall-tape-edge: rgb(0 0 0 / 0.05);
+    --wall-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
+    --wall-shadow-md: 0 1px 5px rgb(0 0 0 / 0.08);
+    --wall-shadow-lg: 0 4px 10px rgb(0 0 0 / 0.14);
 }
 html.dark {
     --text-main: #fff;
@@ -45,6 +50,13 @@ html.dark {
     --note-text: #e8e6e3;
     --wall-paper: #201e19;
     --wall-dot: #4b463b;
+    /* Dark notes need a dimmer tape and heavier shadows; a black shadow on a
+       dark surface reads as nothing. */
+    --wall-tape: rgb(255 255 255 / 0.1);
+    --wall-tape-edge: rgb(255 255 255 / 0.08);
+    --wall-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --wall-shadow-md: 0 1px 5px rgb(0 0 0 / 0.45);
+    --wall-shadow-lg: 0 4px 12px rgb(0 0 0 / 0.55);
 }
 
 @theme inline {

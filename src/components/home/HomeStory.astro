@@ -33,6 +33,13 @@ const [openScene, focusScene, nowScene, readingScene, proofScene, enterScene] = 
     <div class="home-story__scenes">
         <HomeStoryScene scene={openScene}>
             <div class="home-intro">
+                <div class="home-intro__text">
+                    <p class="home-intro__copy">前端工程师，持续实践 AI 工作流、复杂状态管理与工程化问题。</p>
+                    <nav class="home-intro__links" aria-label="开始浏览">
+                        <a href="/blog/">阅读写作 <span aria-hidden="true">→</span></a>
+                        <a href="/projects/">查看项目 <span aria-hidden="true">→</span></a>
+                    </nav>
+                </div>
                 {
                     avatar && (
                         <figure class="home-bookplate">
@@ -50,7 +57,6 @@ const [openScene, focusScene, nowScene, readingScene, proofScene, enterScene] = 
                         </figure>
                     )
                 }
-                <p class="home-intro__copy">前端工程师，持续实践 AI 工作流、复杂状态管理与工程化问题。</p>
             </div>
         </HomeStoryScene>
 
@@ -99,7 +105,7 @@ const [openScene, focusScene, nowScene, readingScene, proofScene, enterScene] = 
                         ))}
                     </div>
                 ) : (
-                    <a class="home-story-link" href="/blog">
+                    <a class="home-story-link" href="/blog/">
                         打开写作目录
                     </a>
                 )
@@ -117,15 +123,15 @@ const [openScene, focusScene, nowScene, readingScene, proofScene, enterScene] = 
                     ))
                 }
             </dl>
-            <a class="home-proof-link" href="/timeline">沿时间线查看全部记录 <span aria-hidden="true">→</span></a>
+            <a class="home-proof-link" href="/timeline/">沿时间线查看全部记录 <span aria-hidden="true">→</span></a>
         </HomeStoryScene>
 
         <HomeStoryScene scene={enterScene}>
             <p>长卷到此收起，余下的路径留给你选择。</p>
             <nav class="home-entry-links" aria-label="继续浏览">
-                <a href="/blog">写作</a>
-                <a href="/tags">主题</a>
-                <a href="/wall">便利贴墙</a>
+                <a href="/blog/">写作</a>
+                <a href="/tags/">主题</a>
+                <a href="/wall/">便利贴墙</a>
             </nav>
         </HomeStoryScene>
     </div>

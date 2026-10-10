@@ -38,7 +38,7 @@
             };
 
             try {
-                const response = await fetch('/api/visitors');
+                const response = await fetch('/api/visitors/');
                 if (!response.ok) throw new Error(`Visitor request failed with ${response.status}`);
                 const data = (await response.json()) as VisitorResponse;
                 setValue('today', data.today.pageviews);

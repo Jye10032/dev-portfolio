@@ -145,7 +145,7 @@ const alternates = translation
                 {
                     tags.length > 0 && (
                         <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm" aria-label={labels.topics}>
-                            {tags.map((tag) => (isEnglish ? <span>#{tag}</span> : <a href={`/tags/${slugify(tag)}`}>#{tag}</a>))}
+                            {tags.map((tag) => (isEnglish ? <span>#{tag}</span> : <a href={`/tags/${slugify(tag)}/`}>#{tag}</a>))}
                         </div>
                     )
                 }
@@ -217,9 +217,9 @@ const alternates = translation
     }
 
     .post-title {
-        font-family: var(--font-sans);
+        font-family: var(--font-serif);
         font-size: clamp(1.875rem, 3vw, 2.5rem);
-        font-weight: 700;
+        font-weight: 600;
         line-height: 1.3;
         text-wrap: pretty;
     }
@@ -237,6 +237,20 @@ const alternates = translation
     .post-series-kicker a:hover {
         text-decoration: underline;
         text-underline-offset: 0.25em;
+    }
+
+    .post-content {
+        font-family: var(--font-serif);
+        font-weight: 400;
+    }
+
+    .post-content :global(:is(h1, h2, h3, h4, h5, h6)) {
+        font-family: var(--font-serif);
+        font-weight: 600;
+    }
+
+    .post-content :global(blockquote) {
+        font-family: var(--font-serif);
     }
 
     .post-content :global(h2) {

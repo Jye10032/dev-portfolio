@@ -34,7 +34,7 @@ const sources = getAlbumSources(album);
 <BaseLayout wide title={title} description={excerpt ?? question} image={seo?.image} pageType="article">
     <article class="album-detail" style={`--album-accent: var(--note-${accent})`}>
         <nav class="album-detail__back" aria-label="返回">
-            <a class="link-underline" href="/albums">← 全部专辑</a>
+            <a class="link-underline" href="/albums/">← 全部专辑</a>
         </nav>
 
         <header class="album-detail__head">
@@ -61,7 +61,7 @@ const sources = getAlbumSources(album);
                 tags.length > 0 && (
                     <p class="album-detail__tags" aria-label="专辑主题">
                         {tags.map((tag) => (
-                            <a class="album-detail__tag" href={`/albums?tag=${slugify(tag)}`}>
+                            <a class="album-detail__tag" href={`/albums/?tag=${slugify(tag)}`}>
                                 #{tag}
                             </a>
                         ))}

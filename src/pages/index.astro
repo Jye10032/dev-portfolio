@@ -41,7 +41,7 @@ const proofItems = [
             <section class="mb-16 sm:mb-24">
                 <div class="mb-8 flex items-baseline justify-between sm:mb-12">
                     <h2 class="font-serif text-xl italic sm:text-2xl">最新</h2>
-                    <Button href="/blog" class="text-sm">
+                    <Button href="/blog/" class="text-sm">
                         查看全部
                     </Button>
                 </div>
@@ -62,7 +62,7 @@ const proofItems = [
                 <div class="flex flex-wrap gap-3">
                     {tags.map((tag) => (
                         <a
-                            href={`/tags/${tag.id}`}
+                            href={`/tags/${tag.id}/`}
                             class="border-main/20 hover:bg-main hover:text-bg-main rounded-full border px-4 py-2 text-sm transition-colors"
                         >
                             #{tag.name}

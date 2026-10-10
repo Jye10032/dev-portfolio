@@ -9,6 +9,7 @@ import siteConfig from './src/data/site-config';
 // https://astro.build/config
 export default defineConfig({
   site: siteConfig.website,
+  trailingSlash: 'always',
   adapter: netlify(),
   vite: {
     plugins: [tailwindcss()]

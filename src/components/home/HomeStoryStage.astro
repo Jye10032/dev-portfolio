@@ -19,10 +19,9 @@ const { inline = false, scene } = Astro.props;
             </div>
             <p class="home-stage__prompt">
                 <span class="home-stage__chevron" aria-hidden="true">›</span>
-                <span data-home-command>{scene?.command}</span>
+                <span><span data-home-command>{scene?.command}</span><span class="home-stage__caret" aria-hidden="true"></span></span>
             </p>
             <p class="home-stage__status" data-home-status>{scene?.response}</p>
-            <span class="home-stage__caret" aria-hidden="true"></span>
             <div class="home-stage__seal" aria-hidden="true">御坂</div>
         </div>
     </div>

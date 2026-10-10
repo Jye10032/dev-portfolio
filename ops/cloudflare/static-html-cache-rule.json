@@ -1,0 +1,19 @@
+{
+  "description": "misaka.design public HTML: respect the origin's five-minute Cloudflare TTL",
+  "expression": "(http.host eq \"misaka.design\" and ends_with(http.request.uri.path, \"/\") and (http.request.uri.path in {\"/\" \"/about/\" \"/contact/\" \"/timeline/\" \"/wall/\"} or starts_with(http.request.uri.path, \"/blog/\") or starts_with(http.request.uri.path, \"/en/blog/\") or starts_with(http.request.uri.path, \"/projects/\") or starts_with(http.request.uri.path, \"/albums/\") or starts_with(http.request.uri.path, \"/tags/\")))",
+  "action": "set_cache_settings",
+  "action_parameters": {
+    "cache": true,
+    "edge_ttl": {
+      "mode": "bypass_by_default",
+      "status_code_ttl": [
+        {
+          "status_code_range": { "from": 400 },
+          "value": -1
+        }
+      ]
+    },
+    "browser_ttl": { "mode": "respect_origin" }
+  },
+  "enabled": false
+}

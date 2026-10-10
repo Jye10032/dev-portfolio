@@ -4,3 +4,59 @@
 
 [build.environment]
   NPM_VERSION = "11.12.1"
+
+# Public HTML only. A Cloudflare Cache Rule must also make these routes eligible.
+# Keep Netlify/browser cache policies unchanged; only Cloudflare gets a 5-minute TTL.
+# Rule draft: ops/cloudflare/static-html-cache-rule.json (disabled until activated).
+# Deploy this header first, then enable the rule. Purge Cloudflare after publishing
+# to avoid serving old HTML that references assets from the previous deployment.
+# https://developers.cloudflare.com/cache/concepts/cdn-cache-control/
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/blog/*"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/en/blog/*"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/projects/*"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/albums/*"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/tags/*"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/timeline/"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/wall/"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/about/"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/contact/"
+  [headers.values]
+    Cloudflare-CDN-Cache-Control = "public, max-age=300"

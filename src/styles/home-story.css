@@ -1,17 +1,29 @@
+/*
+ * Module token block. Every colour in this file must come from here so a
+ * retheme only edits these two blocks. The terminal keeps a fixed dark
+ * palette in both modes on purpose — it is a terminal mock, not a surface.
+ */
 .home-story,
 body:has(.home-story) {
     --home-paper: #f7f5ef;
     --home-paper-deep: #eee9dc;
+    --home-paper-rule: rgb(125 105 70 / 4%);
     --home-ink: #20201e;
     --home-ink-muted: #69675f;
     --home-vermilion: #a33a2b;
+    --home-vermilion-deep: #7c2d22;
+    --home-terminal-bg: #181918;
+    --home-terminal-ink: #f4f2eb;
+    --home-terminal-accent: #d98b6a;
+    --home-shadow-soft: 0 24px 70px rgb(24 25 24 / 12%);
+    --home-shadow-flat: 0 18px 60px rgb(52 42 24 / 10%);
 }
 
 body:has(.home-story) {
     --text-main: var(--home-ink);
     --border-main: var(--home-ink);
     --accent: var(--home-vermilion);
-    --accent-muted: #7c2d22;
+    --accent-muted: var(--home-vermilion-deep);
 }
 
 body:has(.home-story) > div > nav {
@@ -60,7 +72,6 @@ body:has(.home-story) > div > header p:first-child {
 .home-story__sticky {
     position: sticky;
     top: clamp(6rem, 14vh, 9rem);
-    min-height: 28rem;
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
     gap: 1.1rem;
@@ -89,13 +100,14 @@ body:has(.home-story) > div > header p:first-child {
 
 .home-stage__terminal {
     position: relative;
-    min-height: 24rem;
+    display: grid;
+    aspect-ratio: 3 / 2;
     overflow: clip;
     border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
     border-radius: 6px;
-    background: #181918;
-    color: #f4f2eb;
-    box-shadow: 0 24px 70px rgb(24 25 24 / 12%);
+    background: var(--home-terminal-bg);
+    color: var(--home-terminal-ink);
+    box-shadow: var(--home-shadow-soft);
     transition:
         background-color 420ms ease,
         border-color 420ms ease,
@@ -105,10 +117,9 @@ body:has(.home-story) > div > header p:first-child {
 }
 
 .home-stage__paper {
-    position: absolute;
-    inset: 0;
-    padding: clamp(1.4rem, 4vw, 2.4rem);
-    background-image: linear-gradient(90deg, transparent 0 96%, rgb(125 105 70 / 4%) 100%);
+    position: relative;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    background-image: linear-gradient(90deg, transparent 0 96%, var(--home-paper-rule) 100%);
     /* This transform is driven per scroll frame by --home-scroll-progress. A long
        easing curve would restart on every frame and trail behind the scroll, so
        keep the smoothing short and linear. */
@@ -119,7 +130,7 @@ body:has(.home-story) > div > header p:first-child {
 .home-stage__chrome {
     display: flex;
     gap: 0.45rem;
-    margin-bottom: clamp(3rem, 10vh, 5rem);
+    margin-bottom: clamp(1.5rem, 4vh, 2rem);
     transition: opacity 300ms ease;
 }
 
@@ -135,7 +146,7 @@ body:has(.home-story) > div > header p:first-child {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 0.65rem;
-    min-height: 5.5rem;
+    min-height: 4.1rem;
     margin: 0;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: clamp(0.92rem, 1.45vw, 1.08rem);
@@ -146,11 +157,11 @@ body:has(.home-story) > div > header p:first-child {
 /* Warm amber inside the dark terminal, so the prompt reads as the same accent
    family as the vermilion used elsewhere in the story. */
 .home-stage__chevron {
-    color: #d98b6a;
+    color: var(--home-terminal-accent);
 }
 
 .home-stage__status {
-    margin: 1.5rem 0 0 1.55rem;
+    margin: 1rem 0 0 1.55rem;
     min-height: 1.8rem;
     color: color-mix(in srgb, currentColor 64%, transparent);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -158,9 +169,9 @@ body:has(.home-story) > div > header p:first-child {
 }
 
 .home-stage__caret {
-    position: absolute;
-    left: clamp(2.95rem, 7vw, 4rem);
-    top: clamp(10.3rem, 24vh, 12.9rem);
+    display: inline-block;
+    margin-left: 0.35rem;
+    vertical-align: -0.15em;
     width: 0.55rem;
     height: 1.1rem;
     background: currentColor;
@@ -256,11 +267,13 @@ body:has(.home-story) > div > header p:first-child {
 .home-intro {
     display: grid;
     grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
+    grid-template-areas: 'portrait copy';
     gap: 2.5rem;
     align-items: end;
 }
 
 .home-bookplate {
+    grid-area: portrait;
     margin: 0;
     padding: 0.5rem;
     border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
@@ -286,6 +299,15 @@ body:has(.home-story) > div > header p:first-child {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.58rem;
     text-align: center;
+}
+
+.home-intro__text {
+    grid-area: copy;
+    min-width: 0;
+}
+
+.home-intro__links {
+    display: none;
 }
 
 .home-intro__copy {
@@ -446,7 +468,7 @@ body:has(.home-story) > div > header p:first-child {
 
 .home-story[data-home-scene='proof'] .home-stage__terminal {
     border-radius: 0;
-    box-shadow: 0 18px 60px rgb(52 42 24 / 10%);
+    box-shadow: var(--home-shadow-flat);
 }
 
 .home-story[data-home-scene='proof'] .home-stage__terminal::before,
@@ -490,6 +512,7 @@ body:has(.home-story) > div > header p:first-child {
 }
 
 .home-story[data-home-scene='enter'] .home-stage__terminal {
+    aspect-ratio: auto;
     min-height: 12rem;
     background: transparent;
     color: inherit;
@@ -502,19 +525,19 @@ body:has(.home-story) > div > header p:first-child {
     opacity: 0;
 }
 
-.dark .home-story {
+/* Both selectors, so the body-level overrides below can derive from these
+   instead of repeating literals. */
+.dark .home-story,
+.dark body:has(.home-story) {
     --home-paper: #24231f;
     --home-paper-deep: #302e28;
+    --home-paper-rule: rgb(236 232 220 / 5%);
     --home-ink: #ece8dc;
     --home-ink-muted: #b6b0a1;
     --home-vermilion: #d46a55;
-}
-
-.dark body:has(.home-story) {
-    --text-main: #ece8dc;
-    --border-main: #ece8dc;
-    --accent: #d46a55;
-    --accent-muted: #e18a78;
+    --home-vermilion-deep: #e18a78;
+    --home-shadow-soft: 0 24px 70px rgb(0 0 0 / 45%);
+    --home-shadow-flat: 0 18px 60px rgb(0 0 0 / 40%);
 }
 
 @keyframes home-caret {
@@ -525,7 +548,7 @@ body:has(.home-story) > div > header p:first-child {
 
 @media (max-width: 1023px) {
     body:has(.home-story) > div > nav {
-        padding-bottom: 3.5rem;
+        padding-bottom: 0;
     }
 
     .home-story {
@@ -545,6 +568,20 @@ body:has(.home-story) > div > header p:first-child {
         opacity: 1;
     }
 
+    .home-story .home-scene[data-home-story-scene='open'] {
+        padding-top: 0.5rem;
+    }
+
+    /* The introductory copy leads on mobile; the terminal is decorative. */
+    .home-scene[data-home-story-scene='open'] > .home-scene__mobile-stage {
+        order: 1;
+        margin: 2rem 0 0;
+    }
+
+    .home-scene[data-home-story-scene='open'] > .home-scene__chapter {
+        display: none;
+    }
+
     .home-scene__mobile-stage {
         display: block;
         width: 100%;
@@ -562,7 +599,8 @@ body:has(.home-story) > div > header p:first-child {
     }
 
     .home-stage--inline .home-stage__terminal {
-        min-height: 13rem;
+        aspect-ratio: auto;
+        min-height: 10rem;
     }
 
     .home-stage--inline .home-stage__paper {
@@ -570,16 +608,16 @@ body:has(.home-story) > div > header p:first-child {
     }
 
     .home-stage--inline .home-stage__chrome {
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
     .home-stage--inline .home-stage__prompt {
-        min-height: 4.5rem;
+        min-height: 0;
         font-size: 0.86rem;
     }
 
     .home-stage--inline .home-stage__status {
-        margin-top: 0.75rem;
+        margin-top: 0.5rem;
         margin-left: 1.45rem;
     }
 
@@ -601,13 +639,33 @@ body:has(.home-story) > div > header p:first-child {
 
     .home-intro {
         grid-template-columns: minmax(8rem, 42%) minmax(0, 1fr);
+        grid-template-areas: 'copy copy' 'portrait .';
         gap: 1.25rem;
+    }
+
+    .home-intro__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .home-intro__links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+        color: var(--home-vermilion);
+        font-size: 0.9375rem;
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
     }
 }
 
 @media (max-width: 560px) {
     .home-intro {
         grid-template-columns: 1fr;
+        grid-template-areas: 'copy' 'portrait';
     }
 
     .home-bookplate {
