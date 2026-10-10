@@ -56,7 +56,9 @@ const timeline = [...new Set(entries.map(({ year }) => year))]
                                                     {String(entry.month).padStart(2, '0')} 月
                                                 </time>
                                             )}
-                                            <span class="entry-kind">{entry.kind}</span>
+                                            <span class="entry-kind" data-kind={entry.kind}>
+                                                {entry.kind}
+                                            </span>
                                         </div>
                                         <h3 id={`experience-${entry.id}`}>{entry.title}</h3>
                                         <p class="entry-description">{entry.description}</p>
@@ -99,6 +101,22 @@ const timeline = [...new Set(entries.map(({ year }) => year))]
 </BaseLayout>
 
 <style>
+    .timeline {
+        --timeline-tag-project: #486477;
+        --timeline-tag-open-source: #4c6953;
+        --timeline-tag-learning: #745b7b;
+        --timeline-tag-work: #8d5740;
+        --timeline-tag-life: #7d682f;
+    }
+
+    :global(html.dark) .timeline {
+        --timeline-tag-project: #abc3d3;
+        --timeline-tag-open-source: #adcab7;
+        --timeline-tag-learning: #c9b7d0;
+        --timeline-tag-work: #d5b19b;
+        --timeline-tag-life: #d5c48e;
+    }
+
     .timeline-header {
         margin-bottom: 4rem;
         max-width: 38rem;
@@ -219,12 +237,29 @@ const timeline = [...new Set(entries.map(({ year }) => year))]
     }
 
     .entry-kind {
+        color: var(--entry-kind-color);
         font-weight: 600;
+        letter-spacing: 0.04em;
     }
 
-    .entry-meta time + .entry-kind {
-        border-left: 1px solid color-mix(in srgb, var(--border-main) 25%, transparent);
-        padding-left: 0.75rem;
+    .entry-kind[data-kind='项目'] {
+        --entry-kind-color: var(--timeline-tag-project);
+    }
+
+    .entry-kind[data-kind='开源'] {
+        --entry-kind-color: var(--timeline-tag-open-source);
+    }
+
+    .entry-kind[data-kind='学习'] {
+        --entry-kind-color: var(--timeline-tag-learning);
+    }
+
+    .entry-kind[data-kind='工作'] {
+        --entry-kind-color: var(--timeline-tag-work);
+    }
+
+    .entry-kind[data-kind='生活'] {
+        --entry-kind-color: var(--timeline-tag-life);
     }
 
     .timeline-entry h3 {
