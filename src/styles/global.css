@@ -6,10 +6,16 @@
 :root {
     --text-main: #000;
     --bg-main: #f7f5ef;
-    --bg-muted: #eee;
-    --border-main: #000;
+    --bg-muted: #eeebe3;
+    --border-main: #8e877a;
+    --border-subtle: #d8d1c5;
     --accent: #000;
-    --accent-muted: #333;
+    --accent-muted: #686357;
+    --radius-small: 0.25rem;
+    --radius-control: 0.375rem;
+    --radius-panel: 0.625rem;
+    --shadow-card: 0 2px 8px rgb(52 42 24 / 4%);
+    --shadow-card-hover: 0 8px 24px rgb(52 42 24 / 9%);
     --note-yellow: #fff4c2;
     --note-mint: #d9f2e4;
     --note-blue: #dbeafe;
@@ -23,10 +29,13 @@
 html.dark {
     --text-main: #fff;
     --bg-main: #24231f;
-    --bg-muted: #222;
-    --border-main: #fff;
+    --bg-muted: #302e28;
+    --border-main: #928b7e;
+    --border-subtle: #4b473f;
     --accent: #fff;
-    --accent-muted: #ccc;
+    --accent-muted: #c5beb1;
+    --shadow-card: 0 2px 8px rgb(0 0 0 / 16%);
+    --shadow-card-hover: 0 8px 24px rgb(0 0 0 / 28%);
     --note-yellow: #4d4526;
     --note-mint: #25473a;
     --note-blue: #243b54;
@@ -90,14 +99,14 @@ html.dark {
         --tw-prose-bold: var(--text-color-main);
         --tw-prose-counters: var(--text-color-main);
         --tw-prose-bullets: var(--text-color-main);
-        --tw-prose-hr: var(--border-color-main);
+        --tw-prose-hr: var(--border-subtle);
         --tw-prose-quotes: var(--text-color-main);
         --tw-prose-quote-borders: var(--border-color-main);
         --tw-prose-captions: var(--text-color-main);
         --tw-prose-kbd: var(--text-color-main);
         --tw-prose-code: var(--text-color-main);
-        --tw-prose-th-borders: var(--border-color-main);
-        --tw-prose-td-borders: var(--border-color-main);
+        --tw-prose-th-borders: var(--border-subtle);
+        --tw-prose-td-borders: var(--border-subtle);
     }
 
     .prose a {
@@ -119,12 +128,13 @@ html.dark {
 
     .prose blockquote {
         @apply border-main border-l-2 pl-4 font-sans text-base leading-relaxed font-normal not-italic;
+        border-color: var(--border-subtle);
     }
 
     .prose pre {
-        border: 1px solid var(--border-main);
-        border-radius: 0;
-        background: var(--bg-main) !important;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-panel);
+        background: var(--bg-muted) !important;
         color: var(--text-main) !important;
     }
 

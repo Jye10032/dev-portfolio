@@ -130,7 +130,7 @@ const sources = getAlbumSources(album);
     }
 
     .album-detail__head {
-        border-top: 2px solid var(--border-main);
+        border-top: 1px solid var(--border-subtle);
         padding-top: 1.25rem;
     }
 
@@ -145,7 +145,7 @@ const sources = getAlbumSources(album);
     }
 
     .album-detail__status {
-        border: 1px solid var(--border-main);
+        border-radius: var(--radius-small);
         background-color: var(--album-accent);
         color: var(--note-text);
         padding: 0.05rem 0.45rem;
@@ -168,8 +168,7 @@ const sources = getAlbumSources(album);
 
     .album-detail__question {
         margin-top: 1.25rem;
-        border: 1px solid var(--border-main);
-        border-left-width: 4px;
+        border-radius: var(--radius-panel);
         background-color: var(--album-accent);
         color: var(--note-text);
         padding: 0.9rem 1.1rem;
@@ -206,7 +205,7 @@ const sources = getAlbumSources(album);
 
     .album-detail__sources {
         margin-top: 3rem;
-        border-top: 1px solid var(--border-main);
+        border-top: 1px solid var(--border-subtle);
         padding-top: 1.25rem;
     }
 
@@ -228,7 +227,8 @@ const sources = getAlbumSources(album);
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        border: 1px solid var(--border-main);
+        border-radius: var(--radius-small);
+        background: var(--bg-muted);
         padding: 0.1rem 0.5rem;
         font-size: 0.8rem;
     }
@@ -249,7 +249,7 @@ const sources = getAlbumSources(album);
         margin-top: 3rem;
         display: grid;
         gap: 1rem;
-        border-top: 1px solid var(--border-main);
+        border-top: 1px solid var(--border-subtle);
         padding-top: 1.5rem;
         grid-template-columns: minmax(0, 1fr);
     }

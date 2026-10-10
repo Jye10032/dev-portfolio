@@ -58,7 +58,7 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
         flex-wrap: wrap;
         align-items: center;
         gap: 0.5rem 1.25rem;
-        border-bottom: 1px solid var(--border-main);
+        border-bottom: 1px solid var(--border-subtle);
         padding: 0.85rem 0;
     }
 
@@ -79,7 +79,8 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
     .site-nav__identity :global(.site-nav__avatar) {
         width: 1.75rem;
         aspect-ratio: 1 / 1;
-        border: 1px solid var(--border-main);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-control);
         object-fit: cover;
     }
 
@@ -97,7 +98,7 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 
     .site-nav__subtitle {
         display: none;
-        border-left: 1px solid var(--border-main);
+        border-left: 1px solid var(--border-subtle);
         padding-left: 0.75rem;
         font-size: 0.8125rem;
         line-height: 1.3;

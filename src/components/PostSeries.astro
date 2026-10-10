@@ -55,7 +55,7 @@ const siblings = [
     .post-series {
         margin-top: 3rem;
         padding-top: 1.5rem;
-        border-top: 1px solid var(--border-main);
+        border-top: 1px solid var(--border-subtle);
         scroll-margin-top: 5rem;
     }
     .post-series__heading {
@@ -88,6 +88,7 @@ const siblings = [
         align-items: baseline;
         gap: 0.75rem;
         padding: 0.75rem;
+        border-radius: var(--radius-control);
         text-decoration: none;
         font-size: 0.875rem;
         line-height: 1.6;
@@ -97,7 +98,7 @@ const siblings = [
         text-underline-offset: 0.25em;
     }
     .post-series__list a[aria-current='page'] {
-        box-shadow: inset 2px 0 var(--border-main);
+        background: var(--bg-muted);
         font-weight: 700;
     }
     .post-series__number,
@@ -117,7 +118,7 @@ const siblings = [
         gap: 1.5rem;
         margin-top: 1.5rem;
         padding-top: 1.25rem;
-        border-top: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+        border-top: 1px solid var(--border-subtle);
     }
     .post-series__sibling {
         display: grid;

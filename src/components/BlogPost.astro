@@ -90,7 +90,7 @@ const alternates = translation
                     )
                 }
                 <div class="mb-4 flex flex-wrap items-center gap-3">
-                    <span class="border-main border px-2 py-1 text-xs opacity-60">{typeLabel}</span>
+                    <span class="post-type">{typeLabel}</span>
                     {readingTime && <span class="text-main/60 text-xs">{labels.minutes(readingTime)}</span>}
                     {
                         translation && (
@@ -289,6 +289,14 @@ const alternates = translation
         font-weight: 700;
     }
 
+    .post-type {
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--radius-small);
+        background: var(--bg-muted);
+        color: var(--accent-muted);
+        font-size: 0.75rem;
+    }
+
     .post-toc {
         font-size: 0.8125rem;
         line-height: 1.45;
@@ -301,7 +309,7 @@ const alternates = translation
         max-height: calc(100svh - 4rem);
         overflow-y: auto;
         padding-left: 1rem;
-        border-left: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+        border-left: 1px solid var(--border-subtle);
     }
 
     .post-toc--desktop > p {
@@ -351,8 +359,9 @@ const alternates = translation
         top: 0;
         z-index: 10;
         margin-bottom: 2rem;
-        padding-block: 0.75rem;
-        border-block: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-control);
         background: var(--bg-main);
     }
 

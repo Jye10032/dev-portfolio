@@ -69,8 +69,10 @@ const tagIds = tags.map((tag) => slugify(tag)).join(' ');
         display: flex;
         height: 100%;
         gap: 0;
-        border: 1px solid var(--border-main);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-panel);
         background-color: var(--bg-main);
+        box-shadow: var(--shadow-card);
         text-decoration: none;
         transition:
             transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -80,19 +82,19 @@ const tagIds = tags.map((tag) => slugify(tag)).join(' ');
     .album-card__link:hover,
     .album-card__link:focus-visible {
         text-decoration: none;
-        transform: translate(-3px, -3px);
-        box-shadow: 5px 5px 0 var(--border-main);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-card-hover);
     }
 
     .album-card__link:focus-visible {
-        outline: 2px solid var(--border-main);
+        outline: 2px solid var(--accent);
         outline-offset: 3px;
     }
 
     .album-card__spine {
         width: 0.75rem;
         flex: none;
-        border-right: 1px solid var(--border-main);
+        border-radius: calc(var(--radius-panel) - 1px) 0 0 calc(var(--radius-panel) - 1px);
         background-color: var(--album-accent);
     }
 
@@ -112,7 +114,8 @@ const tagIds = tags.map((tag) => slugify(tag)).join(' ');
     }
 
     .album-card__status {
-        border: 1px solid var(--border-main);
+        border-radius: var(--radius-small);
+        background-color: var(--bg-muted);
         padding: 0.05rem 0.4rem;
     }
 
@@ -156,7 +159,7 @@ const tagIds = tags.map((tag) => slugify(tag)).join(' ');
     }
 
     .album-card__source {
-        border: 1px solid var(--border-main);
+        border-radius: var(--radius-small);
         background-color: var(--album-accent);
         color: var(--note-text);
         padding: 0.05rem 0.4rem;
