@@ -1,8 +1,3 @@
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
 let activeRoot: HTMLElement | null = null;
 let cleanup: (() => void) | undefined;
 
@@ -13,97 +8,62 @@ function teardown() {
 }
 
 function setup() {
-    const root = document.querySelector<HTMLElement>('.project-index__list');
+    const root = document.querySelector<HTMLElement>('.project-index');
     if (root === activeRoot) return;
     teardown();
     if (!root) return;
     activeRoot = root;
 
-    const media = gsap.matchMedia();
-    media.add(
-        '(prefers-reduced-motion: no-preference)',
-        () => {
-            const panels = Array.from(root.querySelectorAll<HTMLElement>('.project-index__item'));
-            if (!panels.length) return;
-            document.documentElement.classList.add('project-motion-active');
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('.project-index__item'));
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('.project-index__directory a'));
+    const directory = root.querySelector<HTMLElement>('.project-index__directory');
+    const desktop = window.matchMedia('(min-width: 64rem)');
+    let frame = 0;
+    let current = '';
 
-            panels.forEach((panel) => {
-                const intro = panel.querySelector<HTMLElement>('.project-showcase__intro');
-                const demo = panel.querySelector<HTMLElement>('.project-demo');
-                const timeline = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: panel,
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: 0.5
-                    }
-                });
+    // CSS owns scrolling. The script only keeps the directory in sync, including reduced-motion mode.
+    const update = () => {
+        frame = 0;
+        const offset = desktop.matches ? 24 : (directory?.offsetHeight ?? 0) + 16;
+        const readingLine = offset + Math.min(160, window.innerHeight * 0.2);
+        let active = panels[0];
+        for (const panel of panels) {
+            if (panel.getBoundingClientRect().top <= readingLine) active = panel;
+        }
+        if (!active || active.id === current) return;
+        current = active.id;
+        for (const link of links) {
+            if (link.hash !== `#${current}`) {
+                link.removeAttribute('aria-current');
+                continue;
+            }
+            link.setAttribute('aria-current', 'location');
+            // Reveal the current title horizontally without moving the surrounding page.
+            const list = link.closest('ol');
+            if (!desktop.matches && list) {
+                const linkRect = link.getBoundingClientRect();
+                const listRect = list.getBoundingClientRect();
+                if (linkRect.left < listRect.left) list.scrollLeft += linkRect.left - listRect.left;
+                else if (linkRect.right > listRect.right) list.scrollLeft += linkRect.right - listRect.right;
+            }
+        }
+    };
 
-                if (intro) {
-                    timeline.fromTo(intro.children, { y: 28, opacity: 0.25 }, { y: 0, opacity: 1, duration: 0.22, stagger: 0.025, ease: 'power2.out' }, 0.04);
-                }
-                if (demo) {
-                    timeline.fromTo(
-                        demo,
-                        { y: 64, scale: 0.95, opacity: 0.4, transformOrigin: 'center center' },
-                        { y: 0, scale: 1, opacity: 1, duration: 0.3, ease: 'power2.out' },
-                        0.07
-                    );
-                }
-                timeline.to([intro, demo].filter(Boolean), { y: -24, opacity: 0.6, duration: 0.2, ease: 'none' }, 0.8);
-            });
+    const scheduleUpdate = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+    };
+    const observer = new ResizeObserver(scheduleUpdate);
+    observer.observe(root);
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    update();
 
-            let stops: number[] = [];
-            const snap = ScrollTrigger.create({
-                start: 0,
-                end: () => Math.max(1, ScrollTrigger.maxScroll(window)),
-                onRefresh: (self) => {
-                    stops = [0, ...panels.map((panel) => gsap.utils.clamp(0, self.end, panel.getBoundingClientRect().top + window.scrollY - 16)), self.end];
-                },
-                snap: {
-                    snapTo: (progress, self) => {
-                        // Never move the surrounding page while someone is operating an embedded app.
-                        if (!self || root.querySelector('iframe:hover') || !stops.length) return progress;
-                        const position = self.scroll();
-                        const nearest = gsap.utils.snap(stops, position);
-                        const radius = Math.min(window.innerHeight * 0.24, 240);
-                        return Math.abs(nearest - position) <= radius ? nearest / self.end : progress;
-                    },
-                    inertia: false,
-                    directional: false,
-                    delay: 0.18,
-                    duration: { min: 0.28, max: 0.65 },
-                    ease: 'power3.out'
-                }
-            });
-
-            const stopSnap = () => snap.getTween(true)?.kill();
-            const frames = Array.from(root.querySelectorAll('iframe'));
-            frames.forEach((frame) => {
-                frame.addEventListener('pointerenter', stopSnap);
-                frame.addEventListener('focus', stopSnap);
-            });
-
-            let live = true;
-            const refresh = requestAnimationFrame(() => ScrollTrigger.refresh());
-            document.fonts.ready.then(() => {
-                if (live) ScrollTrigger.refresh();
-            });
-
-            return () => {
-                live = false;
-                cancelAnimationFrame(refresh);
-                frames.forEach((frame) => {
-                    frame.removeEventListener('pointerenter', stopSnap);
-                    frame.removeEventListener('focus', stopSnap);
-                });
-                document.documentElement.classList.remove('project-motion-active');
-            };
-        },
-        root
-    );
-
-    cleanup = () => media.revert();
+    cleanup = () => {
+        cancelAnimationFrame(frame);
+        observer.disconnect();
+        window.removeEventListener('scroll', scheduleUpdate);
+        window.removeEventListener('resize', scheduleUpdate);
+    };
 }
 
 setup();

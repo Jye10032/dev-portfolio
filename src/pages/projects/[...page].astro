@@ -24,15 +24,35 @@ const { page } = Astro.props;
         <p>上下滚动浏览项目，直接体验它的功能。</p>
     </header>
 
-    <ol class="project-index__list">
-        {
-            page.data.map((project, index) => (
-                <li class="project-index__item">
-                    <ProjectShowcase project={project} index={page.start + index + 1} />
-                </li>
-            ))
-        }
-    </ol>
+    <div class="project-index">
+        <nav class="project-index__directory" aria-label="项目目录">
+            <p class="project-index__directory-label">项目目录</p>
+            <ol>
+                {
+                    page.data.map((project, index) => (
+                        <li>
+                            <a href={`#project-${project.id}`} data-astro-reload aria-current={index === 0 ? 'location' : undefined}>
+                                <span class="project-index__directory-number" aria-hidden="true">
+                                    {String(page.start + index + 1).padStart(2, '0')}
+                                </span>
+                                <span>{project.data.title}</span>
+                            </a>
+                        </li>
+                    ))
+                }
+            </ol>
+        </nav>
+
+        <ol class="project-index__list">
+            {
+                page.data.map((project, index) => (
+                    <li id={`project-${project.id}`} class="project-index__item" tabindex="-1">
+                        <ProjectShowcase project={project} index={page.start + index + 1} />
+                    </li>
+                ))
+            }
+        </ol>
+    </div>
 
     {page.lastPage > 1 && <Pagination page={page} class="project-index__pager" />}
 </BaseLayout>
@@ -42,12 +62,8 @@ const { page } = Astro.props;
 </script>
 
 <style>
-    :global(html.project-motion-active) {
-        scroll-behavior: auto;
-    }
-
     .project-index__header {
-        padding-block: 1rem clamp(2rem, 5vw, 4rem);
+        padding-block: 1rem 2.5rem;
     }
 
     .project-index__header h1 {
@@ -63,16 +79,133 @@ const { page } = Astro.props;
         line-height: 1.75;
     }
 
+    .project-index {
+        display: grid;
+        align-items: start;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .project-index__directory {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        min-width: 0;
+        padding-block: 0.75rem;
+        border-block: 1px solid var(--border-main);
+        background: var(--bg-main);
+    }
+
+    .project-index__directory-label {
+        display: none;
+        margin-bottom: 1.25rem;
+        color: var(--accent-muted);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+    }
+
+    .project-index__directory ol {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+        list-style: none;
+    }
+
+    .project-index__directory ol::-webkit-scrollbar {
+        display: none;
+    }
+
+    .project-index__directory li {
+        flex: none;
+    }
+
+    .project-index__directory a {
+        display: flex;
+        align-items: baseline;
+        gap: 0.65rem;
+        min-height: 2.75rem;
+        padding: 0.65rem 0.75rem;
+        color: var(--accent-muted);
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        text-decoration: none;
+    }
+
+    .project-index__directory a[aria-current='location'] {
+        color: var(--text-main);
+        box-shadow: inset 2px 0 var(--border-main);
+        font-weight: 600;
+    }
+
+    .project-index__directory a:hover {
+        color: var(--text-main);
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
+    }
+
+    .project-index__directory a:focus-visible {
+        outline: 2px solid var(--border-main);
+        outline-offset: -2px;
+    }
+
+    .project-index__directory-number {
+        font-size: 0.6875rem;
+        font-variant-numeric: tabular-nums;
+    }
+
     .project-index__list {
         display: grid;
-        margin-bottom: 3rem;
+        min-width: 0;
+        gap: 3rem;
         list-style: none;
     }
 
     .project-index__item {
         display: grid;
         min-width: 0;
-        min-height: calc(100svh - 2rem);
+        scroll-margin-top: 5.5rem;
+    }
+
+    @media (min-width: 64rem) {
+        .project-index {
+            grid-template-columns: 12rem minmax(0, 1fr);
+            gap: clamp(2rem, 4vw, 3.5rem);
+        }
+
+        .project-index__directory {
+            top: 1.5rem;
+            padding-block: 0.75rem 0;
+            border: 0;
+        }
+
+        .project-index__directory-label {
+            display: block;
+        }
+
+        .project-index__directory ol {
+            display: grid;
+        }
+
+        .project-index__item {
+            scroll-margin-top: 1.5rem;
+        }
+    }
+
+    @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+        /* Native snapping also permits free scrolling inside a panel taller than the viewport. */
+        :global(html:has(.project-index)) {
+            scroll-snap-type: y mandatory;
+        }
+
+        .project-index__item,
+        :global(body:has(.project-index) .site-nav) {
+            scroll-snap-align: start;
+        }
+
+        :global(body:has(.project-index) footer) {
+            scroll-snap-align: end;
+        }
     }
 
     :global(.project-index__pager) {

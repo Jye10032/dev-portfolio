@@ -9,12 +9,17 @@ type Props = {
 
 const { id, src, title, height = 640, variant = 'detail' } = Astro.props;
 const desktopWidth = 1440;
+// Cross-origin documents cannot inherit our scrollbar CSS. Clip just their outer gutter instead.
+const scrollbarGutter = 18;
 const headingId = `${id}-title`;
 const frameId = `${id}-frame`;
 const Heading = variant === 'showcase' ? 'h3' : 'h2';
 ---
 
-<project-demo class:list={['project-demo', { 'project-demo--showcase': variant === 'showcase' }]}>
+<project-demo
+    class:list={['project-demo', { 'project-demo--showcase': variant === 'showcase' }]}
+    style={`--demo-width: ${desktopWidth}; --demo-height: ${height}; --demo-gutter: ${scrollbarGutter}`}
+>
     <section aria-labelledby={headingId}>
         <div class="project-demo__toolbar">
             <Heading id={headingId}>在线体验</Heading>
@@ -29,18 +34,20 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
                 <a href={src} target="_blank" rel="noopener noreferrer">新窗口打开 <span aria-hidden="true">↗</span></a>
             </div>
         </div>
-        <div class="project-demo__viewport" style={`--demo-width: ${desktopWidth}; --demo-height: ${height}`}>
-            <iframe
-                id={frameId}
-                class="project-demo__frame"
-                src={src}
-                title={`${title} — 交互演示`}
-                width={desktopWidth}
-                height={height}
-                loading="lazy"
-                referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
-                allow="fullscreen"></iframe>
+        <div class="project-demo__window">
+            <div class="project-demo__viewport" data-scrollbar-gutter={scrollbarGutter}>
+                <iframe
+                    id={frameId}
+                    class="project-demo__frame"
+                    src={src}
+                    title={`${title} — 交互演示`}
+                    width={desktopWidth}
+                    height={height}
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
+                    allow="fullscreen"></iframe>
+            </div>
         </div>
         <p class="project-demo__hint">桌面画面等比缩放，可直接操作和滚动。需要更大画面或登录受限时，请使用「新窗口打开」。</p>
     </section>
@@ -56,9 +63,9 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
             const frame = this.querySelector<HTMLIFrameElement>('iframe');
             if (!viewport || !frame) return;
 
-            // Only scale the rendered surface; keep the embedded site's layout viewport unchanged.
+            // The child keeps its desktop viewport and native scrolling; only the edge gutter is clipped.
             const resize = (width = viewport.clientWidth) => {
-                const scale = width / Number(frame.width);
+                const scale = width / (Number(frame.width) - Number(viewport.dataset.scrollbarGutter));
                 viewport.style.setProperty('--demo-scale', String(scale));
             };
             const observer = new ResizeObserver(([entry]) => resize(entry.contentRect.width));
@@ -159,12 +166,17 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
         display: none;
     }
 
+    .project-demo__window {
+        border: 2px solid var(--border-main);
+        background: var(--bg-main);
+    }
+
     .project-demo__viewport {
         position: relative;
         width: 100%;
-        aspect-ratio: var(--demo-width) / var(--demo-height);
+        aspect-ratio: calc(var(--demo-width) - var(--demo-gutter)) / var(--demo-height);
         overflow: hidden;
-        background: var(--bg-muted);
+        background: var(--bg-main);
     }
 
     .project-demo__frame {
@@ -175,7 +187,7 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
         width: calc(var(--demo-width) * 1px);
         max-width: none;
         height: calc(var(--demo-height) * 1px);
-        border: 1px solid var(--border-main);
+        border: 0;
         transform: scale(var(--demo-scale, 1));
         transform-origin: top left;
         color-scheme: normal;
@@ -190,6 +202,13 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
 
     .project-demo--showcase {
         margin-block: 0;
+    }
+
+    @media (min-width: 64rem) {
+        .project-demo--showcase {
+            width: 100%;
+            max-width: calc(max(15rem, 100svh - 23rem) * (var(--demo-width) - var(--demo-gutter)) / var(--demo-height));
+        }
     }
 
     :global(.page-shell--demo-expanded > main) {
