@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../../components/BlogPost.astro';
-import { findPostTranslation, getPostSlug, getPostsByLanguage, sortItemsByDateDesc } from '../../../utils/data-utils';
+import { findPostTranslation, getPostSeries, getPostSlug, getPostsByLanguage, sortItemsByDateDesc, type PostSeriesData } from '../../../utils/data-utils';
 
 export async function getStaticPaths() {
     const allPosts = await getCollection('blog', ({ data }) => !data.draft);
@@ -10,6 +10,7 @@ export async function getStaticPaths() {
         params: { id: getPostSlug(post) },
         props: {
             post,
+            series: getPostSeries(post, allPosts),
             prevPost: index + 1 !== posts.length ? posts[index + 1] : null,
             nextPost: index !== 0 ? posts[index - 1] : null,
             translation: findPostTranslation(post, allPosts)
@@ -19,15 +20,16 @@ export async function getStaticPaths() {
 
 type Props = {
     post: CollectionEntry<'blog'>;
+    series?: PostSeriesData;
     prevPost: CollectionEntry<'blog'> | null;
     nextPost: CollectionEntry<'blog'> | null;
     translation?: CollectionEntry<'blog'>;
 };
 
-const { post, prevPost, nextPost, translation } = Astro.props;
+const { post, series, prevPost, nextPost, translation } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<BlogPost {post} {prevPost} {nextPost} {translation} {headings}>
+<BlogPost {post} {series} {prevPost} {nextPost} {translation} {headings}>
     <Content />
 </BlogPost>

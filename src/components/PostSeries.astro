@@ -1,0 +1,149 @@
+---
+import { getPostHref, type BlogLanguage, type PostSeriesData } from '../utils/data-utils';
+
+type Props = { series: PostSeriesData; lang: BlogLanguage };
+const { series, lang } = Astro.props;
+const isEnglish = lang === 'en';
+const siblings = [
+    { post: series.previous, label: isEnglish ? 'Previous in series' : '上一篇', direction: 'previous' },
+    { post: series.next, label: isEnglish ? 'Next in series' : '下一篇', direction: 'next' }
+].filter(({ post }) => Boolean(post));
+---
+
+<nav id="post-series" class="post-series" aria-label={isEnglish ? 'Read this series' : '系列阅读'}>
+    <div class="post-series__heading">
+        <h2>{series.title} <span>{isEnglish ? 'Series' : '系列阅读'}</span></h2>
+        {
+            series.projectHref && (
+                <a href={series.projectHref}>
+                    {isEnglish ? 'Explore the project' : '查看项目与在线体验'} <span aria-hidden="true">↗</span>
+                </a>
+            )
+        }
+    </div>
+    <ol class="post-series__list">
+        {
+            series.posts.map((entry) => (
+                <li>
+                    <a href={getPostHref(entry)} aria-current={entry.id === series.currentId ? 'page' : undefined}>
+                        <span class="post-series__number">{String(entry.data.series!.order).padStart(2, '0')}</span>
+                        <span>{entry.data.displayTitle ?? entry.data.title}</span>
+                        {entry.id === series.currentId && <span class="post-series__current">{isEnglish ? 'Reading' : '正在阅读'}</span>}
+                    </a>
+                </li>
+            ))
+        }
+    </ol>
+    {isEnglish && <p class="post-series__note">Only published English editions are listed here.</p>}
+    {
+        siblings.length > 0 && (
+            <div class="post-series__siblings">
+                {siblings.map(({ post, label, direction }) => (
+                    <a class:list={['post-series__sibling', `post-series__sibling--${direction}`]} href={getPostHref(post!)}>
+                        <span>
+                            {label} {direction === 'next' ? '→' : '←'}
+                        </span>
+                        <strong>{post!.data.displayTitle ?? post!.data.title}</strong>
+                    </a>
+                ))}
+            </div>
+        )
+    }
+</nav>
+
+<style>
+    .post-series {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-main);
+        scroll-margin-top: 5rem;
+    }
+    .post-series__heading {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.75rem 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+    .post-series__heading h2 {
+        font-size: 1.125rem;
+        font-weight: 700;
+    }
+    .post-series__heading h2 span,
+    .post-series__heading > a {
+        font-size: 0.8125rem;
+        font-weight: 400;
+    }
+    .post-series__heading h2 span {
+        margin-left: 0.5rem;
+        color: var(--accent-muted);
+    }
+    .post-series__list {
+        list-style: none;
+    }
+    .post-series__list a {
+        display: grid;
+        grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        text-decoration: none;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+    .post-series__list a:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
+    }
+    .post-series__list a[aria-current='page'] {
+        box-shadow: inset 2px 0 var(--border-main);
+        font-weight: 700;
+    }
+    .post-series__number,
+    .post-series__current,
+    .post-series__note {
+        color: var(--accent-muted);
+        font-size: 0.75rem;
+        font-weight: 400;
+        font-variant-numeric: tabular-nums;
+    }
+    .post-series__note {
+        margin-top: 0.75rem;
+    }
+    .post-series__siblings {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+    }
+    .post-series__sibling {
+        display: grid;
+        gap: 0.5rem;
+        text-decoration: none;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+    .post-series__sibling > span {
+        color: var(--accent-muted);
+        font-size: 0.75rem;
+    }
+    .post-series__sibling:hover strong {
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
+    }
+    .post-series__sibling--next {
+        grid-column: 2;
+        text-align: right;
+    }
+    @media (max-width: 30rem) {
+        .post-series__list a {
+            grid-template-columns: 1.5rem minmax(0, 1fr);
+        }
+        .post-series__current {
+            grid-column: 2;
+        }
+    }
+</style>

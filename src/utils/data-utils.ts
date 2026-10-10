@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { slugify } from './common-utils';
+import { BLOG_SERIES } from '../data/blog-series';
 
 export type BlogLanguage = CollectionEntry<'blog'>['data']['lang'];
 
@@ -25,6 +26,28 @@ export function getPostHref(post: CollectionEntry<'blog'>): string {
     const slug = getPostSlug(post);
     return post.data.lang === 'en' ? `/en/blog/${slug}/` : `/blog/${slug}/`;
 }
+
+/** Series order is editorial, independent of publication dates and other language editions. */
+export function getPostSeries(post: CollectionEntry<'blog'>, allPosts: CollectionEntry<'blog'>[]) {
+    if (!post.data.series || post.data.draft) return undefined;
+    const { id, order } = post.data.series;
+    const posts = allPosts
+        .filter((candidate) => !candidate.data.draft && candidate.data.lang === post.data.lang && candidate.data.series?.id === id)
+        .sort((a, b) => a.data.series!.order - b.data.series!.order);
+    const index = posts.findIndex((candidate) => candidate.id === post.id);
+    if (index < 0) return undefined;
+
+    return {
+        ...BLOG_SERIES[id],
+        order,
+        posts,
+        currentId: post.id,
+        previous: posts[index - 1],
+        next: posts[index + 1]
+    };
+}
+
+export type PostSeriesData = NonNullable<ReturnType<typeof getPostSeries>>;
 
 export function getPostsByLanguage(posts: CollectionEntry<'blog'>[], lang: BlogLanguage): CollectionEntry<'blog'>[] {
     return posts.filter((post) => post.data.lang === lang);

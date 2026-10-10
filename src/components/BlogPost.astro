@@ -4,22 +4,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from './Button.astro';
 import FormattedDate from './FormattedDate.astro';
 import PostPreview from './PostPreview.astro';
-import { getPostHref } from '../utils/data-utils';
+import PostSeries from './PostSeries.astro';
+import { getPostHref, type PostSeriesData } from '../utils/data-utils';
 import { slugify } from '../utils/common-utils';
 
 type Heading = { depth: number; slug: string; text: string };
 
 type Props = {
     post: CollectionEntry<'blog'>;
+    series?: PostSeriesData;
     prevPost: CollectionEntry<'blog'> | null;
     nextPost: CollectionEntry<'blog'> | null;
     translation?: CollectionEntry<'blog'>;
     headings: Heading[];
 };
 
-const { post, prevPost, nextPost, translation, headings } = Astro.props;
-const { title, publishDate, updatedDate, excerpt, tags = [], seo, type, readingTime, lang } = post.data;
-const tableOfContents = type === 'article' && headings.filter((heading) => heading.depth === 2);
+const { post, series, prevPost, nextPost, translation, headings } = Astro.props;
+const { title, displayTitle, publishDate, updatedDate, excerpt, tags = [], seo, type, readingTime, lang } = post.data;
+const tableOfContents = type === 'article' ? headings.filter((heading) => heading.depth === 2) : [];
 const showTableOfContents = tableOfContents.length >= 3;
 const isEnglish = lang === 'en';
 const labels = isEnglish
@@ -74,9 +76,19 @@ const alternates = translation
         )
     }
 
-    <div class:list={['post-layout', showTableOfContents && 'post-layout--with-toc']}>
+    <div class:list={['post-layout', showTableOfContents && 'post-layout--with-toc']} data-blog-reading>
         <article class="post-article mb-16 sm:mb-24">
             <header class="mb-8">
+                {
+                    series && (
+                        <p class="post-series-kicker">
+                            <a href="#post-series" data-astro-reload>
+                                {series.title} · {isEnglish ? `Part ${series.order}` : `第 ${series.order} 篇`}
+                                <span aria-hidden="true"> ↓</span>
+                            </a>
+                        </p>
+                    )
+                }
                 <div class="mb-4 flex flex-wrap items-center gap-3">
                     <span class="border-main border px-2 py-1 text-xs opacity-60">{typeLabel}</span>
                     {readingTime && <span class="text-main/60 text-xs">{labels.minutes(readingTime)}</span>}
@@ -90,7 +102,7 @@ const alternates = translation
                         )
                     }
                 </div>
-                <h1 class="font-sans text-3xl leading-tight font-bold sm:text-5xl sm:leading-tight">{title}</h1>
+                <h1 class="post-title">{displayTitle ?? title}</h1>
                 <div class="text-main/70 mt-4 text-sm">
                     <FormattedDate date={publishDate} lang={lang} />
                     {
@@ -108,12 +120,17 @@ const alternates = translation
 
             {
                 showTableOfContents && (
-                    <details class="post-toc post-toc--mobile">
-                        <summary>{labels.toc}</summary>
+                    <details class="post-toc post-toc--compact">
+                        <summary>
+                            {labels.toc}
+                            <span data-toc-current aria-hidden="true" />
+                        </summary>
                         <ol>
                             {tableOfContents.map((heading) => (
                                 <li>
-                                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                                    <a href={`#${heading.slug}`} data-astro-reload>
+                                        {heading.text}
+                                    </a>
                                 </li>
                             ))}
                         </ol>
@@ -121,7 +138,7 @@ const alternates = translation
                 )
             }
 
-            <div class="prose sm:prose-lg max-w-none">
+            <div class="post-content prose sm:prose-lg max-w-none">
                 <slot />
             </div>
             <div class="mt-8 flex flex-wrap items-center justify-between gap-6 text-sm sm:mt-12 sm:text-base">
@@ -142,6 +159,7 @@ const alternates = translation
                     {labels.share}
                 </Button>
             </div>
+            {series && <PostSeries {series} {lang} />}
         </article>
 
         {
@@ -151,7 +169,9 @@ const alternates = translation
                     <ol>
                         {tableOfContents.map((heading) => (
                             <li>
-                                <a href={`#${heading.slug}`}>{heading.text}</a>
+                                <a href={`#${heading.slug}`} data-astro-reload>
+                                    {heading.text}
+                                </a>
                             </li>
                         ))}
                     </ol>
@@ -162,7 +182,7 @@ const alternates = translation
 
     <div class="post-after mx-auto max-w-3xl">
         {
-            relatedPosts.length > 0 && (
+            !series && relatedPosts.length > 0 && (
                 <nav class="post-related" aria-label={labels.continueReading}>
                     <h2 class="post-related__title">{labels.continueReading}</h2>
                     <ol class="post-related__list">
@@ -179,56 +199,7 @@ const alternates = translation
 </BaseLayout>
 
 <script>
-    document.addEventListener('astro:page-load', () => {
-        const progressBar = document.getElementById('reading-progress');
-        const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('.post-toc a')];
-        const tocHeadings = tocLinks
-            .map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
-            .filter((heading): heading is HTMLElement => Boolean(heading));
-
-        if (progressBar || tocHeadings.length > 0) {
-            const updateReadingState = () => {
-                const scrollTop = window.scrollY;
-                if (progressBar) {
-                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-                    progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
-                }
-
-                if (tocHeadings.length > 0) {
-                    const activeHeading = [...tocHeadings].reverse().find((heading) => heading.offsetTop <= scrollTop + 160) ?? tocHeadings[0];
-                    tocLinks.forEach((link) => {
-                        const isActive = decodeURIComponent(link.hash.slice(1)) === activeHeading.id;
-                        if (isActive) link.setAttribute('aria-current', 'location');
-                        else link.removeAttribute('aria-current');
-                    });
-                }
-            };
-            window.addEventListener('scroll', updateReadingState, { passive: true });
-            updateReadingState();
-        }
-
-        const shareButton = document.querySelector<HTMLElement>('[data-share-url]');
-        if (shareButton) {
-            let resetTimer: ReturnType<typeof setTimeout> | undefined;
-
-            shareButton.addEventListener('click', async () => {
-                const { shareUrl = '', shareIdle = '', shareDone = '' } = shareButton.dataset;
-
-                try {
-                    await navigator.clipboard.writeText(shareUrl);
-                } catch {
-                    return; // Clipboard denied or unavailable: leave the label alone.
-                }
-
-                shareButton.textContent = shareDone;
-                clearTimeout(resetTimer);
-                resetTimer = setTimeout(() => {
-                    shareButton.textContent = shareIdle;
-                }, 2400);
-            });
-        }
-    });
+    import '../scripts/blog-reading';
 </script>
 
 <style>
@@ -238,15 +209,38 @@ const alternates = translation
     }
 
     .post-layout--with-toc {
-        position: relative;
-        left: 50%;
         display: grid;
-        grid-template-columns: 16rem minmax(0, 48rem) 16rem;
+        grid-template-columns: minmax(0, 48rem) 14rem;
         align-items: start;
-        gap: 3rem;
-        width: min(86rem, calc(100vw - 4rem));
-        max-width: none;
-        transform: translateX(-50%);
+        gap: clamp(1.5rem, 3vw, 3rem);
+        max-width: 65rem;
+    }
+
+    .post-title {
+        font-family: var(--font-sans);
+        font-size: clamp(1.875rem, 3vw, 2.5rem);
+        font-weight: 700;
+        line-height: 1.3;
+        text-wrap: pretty;
+    }
+
+    .post-series-kicker {
+        margin-bottom: 1rem;
+        color: var(--accent-muted);
+        font-size: 0.8125rem;
+    }
+
+    .post-series-kicker a {
+        text-decoration: none;
+    }
+
+    .post-series-kicker a:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
+    }
+
+    .post-content :global(h2) {
+        scroll-margin-top: 5rem;
     }
 
     .post-article {
@@ -289,10 +283,6 @@ const alternates = translation
         }
     }
 
-    .post-layout--with-toc .post-article {
-        grid-column: 2;
-    }
-
     .post-language-switch {
         margin-left: auto;
         font-size: 0.75rem;
@@ -307,7 +297,9 @@ const alternates = translation
     .post-toc--desktop {
         position: sticky;
         top: 2rem;
-        grid-column: 3;
+        grid-column: 2;
+        max-height: calc(100svh - 4rem);
+        overflow-y: auto;
         padding-left: 1rem;
         border-left: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
     }
@@ -353,36 +345,59 @@ const alternates = translation
         content: '';
     }
 
-    .post-toc--mobile {
+    .post-toc--compact {
         display: none;
+        position: sticky;
+        top: 0;
+        z-index: 10;
         margin-bottom: 2rem;
         padding-block: 0.75rem;
         border-block: 1px solid color-mix(in srgb, var(--border-main) 24%, transparent);
+        background: var(--bg-main);
     }
 
-    .post-toc--mobile summary {
+    .post-toc--compact summary {
         cursor: pointer;
         font-weight: 700;
     }
 
-    .post-toc--mobile[open] summary {
+    .post-toc--compact summary span {
+        display: inline-block;
+        max-width: calc(100% - 7rem);
+        margin-left: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+        white-space: nowrap;
+        color: var(--accent-muted);
+        font-weight: 400;
+    }
+
+    .post-toc--compact[open] summary {
         margin-bottom: 0.75rem;
     }
 
-    @media (max-width: 1439px) {
+    .post-toc--compact ol {
+        max-height: min(60svh, 24rem);
+        overflow-y: auto;
+    }
+
+    .post-toc--compact a {
+        display: block;
+        padding-block: 0.5rem;
+    }
+
+    @media (max-width: 63.999rem) {
         .post-layout--with-toc {
             display: block;
-            position: static;
             max-width: 48rem;
-            width: auto;
-            transform: none;
         }
 
         .post-toc--desktop {
             display: none;
         }
 
-        .post-toc--mobile {
+        .post-toc--compact {
             display: block;
         }
     }

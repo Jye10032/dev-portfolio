@@ -1,5 +1,9 @@
 ---
 title: "FEMentor（三）：面经召回与知识图谱"
+displayTitle: '面经召回与知识图谱'
+series:
+    id: fementor
+    order: 3
 publishDate: "2026-04-02"
 type: article
 draft: false

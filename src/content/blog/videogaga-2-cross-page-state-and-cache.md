@@ -1,5 +1,9 @@
 ---
 title: "VideoGaga（二）：跨页面状态与缓存"
+displayTitle: '跨页面状态与缓存'
+series:
+    id: videogaga
+    order: 2
 publishDate: "2026-03-22"
 type: article
 draft: false

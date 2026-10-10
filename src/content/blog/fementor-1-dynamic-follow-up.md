@@ -1,5 +1,9 @@
 ---
 title: "FEMentor（一）：从固定题单到动态追问"
+displayTitle: '从固定题单到动态追问'
+series:
+    id: fementor
+    order: 1
 publishDate: "2026-03-12"
 type: article
 draft: false

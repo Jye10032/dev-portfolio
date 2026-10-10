@@ -1,5 +1,9 @@
 ---
 title: 'FEMentor（二）：上下文压缩与长期记忆'
+displayTitle: '上下文压缩与长期记忆'
+series:
+    id: fementor
+    order: 2
 publishDate: '2026-03-17'
 type: article
 draft: false

@@ -1,6 +1,14 @@
 import type { CollectionEntry } from 'astro:content';
 import { describe, expect, it } from 'vitest';
-import { findPostTranslation, getHomepageFocusAreas, getHomepageRecommendations, getPostHref, getPostSlug, getPostsByLanguage } from '../src/utils/data-utils';
+import {
+    findPostTranslation,
+    getHomepageFocusAreas,
+    getHomepageRecommendations,
+    getPostHref,
+    getPostSeries,
+    getPostSlug,
+    getPostsByLanguage
+} from '../src/utils/data-utils';
 
 function post(
     id: string,
@@ -76,5 +84,47 @@ describe('getHomepageFocusAreas', () => {
         ];
 
         expect(getHomepageFocusAreas(posts, areas)).toEqual([{ title: 'AI', tag: 'FEMentor', count: 1 }]);
+    });
+});
+
+describe('series reading order', () => {
+    const chapter = (id: string, order: number, date: string) => {
+        const entry = post(id, date);
+        entry.data.series = { id: 'fementor', order };
+        return entry;
+    };
+
+    it('follows editorial order despite dates, interleaved projects, drafts and translations', () => {
+        const first = chapter('first', 1, '2026-04-04');
+        const current = chapter('current', 2, '2026-03-01');
+        const next = chapter('next', 3, '2026-01-01');
+        const draft = chapter('draft', 4, '2026-05-01');
+        draft.data.draft = true;
+        const translation = chapter('translated', 2, '2026-03-01');
+        translation.data.lang = 'en';
+        const otherProject = chapter('other-project', 3, '2026-03-02');
+        otherProject.data.series = { id: 'videogaga', order: 3 };
+
+        const series = getPostSeries(current, [next, draft, otherProject, translation, current, first]);
+        expect(series?.posts.map(({ id }) => id)).toEqual(['first', 'current', 'next']);
+        expect(series?.previous?.id).toBe('first');
+        expect(series?.next?.id).toBe('next');
+    });
+
+    it('does not wrap at either end or invent siblings for a partially translated series', () => {
+        const first = chapter('first', 1, '2026-01-01');
+        const last = chapter('last', 4, '2026-02-01');
+        const translated = chapter('translated', 2, '2026-01-15');
+        translated.data.lang = 'en';
+        translated.data.publicSlug = 'translated-chapter';
+        const posts = [last, translated, first];
+
+        expect(getPostSeries(first, posts)?.previous).toBeUndefined();
+        expect(getPostSeries(last, posts)?.next).toBeUndefined();
+        const series = getPostSeries(translated, posts)!;
+        expect(series.order).toBe(2);
+        expect(series.previous).toBeUndefined();
+        expect(series.next).toBeUndefined();
+        expect(series.posts.map(getPostHref)).toEqual(['/en/blog/translated-chapter/']);
     });
 });

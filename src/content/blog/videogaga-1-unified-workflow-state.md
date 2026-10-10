@@ -1,5 +1,9 @@
 ---
 title: "VideoGaga（一）：从七步流程到统一状态模型"
+displayTitle: '从七步流程到统一状态模型'
+series:
+    id: videogaga
+    order: 1
 publishDate: "2026-02-11"
 type: article
 draft: false

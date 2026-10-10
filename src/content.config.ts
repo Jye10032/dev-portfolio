@@ -1,6 +1,7 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z, type ImageFunction } from 'astro:content';
 import { ALBUM_ACCENTS, ALBUM_ENTRY_KINDS, ALBUM_STATUSES } from './utils/album-constants';
+import { BLOG_SERIES_IDS } from './data/blog-series';
 
 /** Every collection loads flat Markdown/MDX from its own directory. */
 const markdownIn = (directory: string) => glob({ pattern: '**/*.{md,mdx}', base: `./src/content/${directory}` });
@@ -31,6 +32,8 @@ const blog = defineCollection({
     schema: ({ image }) =>
         z.object({
             title: z.string(),
+            displayTitle: z.string().optional(),
+            series: z.object({ id: z.enum(BLOG_SERIES_IDS), order: z.number().int().positive() }).optional(),
             excerpt: z.string().optional(),
             publishDate: z.coerce.date(),
             updatedDate: z.coerce.date().optional(),

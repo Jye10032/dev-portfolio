@@ -1,5 +1,9 @@
 ---
 title: "VideoGaga（三）：主题、Hydration 与界面一致性"
+displayTitle: '主题、Hydration 与界面一致性'
+series:
+    id: videogaga
+    order: 3
 publishDate: "2026-03-31"
 type: article
 draft: false

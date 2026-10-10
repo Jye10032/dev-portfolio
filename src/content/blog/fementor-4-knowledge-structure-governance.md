@@ -1,5 +1,9 @@
 ---
 title: "FEMentor（四）：孤立节点与知识结构治理"
+displayTitle: '孤立节点与知识结构治理'
+series:
+    id: fementor
+    order: 4
 publishDate: "2026-04-02 23:00:00"
 type: article
 draft: false

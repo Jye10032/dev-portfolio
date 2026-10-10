@@ -1,5 +1,9 @@
 ---
 title: 'FEMentor (II): Context Compression and Long-Term Memory'
+displayTitle: 'Context Compression and Long-Term Memory'
+series:
+    id: fementor
+    order: 2
 publishDate: '2026-03-17'
 type: article
 draft: false
