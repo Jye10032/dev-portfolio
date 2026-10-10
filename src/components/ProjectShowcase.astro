@@ -16,7 +16,16 @@ const titleId = `project-title-${project.id}`;
 <article class:list={['project-showcase', { 'project-showcase--with-demo': hasDemo }]} aria-labelledby={titleId}>
     <div class="project-showcase__intro">
         <p class="project-showcase__number">项目 / {String(index).padStart(2, '0')}</p>
-        <h2 id={titleId} class="project-showcase__title"><a href={`/projects/${project.id}/`}>{title}</a></h2>
+        <h2 id={titleId} class="project-showcase__title">
+            <a href={`/projects/${project.id}/`}>
+                {title.split(' · ').map((part, index) => (
+                    <>
+                        {index > 0 && ' · '}
+                        <span class="project-showcase__title-part">{part}</span>
+                    </>
+                ))}
+            </a>
+        </h2>
         {description && <p class="project-showcase__description">{description}</p>}
         <div class="project-showcase__links">
             <a href={`/projects/${project.id}/`}>项目详情 <span aria-hidden="true">→</span></a>
@@ -39,7 +48,7 @@ const titleId = `project-title-${project.id}`;
         align-items: start;
         gap: 1.5rem;
         padding-block: 1.5rem 0;
-        border-top: 1px solid color-mix(in srgb, var(--border-main) 25%, transparent);
+        border-top: 1px solid var(--border-subtle);
     }
 
     .project-showcase__intro {
@@ -59,6 +68,7 @@ const titleId = `project-title-${project.id}`;
         font-size: clamp(1.75rem, 2.6vw, 2.5rem);
         font-weight: 500;
         line-height: 1.25;
+        text-wrap: balance;
     }
 
     .project-showcase__description {
@@ -69,11 +79,16 @@ const titleId = `project-title-${project.id}`;
         line-height: 1.9;
     }
 
+    .project-showcase__title-part {
+        display: inline-block;
+        max-width: 100%;
+    }
+
     .project-showcase__links {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem 1.5rem;
-        margin-top: 0.5rem;
+        margin-top: 1.25rem;
     }
 
     .project-showcase__links a {
@@ -87,27 +102,23 @@ const titleId = `project-title-${project.id}`;
     }
 
     .project-showcase a:focus-visible {
-        outline: 2px solid var(--border-main);
+        outline: 2px solid var(--accent);
         outline-offset: 4px;
     }
 
-    @media (min-width: 64rem) {
-        .project-showcase__intro {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            column-gap: 1.5rem;
+    @media (min-width: 80rem) {
+        .project-showcase--with-demo {
+            grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.8fr);
+            column-gap: clamp(2rem, 3vw, 3rem);
         }
 
-        .project-showcase__number,
+        .project-showcase__title {
+            font-size: clamp(1.75rem, 2.25vw, 2.5rem);
+            line-height: 1.35;
+        }
+
         .project-showcase__description {
-            grid-column: 1 / -1;
-        }
-
-        .project-showcase__links {
-            grid-column: 2;
-            grid-row: 2;
-            align-self: center;
-            margin-top: 0;
+            margin-top: 1.25rem;
         }
     }
 </style>

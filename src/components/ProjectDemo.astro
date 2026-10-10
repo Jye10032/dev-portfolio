@@ -147,6 +147,7 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
 
     .project-demo__actions button {
         border: 1px solid var(--border-main);
+        border-radius: var(--radius-control);
         background: var(--bg-main);
         padding: 0.375rem 0.75rem;
     }
@@ -158,7 +159,7 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
     }
 
     .project-demo__actions :focus-visible {
-        outline: 2px solid var(--border-main);
+        outline: 2px solid var(--accent);
         outline-offset: 4px;
     }
 
@@ -167,7 +168,10 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
     }
 
     .project-demo__window {
-        border: 2px solid var(--border-main);
+        overflow: hidden;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-panel);
+        box-shadow: var(--shadow-card);
         background: var(--bg-main);
     }
 
@@ -202,13 +206,7 @@ const Heading = variant === 'showcase' ? 'h3' : 'h2';
 
     .project-demo--showcase {
         margin-block: 0;
-    }
-
-    @media (min-width: 64rem) {
-        .project-demo--showcase {
-            width: 100%;
-            max-width: calc(max(15rem, 100svh - 23rem) * (var(--demo-width) - var(--demo-gutter)) / var(--demo-height));
-        }
+        width: 100%;
     }
 
     :global(.page-shell--demo-expanded > main) {

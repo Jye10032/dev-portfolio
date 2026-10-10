@@ -107,7 +107,7 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 
     /*
      * Narrow screens: identity and the toggle share row one, links wrap to row two.
-     * From 48rem everything sits on a single row with the toggle pushed right.
+     * From 48rem the links and theme toggle sit together on the right.
      */
     .site-nav__links {
         order: 3;
@@ -134,12 +134,13 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
         .site-nav__links {
             order: 2;
             flex-basis: auto;
-            margin-left: 0.75rem;
+            margin-left: auto;
             column-gap: 0.875rem;
         }
 
         .site-nav__actions {
             order: 3;
+            margin-left: 0;
         }
     }
 
