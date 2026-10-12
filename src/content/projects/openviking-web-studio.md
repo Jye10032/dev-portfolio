@@ -23,7 +23,7 @@ OpenViking 是面向 AI Agent 的开源上下文数据库，通过文件系统�
 - [我的 fork](https://github.com/Jye10032/OpenViking)
 - [Web Studio 使用与部署说明](https://github.com/volcengine/OpenViking/blob/main/web-studio/README.md)
 
-在线入口部署在独立的 Railway 项目中。前端来自我的 fork `Jye10032/OpenViking` 的 `main` 分支，配套后端使用同一提交对应的官方 `main` 镜像，并挂载持久化数据盘。在线演示自动连接到我公开的 `default/jye10032` 数据，访客无需填写密钥，即可浏览现有资源、记忆、会话、用量与运行状态。展示入口由服务端限制为只读，新增、编辑、删除、管理和发起对话均已停用；真实用户凭据仅保存在 Railway 服务端。
+在线入口部署在独立的 Railway 项目中。前端基于官方 `main`，在我的 fork `Jye10032/OpenViking` 中加入公开只读展示配置，并由 fork 的 `main` 分支部署；配套后端使用官方 `main` 镜像，并挂载持久化数据盘。在线演示自动连接到我公开的 `default/jye10032` 数据，访客无需填写密钥，即可浏览现有资源、记忆、会话、用量与运行状态。展示入口由服务端限制为只读，新增、编辑、删除、管理和发起对话均已停用；真实用户凭据仅保存在 Railway 服务端。
 
 ## 我参与的工作
 
