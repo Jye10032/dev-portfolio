@@ -8,7 +8,10 @@ export type HomeStoryScene = {
     title: string;
     command: string;
     response: string;
+    summary: readonly { label: string; value: string }[];
 };
+
+export const HOME_TERMINAL_TITLE = 'misaka / 工程手记';
 
 export const HOME_STORY_SCENES: readonly HomeStoryScene[] = [
     {
@@ -16,42 +19,72 @@ export const HOME_STORY_SCENES: readonly HomeStoryScene[] = [
         eyebrow: '启园',
         title: '前端工程 × AI',
         command: '吾有一园，记工程实践与未竟之思。启之。',
-        response: '技术档案已展开。'
+        response: '技术档案已展开。',
+        summary: [
+            { label: '身份', value: '前端工程师' },
+            { label: '关注', value: 'AI 工作流 · 复杂状态 · 工程实践' },
+            { label: '记录', value: '以作品为线索，记录问题与思考。' }
+        ]
     },
     {
         id: 'focus',
         eyebrow: '方向',
         title: '三个持续投入的方向',
         command: '不列泛泛所好，以作品为证。',
-        response: '三条实践脉络已列。'
+        response: '三条实践脉络已列。',
+        summary: [
+            { label: '智能', value: 'Agent · 检索 · 长期记忆' },
+            { label: '工程', value: '状态模型 · 缓存 · 界面一致性' },
+            { label: '基础', value: '算法 · JavaScript · 工程复盘' }
+        ]
     },
     {
         id: 'now',
         eyebrow: '近况',
         title: '此刻在做什么',
         command: '列当前项目、研究主题与近期整理。',
-        response: '近况已录。'
+        response: '近况已录。',
+        summary: [
+            { label: '项目', value: 'FEMentor / 模拟面试 Agent' },
+            { label: '研究', value: '上下文压缩与知识结构治理' },
+            { label: '整理', value: 'VideoGaga / 状态与缓存' }
+        ]
     },
     {
         id: 'reading',
         eyebrow: '荐读',
         title: '三篇代表作',
         command: '各择一篇，见智能、工程与判断。',
-        response: '代表作已置。'
+        response: '代表作已置。',
+        summary: [
+            { label: '智能', value: 'FEMentor / 上下文与记忆' },
+            { label: '工程', value: 'VideoGaga / 主题与一致性' },
+            { label: '判断', value: 'Lianjia-crawler / 性能实验复盘' }
+        ]
     },
     {
         id: 'proof',
         eyebrow: '积累',
         title: '时间留下的证据',
         command: '计其年月、文章、专题与题解。',
-        response: '积累已有据可查。'
+        response: '积累已有据可查。',
+        summary: [
+            { label: '写作', value: '将实践整理为可回看的记录' },
+            { label: '专题', value: '围绕同一问题，持续深入' },
+            { label: '题解', value: '保留推导过程与解题思路' }
+        ]
     },
     {
         id: 'enter',
         eyebrow: '入园',
         title: '园门既开',
         command: '园门既开，请君自游。',
-        response: '请君自游。'
+        response: '请君自游。',
+        summary: [
+            { label: '写作', value: '从一篇完整的工程记录开始' },
+            { label: '主题', value: '沿感兴趣的线索继续阅读' },
+            { label: '留言', value: '在便利贴墙留下一点想法' }
+        ]
     }
 ] as const;
 

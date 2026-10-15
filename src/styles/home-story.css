@@ -12,10 +12,10 @@ body:has(.home-story) {
     --home-ink-muted: #69675f;
     --home-vermilion: #a33a2b;
     --home-vermilion-deep: #7c2d22;
-    --home-terminal-bg: #181918;
-    --home-terminal-ink: #f4f2eb;
-    --home-terminal-accent: #d98b6a;
-    --home-shadow-soft: 0 24px 70px rgb(24 25 24 / 12%);
+    --home-terminal-bg: #30332e;
+    --home-terminal-ink: #f0ede4;
+    --home-terminal-accent: #dfb28e;
+    --home-shadow-soft: 0 16px 40px rgb(42 43 37 / 10%);
     --home-shadow-flat: 0 18px 60px rgb(52 42 24 / 10%);
 }
 
@@ -57,8 +57,8 @@ body:has(.home-story) > div > header p:first-child {
 .home-story {
     --home-scroll-progress: 0;
     display: grid;
-    grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.2fr);
-    gap: clamp(3rem, 7vw, 7rem);
+    grid-template-columns: minmax(24rem, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(2.5rem, 4.5vw, 4.75rem);
     align-items: start;
     margin-bottom: clamp(5rem, 12vw, 10rem);
 }
@@ -101,7 +101,7 @@ body:has(.home-story) > div > header p:first-child {
 .home-stage__terminal {
     position: relative;
     display: grid;
-    aspect-ratio: 3 / 2;
+    min-height: 27rem;
     overflow: clip;
     border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
     border-radius: 6px;
@@ -109,32 +109,37 @@ body:has(.home-story) > div > header p:first-child {
     color: var(--home-terminal-ink);
     box-shadow: var(--home-shadow-soft);
     transition:
-        background-color 420ms ease,
-        border-color 420ms ease,
-        color 420ms ease,
-        border-radius 420ms ease,
-        box-shadow 420ms ease;
+        background-color 220ms ease-out,
+        border-color 220ms ease-out,
+        color 220ms ease-out;
 }
 
 .home-stage__paper {
     position: relative;
+    display: flex;
+    flex-direction: column;
     padding: clamp(1.4rem, 3vw, 2rem);
     background-image: linear-gradient(90deg, transparent 0 96%, var(--home-paper-rule) 100%);
-    /* This transform is driven per scroll frame by --home-scroll-progress. A long
-       easing curve would restart on every frame and trail behind the scroll, so
-       keep the smoothing short and linear. */
-    transition: transform 120ms linear;
-    will-change: transform;
+    /* Scroll progress already updates once per frame; a CSS transition would
+       chase a moving target and make the paper lag behind the pointer. */
 }
 
 .home-stage__chrome {
     display: flex;
-    gap: 0.45rem;
-    margin-bottom: clamp(1.5rem, 4vh, 2rem);
-    transition: opacity 300ms ease;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
 }
 
-.home-stage__chrome span {
+.home-stage__dots {
+    display: flex;
+    gap: 0.45rem;
+}
+
+.home-stage__dots span {
     width: 0.55rem;
     aspect-ratio: 1;
     border-radius: 50%;
@@ -142,16 +147,82 @@ body:has(.home-story) > div > header p:first-child {
     opacity: 0.35;
 }
 
+.home-stage__window-title {
+    color: inherit;
+    opacity: 0.68;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.025em;
+}
+
+.home-stage [data-home-stage-content] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.home-stage__output {
+    display: grid;
+    margin-top: auto;
+    padding-top: 1.4rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+}
+
+/* All summaries reserve the same space, even while only one is visible. */
+.home-stage__output dl {
+    grid-area: 1 / 1;
+    margin: 0;
+    visibility: hidden;
+}
+
+.home-stage__output [data-active] {
+    visibility: visible;
+}
+
+.home-stage__output dl > div {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-block: 0.8rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 13%, transparent);
+}
+
+.home-stage__output dt {
+    color: inherit;
+    opacity: 0.68;
+}
+
+.home-stage__output dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
 .home-stage__prompt {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 0.65rem;
-    min-height: 4.1rem;
+    min-height: 4rem;
     margin: 0;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: clamp(0.92rem, 1.45vw, 1.08rem);
     line-height: 1.85;
     overflow-wrap: anywhere;
+}
+
+.home-stage__command {
+    display: grid;
+    min-width: 0;
+}
+
+.home-stage__command-space,
+.home-stage__command-text {
+    grid-area: 1 / 1;
+}
+
+.home-stage__command-space {
+    visibility: hidden;
 }
 
 /* Warm amber inside the dark terminal, so the prompt reads as the same accent
@@ -161,11 +232,17 @@ body:has(.home-story) > div > header p:first-child {
 }
 
 .home-stage__status {
-    margin: 1rem 0 0 1.55rem;
+    margin: 0.5rem 0 0 1.55rem;
     min-height: 1.8rem;
     color: color-mix(in srgb, currentColor 64%, transparent);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.82rem;
+    transition: opacity 180ms ease-out;
+}
+
+.home-stage[data-home-typing='true'] .home-stage__status {
+    opacity: 0;
+    transition: none;
 }
 
 .home-stage__caret {
@@ -176,13 +253,23 @@ body:has(.home-story) > div > header p:first-child {
     height: 1.1rem;
     background: currentColor;
     opacity: 0.7;
-    animation: home-caret 1s steps(1) infinite;
+    animation: home-caret 1s steps(1) infinite paused;
+}
+
+.home-stage[data-home-motion='running'] .home-stage__command-text .home-stage__caret {
+    animation-play-state: running;
+}
+
+.home-stage[data-home-motion='paused'] *,
+.home-stage[data-home-motion='paused'] *::before,
+.home-stage[data-home-motion='paused'] *::after {
+    transition: none;
 }
 
 .home-stage__seal {
     position: absolute;
     right: 2rem;
-    bottom: 2rem;
+    top: 6.75rem;
     display: grid;
     width: 4.3rem;
     aspect-ratio: 1;
@@ -210,6 +297,11 @@ body:has(.home-story) > div > header p:first-child {
     flex-direction: column;
     justify-content: center;
     padding-block: clamp(2.5rem, 6vh, 4rem);
+}
+
+.home-scene[data-home-story-scene='open'] {
+    justify-content: flex-start;
+    padding-top: 0.5rem;
 }
 
 /* Dimming is an enhancement only. Without the controller every scene stays
@@ -266,10 +358,10 @@ body:has(.home-story) > div > header p:first-child {
 
 .home-intro {
     display: grid;
-    grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
+    grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr);
     grid-template-areas: 'portrait copy';
-    gap: 2.5rem;
-    align-items: end;
+    gap: 1.5rem;
+    align-items: center;
 }
 
 .home-bookplate {
@@ -436,43 +528,37 @@ body:has(.home-story) > div > header p:first-child {
     text-decoration: none;
 }
 
-.home-story[data-home-scene='focus'] .home-stage__terminal,
-.home-story[data-home-scene='now'] .home-stage__terminal,
-.home-story[data-home-scene='reading'] .home-stage__terminal,
-.home-story[data-home-scene='proof'] .home-stage__terminal {
+.home-stage[data-home-active-scene='focus'] .home-stage__terminal,
+.home-stage[data-home-active-scene='now'] .home-stage__terminal,
+.home-stage[data-home-active-scene='reading'] .home-stage__terminal,
+.home-stage[data-home-active-scene='proof'] .home-stage__terminal {
     border-color: color-mix(in srgb, var(--home-ink) 24%, transparent);
     background: var(--home-paper);
     color: var(--home-ink);
 }
 
-.home-story[data-home-scene='focus'] .home-stage__chevron,
-.home-story[data-home-scene='now'] .home-stage__chevron,
-.home-story[data-home-scene='reading'] .home-stage__chevron,
-.home-story[data-home-scene='proof'] .home-stage__chevron {
+.home-stage[data-home-active-scene='focus'] .home-stage__chevron,
+.home-stage[data-home-active-scene='now'] .home-stage__chevron,
+.home-stage[data-home-active-scene='reading'] .home-stage__chevron,
+.home-stage[data-home-active-scene='proof'] .home-stage__chevron {
     color: var(--home-vermilion);
 }
 
-.home-story[data-home-scene='now'] .home-stage__chrome,
-.home-story[data-home-scene='reading'] .home-stage__chrome,
-.home-story[data-home-scene='proof'] .home-stage__chrome {
-    opacity: 0;
-}
-
-.home-story[data-home-scene='reading'] .home-stage__caret,
-.home-story[data-home-scene='proof'] .home-stage__caret {
+.home-stage[data-home-active-scene='reading'] .home-stage__caret,
+.home-stage[data-home-active-scene='proof'] .home-stage__caret {
     width: 0.65rem;
     height: 0.65rem;
     border-radius: 50%;
     background: var(--home-vermilion);
 }
 
-.home-story[data-home-scene='proof'] .home-stage__terminal {
+.home-stage[data-home-active-scene='proof'] .home-stage__terminal {
     border-radius: 0;
     box-shadow: var(--home-shadow-flat);
 }
 
-.home-story[data-home-scene='proof'] .home-stage__terminal::before,
-.home-story[data-home-scene='proof'] .home-stage__terminal::after {
+.home-stage[data-home-active-scene='proof'] .home-stage__terminal::before,
+.home-stage[data-home-active-scene='proof'] .home-stage__terminal::after {
     position: absolute;
     z-index: 2;
     top: -0.5rem;
@@ -484,20 +570,20 @@ body:has(.home-story) > div > header p:first-child {
     content: '';
 }
 
-.home-story[data-home-scene='proof'] .home-stage__terminal::before {
+.home-stage[data-home-active-scene='proof'] .home-stage__terminal::before {
     left: 0.4rem;
 }
 
-.home-story[data-home-scene='proof'] .home-stage__terminal::after {
+.home-stage[data-home-active-scene='proof'] .home-stage__terminal::after {
     right: 0.4rem;
 }
 
-.home-story[data-home-scene='proof'] .home-stage__paper {
+.home-stage[data-home-active-scene='proof'] .home-stage__paper {
     transform: translateX(calc((1 - var(--home-scroll-progress)) * -5%));
 }
 
-.home-story[data-home-scene='proof'] .home-stage__prompt,
-.home-story[data-home-scene='proof'] .home-stage__status {
+.home-stage[data-home-active-scene='proof'] .home-stage__prompt,
+.home-stage[data-home-active-scene='proof'] .home-stage__status {
     font-family:
         STSong,
         Songti SC,
@@ -505,23 +591,21 @@ body:has(.home-story) > div > header p:first-child {
         serif;
 }
 
-.home-story[data-home-scene='proof'] .home-stage__seal {
+.home-stage[data-home-active-scene='proof'] .home-stage__seal {
     opacity: 0.88;
     transform: scale(1);
     filter: blur(0.15px);
 }
 
-.home-story[data-home-scene='enter'] .home-stage__terminal {
-    aspect-ratio: auto;
-    min-height: 12rem;
+.home-stage[data-home-active-scene='enter'] .home-stage__terminal {
     background: transparent;
     color: inherit;
     box-shadow: none;
 }
 
-.home-story[data-home-scene='enter'] .home-stage__chrome,
-.home-story[data-home-scene='enter'] .home-stage__caret,
-.home-story[data-home-scene='enter'] .home-stage__seal {
+.home-stage[data-home-active-scene='enter'] .home-stage__dots,
+.home-stage[data-home-active-scene='enter'] .home-stage__caret,
+.home-stage[data-home-active-scene='enter'] .home-stage__seal {
     opacity: 0;
 }
 
@@ -536,7 +620,7 @@ body:has(.home-story) > div > header p:first-child {
     --home-ink-muted: #b6b0a1;
     --home-vermilion: #d46a55;
     --home-vermilion-deep: #e18a78;
-    --home-shadow-soft: 0 24px 70px rgb(0 0 0 / 45%);
+    --home-shadow-soft: 0 16px 40px rgb(0 0 0 / 25%);
     --home-shadow-flat: 0 18px 60px rgb(0 0 0 / 40%);
 }
 
@@ -599,7 +683,6 @@ body:has(.home-story) > div > header p:first-child {
     }
 
     .home-stage--inline .home-stage__terminal {
-        aspect-ratio: auto;
         min-height: 10rem;
     }
 
@@ -626,10 +709,21 @@ body:has(.home-story) > div > header p:first-child {
     }
 
     .home-stage--inline .home-stage__seal {
-        right: 1.2rem;
-        bottom: 1rem;
-        width: 3.4rem;
-        font-size: 0.95rem;
+        display: none;
+    }
+
+    .home-stage--inline[data-home-active-scene='proof'] .home-stage__paper {
+        padding-inline: 1.8rem;
+        transform: none;
+    }
+
+    .home-stage--inline .home-stage__output {
+        padding-top: 1rem;
+        font-size: 0.75rem;
+    }
+
+    .home-stage--inline .home-stage__output dl > div {
+        padding-block: 0.65rem;
     }
 
     .home-scene__title {

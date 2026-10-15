@@ -1,27 +1,52 @@
 ---
-import type { HomeStoryScene } from '../../data/home-story';
+import { HOME_STORY_SCENES, HOME_TERMINAL_TITLE, type HomeStoryScene } from '../../data/home-story';
 
 type Props = {
     inline?: boolean;
     scene?: HomeStoryScene;
 };
 
-const { inline = false, scene } = Astro.props;
+const { inline = false, scene = HOME_STORY_SCENES[0] } = Astro.props;
+const summaries = inline ? [scene] : HOME_STORY_SCENES;
 ---
 
-<div class:list={['home-stage', inline && 'home-stage--inline']} data-home-stage>
+<div class:list={['home-stage', inline && 'home-stage--inline']} data-home-stage data-home-active-scene={scene.id}>
     <!-- The typed command is a decorative animation. Each scene exposes the same
          command and response to assistive tech via its own sr-only line. -->
     <div class="home-stage__terminal" aria-hidden="true">
         <div class="home-stage__paper">
             <div class="home-stage__chrome" aria-hidden="true">
-                <span></span><span></span><span></span>
+                <div class="home-stage__dots"><span></span><span></span><span></span></div>
+                <span class="home-stage__window-title">{HOME_TERMINAL_TITLE}</span>
             </div>
-            <p class="home-stage__prompt">
-                <span class="home-stage__chevron" aria-hidden="true">›</span>
-                <span><span data-home-command>{scene?.command}</span><span class="home-stage__caret" aria-hidden="true"></span></span>
-            </p>
-            <p class="home-stage__status" data-home-status>{scene?.response}</p>
+            <div data-home-stage-content>
+                <p class="home-stage__prompt">
+                    <span class="home-stage__chevron" aria-hidden="true">›</span>
+                    <span class="home-stage__command">
+                        <span class="home-stage__command-space" aria-hidden="true"
+                            ><span data-home-command-space>{scene?.command}</span><span class="home-stage__caret"></span></span
+                        >
+                        <span class="home-stage__command-text"
+                            ><span data-home-command>{scene?.command}</span><span class="home-stage__caret" aria-hidden="true"></span></span
+                        >
+                    </span>
+                </p>
+                <p class="home-stage__status" data-home-status>{scene?.response}</p>
+                <div class="home-stage__output">
+                    {
+                        summaries.map((item) => (
+                            <dl data-home-output-scene={item.id} data-active={item.id === scene.id ? '' : undefined}>
+                                {item.summary.map((row) => (
+                                    <div>
+                                        <dt>{row.label}</dt>
+                                        <dd>{row.value}</dd>
+                                    </div>
+                                ))}
+                            </dl>
+                        ))
+                    }
+                </div>
+            </div>
             <div class="home-stage__seal" aria-hidden="true">御坂</div>
         </div>
     </div>
